@@ -9,42 +9,42 @@ export const MenuList = [
   {
     name: "Dosa",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat, ab!",
+      "love the food",
     image: Dosa,
     price: 200,
   },
   {
     name: "Chola",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat, ab!",
+      "love the food",
     image: Chola,
     price: 250,
   },
   {
     name: "Idli Sambhar",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat, ab!",
+      "love the food",
     image: Idli,
     price: 300,
   },
   {
     name: "Masala Dosa",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat, ab!",
+      "love the food",
     image: MasalaDosa,
     price: 100,
   },
   {
     name: "Paneer",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat, ab!",
+      "love the food",
     image: Paneer,
     price: 400,
   },
   {
-    name: "Gujrati",
+    name: "Gujarati",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat, ab!",
+      "love the food",
     image: Gujrati,
     price: 500,
   },
