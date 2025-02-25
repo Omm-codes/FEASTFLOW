@@ -1,0 +1,20 @@
+.contact-container {
+  margin-top: 100px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  margin-bottom: 20px;
+}
+
+.contact-info-container {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .contact-container {
+    margin-top: 60px;
+  }
+}

@@ -27,3 +27,41 @@
   font-size: 1.4rem;
   color: black;
 }
+
+.navigation-link {
+  text-decoration: none;
+  color: #333;
+  font-size: 1.1rem;
+  margin-left: 20px;
+  transition: color 0.3s ease-in-out;
+  font-weight: 500;
+}
+
+.navigation-link:hover {
+  color: goldenrod;
+}
+
+.navigation-link.active {
+  color: goldenrod;
+  border-bottom: 2px solid goldenrod;
+  padding-bottom: 5px;
+}
+
+/* Drawer styles */
+.MuiDrawer-paper {
+  background-color: white !important;
+  color: #333 !important;
+}
+
+.MuiListItemButton-root {
+  color: #333 !important;
+}
+
+.MuiListItemButton-root:hover {
+  color: goldenrod !important;
+  background-color: rgba(218, 165, 32, 0.1) !important;
+}
+
+.MuiListItemIcon-root {
+  color: goldenrod !important;
+}

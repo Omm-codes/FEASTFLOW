@@ -1,102 +1,146 @@
 import React, { useState } from "react";
-import {
-  AppBar,
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  Toolbar,
+import { 
+  AppBar, 
+  Box, 
+  Divider, 
+  Drawer, 
+  IconButton, 
+  Toolbar, 
   Typography,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
-import Logo from "../../images/logo.png";
-
-import MenuIcon from "@mui/icons-material/Menu";
+import {
+  Menu as MenuIcon,
+  Restaurant as RestaurantIcon,
+  Home as HomeIcon,
+  Info as InfoIcon,
+  Menu as MenuBookIcon,
+  ContactMail as ContactMailIcon,
+} from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
+import Logo from "../../images/logo.png";
 import "../../styles/HeaderStyles.css";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Handle menu click
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Menu drawer
+  const menuItems = [
+    {
+      link: "/",
+      name: "Home",
+      icon: <HomeIcon />,
+    },
+    {
+      link: "/menu",
+      name: "Menu",
+      icon: <MenuBookIcon />,
+    },
+    {
+      link: "/about",
+      name: "About",
+      icon: <InfoIcon />,
+    },
+    {
+      link: "/contact",
+      name: "Contact",
+      icon: <ContactMailIcon />,
+    },
+  ];
+
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", bgcolor: "white" }}>
-      <Typography variant="h6" component="div" sx={{ flexGrow: 1, my: 2 }}>
-        <img src={Logo} alt="logo" height="70" width="200" />
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+      <Typography
+        variant="h6"
+        component="div"
+        sx={{ flexGrow: 1, my: 2, color: "goldenrod" }}
+      >
+        <RestaurantIcon sx={{ mr: 1 }} />
+        FeastFlow
       </Typography>
       <Divider />
-      <ul className="mobile-navigation">
-        <li>
-          <NavLink activeClassName="active" to={"/"} style={{ color: "black" }}>
-            HOME
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to={"/menu"} style={{ color: "black" }}>
-            MENU
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to={"/about"} style={{ color: "black" }}>
-            ABOUT
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to={"/contact"} style={{ color: "black" }}>
-            CONTACT
-          </NavLink>
-        </li>
-      </ul>
+      <List>
+        {menuItems.map((item) => (
+          <ListItem key={item.name} disablePadding>
+            <ListItemButton 
+              component={NavLink} 
+              to={item.link}
+              sx={{
+                "&.active": {
+                  color: "goldenrod",
+                  backgroundColor: "rgba(218, 165, 32, 0.1)",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: "goldenrod" }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.name} sx={{ color: "black" }} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
     </Box>
   );
 
   return (
     <>
       <Box>
-        <AppBar component={"nav"} sx={{ bgcolor: "white", boxShadow: 1 }}>
+        <AppBar 
+          component="nav" 
+          sx={{ 
+            bgcolor: "white",
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
           <Toolbar>
             <IconButton
-              color="black"
+              color="inherit"
               aria-label="open drawer"
               edge="start"
-              sx={{
-                mr: 2,
-                display: { sm: "none" },
-              }}
+              sx={{ mr: 2, display: { sm: "none" }, color: "black" }}
               onClick={handleDrawerToggle}
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <img src={Logo} alt="logo" height="70" width="250" />
+            <Box 
+              component="img" 
+              src={Logo} 
+              alt="logo" 
+              height="50px"
+              sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}
+            />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ 
+                flexGrow: 1, 
+                color: "goldenrod",
+                display: "flex",
+                alignItems: "center",
+                fontWeight: "bold" 
+              }}
+            >
+              <RestaurantIcon sx={{ mr: 1, display: { xs: "block", sm: "none" } }} />
+              FeastFlow
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
-              <ul className="navigation-menu">
-                <li>
-                  <NavLink activeClassName="active" to={"/"} style={{ color: "black" }}>
-                    Home
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to={"/menu"} style={{ color: "black" }}>
-                    Menu
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to={"/about"} style={{ color: "black" }}>
-                    About
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to={"/contact"} style={{ color: "black" }}>
-                    Contact
-                  </NavLink>
-                </li>
-              </ul>
+              {menuItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.link}
+                  className="navigation-link"
+                >
+                  {item.name}
+                </NavLink>
+              ))}
             </Box>
           </Toolbar>
         </AppBar>
@@ -105,11 +149,14 @@ const Header = () => {
             variant="temporary"
             open={mobileOpen}
             onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true,
+            }}
             sx={{
               display: { xs: "block", sm: "none" },
               "& .MuiDrawer-paper": {
                 boxSizing: "border-box",
-                width: "240px",
+                width: 240,
                 bgcolor: "white",
               },
             }}
