@@ -1,14 +1,35 @@
+
 import React from "react";
-import Footer from "./Footer";
 import Header from "./Header";
-const Layout = ({ children }) => {
+import Footer from "./Footer";
+import { Helmet } from "react-helmet";
+import { Toaster } from "react-hot-toast";
+
+const Layout = ({ children, title, description, keywords, author }) => {
   return (
-    <>
+    <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="author" content={author} />
+        <title>{title}</title>
+      </Helmet>
       <Header />
-      <div>{children}</div>
+      <main style={{ minHeight: "70vh" }}>
+        <Toaster />
+        {children}
+      </main>
       <Footer />
-    </>
+    </div>
   );
+};
+
+Layout.defaultProps = {
+  title: "FeastFlow - Your Digital Canteen",
+  description: "A digital canteen management solution",
+  keywords: "react, canteen, food, management, digital",
+  author: "Your Name",
 };
 
 export default Layout;

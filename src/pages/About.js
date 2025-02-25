@@ -39,12 +39,27 @@ const About = () => {
           sx={{ 
             fontWeight: "bold",
             color: "goldenrod",
-            mb: 2 
+            mb: 2,
+            fontFamily: "'Playfair Display', serif",
+            fontSize: { xs: "2.5rem", md: "3.5rem" },
+            textTransform: "capitalize",
+            letterSpacing: "0.02em"
           }}
         >
           About FeastFlow
         </Typography>
-        <Typography variant="h6" sx={{ color: "white", maxWidth: "800px", mx: "auto", px: 3 }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            color: "white", 
+            maxWidth: "800px", 
+            mx: "auto", 
+            px: 3,
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 300,
+            letterSpacing: "0.05em"
+          }}
+        >
           Your Digital Canteen Management Solution
         </Typography>
       </Box>
@@ -53,34 +68,46 @@ const About = () => {
       <Box sx={{ py: 8, px: 3 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
-            <Typography className="section-title" variant="h4" gutterBottom>
+            <Typography 
+              className="section-title" 
+              variant="h4" 
+              gutterBottom
+              sx={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 700,
+                fontSize: { xs: "2rem", md: "2.5rem" }
+              }}
+            >
               Our Story
             </Typography>
-            <Typography paragraph>
+            <Typography 
+              paragraph
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "1.1rem",
+                lineHeight: 1.8,
+                color: "#555"
+              }}
+            >
               FeastFlow was born from a simple idea: make campus dining smarter and more efficient. 
               We understand the challenges of traditional canteen systems - long queues, 
               payment hassles, and limited menu visibility.
             </Typography>
-            <Typography paragraph>
+            <Typography 
+              paragraph
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "1.1rem",
+                lineHeight: 1.8,
+                color: "#555"
+              }}
+            >
               Our digital solution transforms the campus dining experience with real-time 
               menu updates, pre-ordering capabilities, and seamless digital payments. 
               We're committed to making your dining experience as enjoyable as the food itself.
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box
-              component="img"
-              src="src\images\logo.png"
-              alt="Canteen"
-              className="about-image"
-              sx={{
-                width: "100%",
-                height: "400px",
-                objectFit: "cover",
-                borderRadius: 2
-              }}
-            />
-          </Grid>
+          
         </Grid>
 
         {/* Features Section */}
@@ -89,7 +116,12 @@ const About = () => {
             className="section-title"
             variant="h4" 
             textAlign="center" 
-            gutterBottom 
+            gutterBottom
+            sx={{
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 700,
+              fontSize: { xs: "2rem", md: "2.5rem" }
+            }}
           >
             Why Choose FeastFlow?
           </Typography>
@@ -101,10 +133,25 @@ const About = () => {
                     <Box className="feature-icon">
                       {feature.icon}
                     </Box>
-                    <Typography variant="h6" sx={{ my: 2 }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        my: 2,
+                        fontFamily: "'Playfair Display', serif",
+                        fontWeight: 600
+                      }}
+                    >
                       {feature.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography 
+                      variant="body2" 
+                      sx={{
+                        color: "#666",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.95rem",
+                        lineHeight: 1.6
+                      }}
+                    >
                       {feature.description}
                     </Typography>
                   </CardContent>

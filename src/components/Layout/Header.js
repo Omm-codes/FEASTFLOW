@@ -1,32 +1,36 @@
-import React, { useState } from "react";
-import { 
-  AppBar, 
-  Box, 
-  Divider, 
-  Drawer, 
-  IconButton, 
-  Toolbar, 
+import React, { useState, useContext } from "react";
+import {
+  AppBar,
+  Box,
+  Divider,
+  Drawer,
+  IconButton,
+  Toolbar,
   Typography,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Badge,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Restaurant as RestaurantIcon,
   Home as HomeIcon,
   Info as InfoIcon,
-  Menu as MenuBookIcon,
+  MenuBook as MenuBookIcon,
   ContactMail as ContactMailIcon,
+  ShoppingCart as ShoppingCartIcon,
 } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 import Logo from "../../images/logo.png";
 import "../../styles/HeaderStyles.css";
+import { CartContext } from "../../context/cartContext";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { cart } = useContext(CartContext);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -42,6 +46,15 @@ const Header = () => {
       link: "/menu",
       name: "Menu",
       icon: <MenuBookIcon />,
+    },
+    {
+      link: "/myorders",
+      name: "My Orders",
+      icon: (
+        <Badge badgeContent={cart.length} color="primary">
+          <ShoppingCartIcon />
+        </Badge>
+      ),
     },
     {
       link: "/about",
@@ -63,14 +76,14 @@ const Header = () => {
         sx={{ flexGrow: 1, my: 2, color: "goldenrod" }}
       >
         <RestaurantIcon sx={{ mr: 1 }} />
-        
+        FeastFlow
       </Typography>
       <Divider />
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.name} disablePadding>
-            <ListItemButton 
-              component={NavLink} 
+            <ListItemButton
+              component={NavLink}
               to={item.link}
               sx={{
                 "&.active": {
@@ -79,9 +92,7 @@ const Header = () => {
                 },
               }}
             >
-              <ListItemIcon sx={{ color: "goldenrod" }}>
-                {item.icon}
-              </ListItemIcon>
+              <ListItemIcon sx={{ color: "goldenrod" }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.name} sx={{ color: "black" }} />
             </ListItemButton>
           </ListItem>
@@ -93,11 +104,11 @@ const Header = () => {
   return (
     <>
       <Box>
-        <AppBar 
-          component="nav" 
-          sx={{ 
+        <AppBar
+          component="nav"
+          sx={{
             bgcolor: "white",
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
         >
           <Toolbar>
@@ -110,34 +121,30 @@ const Header = () => {
             >
               <MenuIcon />
             </IconButton>
-            <Box 
-              component="img" 
-              src={Logo} 
-              alt="logo" 
+            <Box
+              component="img"
+              src={Logo}
+              alt="logo"
               height="50px"
               sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}
             />
             <Typography
               variant="h6"
               component="div"
-              sx={{ 
-                flexGrow: 1, 
+              sx={{
+                flexGrow: 1,
                 color: "goldenrod",
                 display: "flex",
                 alignItems: "center",
-                fontWeight: "bold" 
+                fontWeight: "bold",
               }}
             >
               <RestaurantIcon sx={{ mr: 1, display: { xs: "block", sm: "none" } }} />
-             
+              FeastFlow
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               {menuItems.map((item) => (
-                <NavLink
-                  key={item.name}
-                  to={item.link}
-                  className="navigation-link"
-                >
+                <NavLink key={item.name} to={item.link} className="navigation-link">
                   {item.name}
                 </NavLink>
               ))}
