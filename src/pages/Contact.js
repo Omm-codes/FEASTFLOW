@@ -19,6 +19,19 @@ import {
   LocationOn,
   AccessTime,
 } from "@mui/icons-material";
+import { styled } from "@mui/system";
+
+// Styled Components
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  transition: "transform 0.3s ease-in-out",
+  "&:hover": {
+    transform: "scale(1.02)",
+  },
+  [theme.breakpoints.down('md')]: {
+    padding: theme.spacing(2),
+  },
+}));
 
 const Contact = () => {
   return (
@@ -31,6 +44,9 @@ const Contact = () => {
             fontWeight: "bold",
             mb: 2,
           },
+          [theme => theme.breakpoints.down('md')]: {
+            ml: 3,
+          }
         }}
       >
         <Typography variant="h4">Contact FeastFlow</Typography>
@@ -40,10 +56,10 @@ const Contact = () => {
         </p>
       </Box>
 
-      <Grid container spacing={4} sx={{ px: 10, py: 4 }}>
+      <Grid container spacing={3} sx={{ px: { xs: 3, md: 10 }, py: 4 }}>
         {/* Contact Form */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 4 }}>
+          <StyledPaper elevation={3}>
             <Typography variant="h5" gutterBottom>
               Send us a Message
             </Typography>
@@ -85,12 +101,12 @@ const Contact = () => {
                 Send Message
               </Button>
             </form>
-          </Paper>
+          </StyledPaper>
         </Grid>
 
         {/* Contact Information */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 4 }}>
+          <StyledPaper elevation={3}>
             <Typography variant="h5" gutterBottom>
               Contact Information
             </Typography>
@@ -144,10 +160,10 @@ const Contact = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-          </Paper>
+          </StyledPaper>
 
           {/* Google Map */}
-          <Paper elevation={3} sx={{ mt: 4, p: 2 }}>
+          <StyledPaper elevation={3} sx={{ mt: 4, p: 2 }}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3172.3325395304414!2d-122.01116148467422!3d37.33463524513264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb59127ce078f%3A0x18e1c3ce7becf1b!2sApple%20Park!5e0!3m2!1sen!2sin!4v1637309850935!5m2!1sen!2sin"
               width="100%"
@@ -157,7 +173,7 @@ const Contact = () => {
               loading="lazy"
               title="restaurant-location"
             ></iframe>
-          </Paper>
+          </StyledPaper>
         </Grid>
       </Grid>
     </Layout>

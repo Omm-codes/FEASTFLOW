@@ -1,33 +1,32 @@
-
 .home {
   height: 90vh;
   display: flex;
-  justify-content: center;
-  align-items: left;
+  justify-content: center; /* Align content to the middle horizontally */
+  align-items: flex-start; /* Align content to the start vertically */
   flex-direction: column;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  text-align: left; /* Align text to the left */
 }
 
 .headerContainer {
-  width: auto;
-  margin-left: 50px;
+  width: 80%; /* Adjust width for smaller screens */
+  margin-left: 50px; /* Keep the left margin */
+  padding: 20px;
 }
 
 .headerContainer h1 {
-  font-size: 50px;
+  font-size: 2.5rem; /* Responsive font size */
   font-weight: 900;
-  margin-left: 50px;
   color: black;
+  margin-bottom: 10px;
 }
 
 .headerContainer p {
-  margin-top: 15px;
-  padding: 0;
-  font-size: 40px;
+  margin-top: 10px;
+  font-size: 1.5rem; /* Responsive font size */
   font-weight: lighter;
-  margin-left: 50px;
   color: black;
 }
 
@@ -37,11 +36,9 @@
   border-radius: 5px;
   cursor: pointer;
   color: white;
-  padding: 15px;
-  width: 180px;
-  margin-top: 25px;
-  margin-left: 50px;
-  font-size: 20px;
+  padding: 12px 24px; /* Adjust padding */
+  font-size: 1rem; /* Responsive font size */
+  margin-top: 20px;
 }
 
 .headerContainer button:hover {
@@ -50,44 +47,17 @@
   transition: 0.3s ease-in-out;
 }
 
-@media only screen and (max-width: 650px) {
-  .home {
-    justify-content: center;
-    align-items: center;
-  }
-
+/* Media query for smaller screens */
+@media (max-width: 600px) {
   .headerContainer {
-    margin-left: 0px;
-    border-radius: 10px;
-    padding: 10px;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    background-color: #121619;
+    margin-left: 20px; /* Adjust margin for smaller screens */
   }
 
   .headerContainer h1 {
-    font-size: 40px;
-    height: 30px;
-    margin: 15px 0px;
-    color: white;
+    font-size: 2rem;
   }
 
   .headerContainer p {
-    font-size: 30px;
-    color: white;
-  }
-
-  .headerContainer button {
-    background-color: white;
-    color: black;
-    margin-bottom: 30px;
-  }
-
-  .headerContainer button:hover {
-    background-color: rgb(225, 225, 225);
-    color: #121619;
+    font-size: 1.2rem;
   }
 }

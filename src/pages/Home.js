@@ -5,6 +5,7 @@ import Banner from "../images/n.jpg";
 import "../styles/HomeStyles.css";
 import { Box, Card, CardActionArea, CardContent, CardMedia, Typography, Grid } from "@mui/material";
 import { MenuList } from "../data/data";
+import { styled } from "@mui/system";
 
 const Home = () => {
   // Get 3 random items for today's special

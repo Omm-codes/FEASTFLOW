@@ -111,7 +111,12 @@ const Header = () => {
             boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
         >
-          <Toolbar>
+          <Toolbar sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: { xs: '0 16px', sm: '0 24px' }
+          }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -137,10 +142,11 @@ const Header = () => {
                 display: "flex",
                 alignItems: "center",
                 fontWeight: "bold",
+                textAlign: { xs: 'center', sm: 'left' }
               }}
             >
               <RestaurantIcon sx={{ mr: 1, display: { xs: "block", sm: "none" } }} />
-              
+             
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               {menuItems.map((item) => (
