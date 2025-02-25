@@ -28,13 +28,13 @@ const Footer = () => {
         <IconButton color="inherit" aria-label="facebook" href="https://www.facebook.com">
           <Facebook />
         </IconButton>
-        <IconButton color="inherit" aria-label="instagram" href="https://www.instagram.com">
+        <IconButton color="inherit" aria-label="instagram" href="https://www.instagram.com/om_chavan_003?igsh=OXM0dHdzb3Zya3Vq">
           <Instagram />
         </IconButton>
         <IconButton color="inherit" aria-label="twitter" href="https://www.twitter.com">
           <Twitter />
         </IconButton>
-        <IconButton color="inherit" aria-label="linkedin" href="https://www.linkedin.com">
+        <IconButton color="inherit" aria-label="linkedin" href="https://www.linkedin.com/in/om-chavan003/">
           <LinkedIn />
         </IconButton>
       </Box>

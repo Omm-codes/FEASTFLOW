@@ -51,7 +51,7 @@ const Contact = () => {
       >
         <Typography variant="h4">Contact FeastFlow</Typography>
         <p>
-          Get in touch with us for the best dining experience in town. 
+          Get in touch with us for the best food experience. 
           We value your feedback and are here to assist you.
         </p>
       </Box>
@@ -165,13 +165,13 @@ const Contact = () => {
           {/* Google Map */}
           <StyledPaper elevation={3} sx={{ mt: 4, p: 2 }}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3172.3325395304414!2d-122.01116148467422!3d37.33463524513264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb59127ce078f%3A0x18e1c3ce7becf1b!2sApple%20Park!5e0!3m2!1sen!2sin!4v1637309850935!5m2!1sen!2sin"
+              src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=400701,%20Sector%208,%20Plot%201,%20Ghansoli,%20Navi%20Mumbai,%20Maharashtra%20400701+(SIGCE%20Canteen)&amp;t=&amp;z=17&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
               width="100%"
               height="300"
               style={{ border: 0 }}
               allowFullScreen=""
               loading="lazy"
-              title="restaurant-location"
+              title="canteen"
             ></iframe>
           </StyledPaper>
         </Grid>
