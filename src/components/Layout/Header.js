@@ -63,7 +63,7 @@ const Header = () => {
         sx={{ flexGrow: 1, my: 2, color: "goldenrod" }}
       >
         <RestaurantIcon sx={{ mr: 1 }} />
-        FeastFlow
+        
       </Typography>
       <Divider />
       <List>
@@ -129,7 +129,7 @@ const Header = () => {
               }}
             >
               <RestaurantIcon sx={{ mr: 1, display: { xs: "block", sm: "none" } }} />
-              FeastFlow
+             
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               {menuItems.map((item) => (
