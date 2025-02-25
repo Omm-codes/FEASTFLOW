@@ -15,13 +15,13 @@ const Menu = () => {
     <Layout>
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
         {MenuList.map((menu) => (
-          <Card sx={{ maxWidth: "390px", display: "flex", m: 2 }}>
+          <Card key={menu.id} sx={{ maxWidth: "300px", display: "flex", m: 2 }}>
             <CardActionArea>
               <CardMedia
-                sx={{ minHeight: "400px" }}
+                sx={{ minHeight: "300px" }}
                 component={"img"}
                 src={menu.image}
-                alt={menu.name}
+                alt={`Image of ${menu.name}`}
               />
               <CardContent>
                 <Typography variant="h5" gutterBottom component={"div"}>
