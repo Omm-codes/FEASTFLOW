@@ -1,3 +1,4 @@
+
 import Dosa from "../images/dosa.jpg";
 import Chola from "../images/chhola.jpg";
 import Idli from "../images/idli.jpg";
@@ -9,43 +10,43 @@ export const MenuList = [
   {
     name: "Dosa",
     description:
-      "love the food",
+      "A crispy and savory South Indian pancake made from fermented batter.",
     image: Dosa,
-    price: 200,
+    price: 30,
   },
   {
     name: "Chola",
     description:
-      "love the food",
+      "A flavorful North Indian dish made with chickpeas in a spicy gravy.",
     image: Chola,
-    price: 250,
+    price: 50,
   },
   {
     name: "Idli Sambhar",
     description:
-      "love the food",
+      "Soft and fluffy steamed rice cakes served with a tangy lentil-based vegetable stew.",
     image: Idli,
-    price: 300,
+    price: 20,
   },
   {
     name: "Masala Dosa",
     description:
-      "love the food",
+      "A popular South Indian dish consisting of a crispy dosa filled with a spiced potato mixture.",
     image: MasalaDosa,
-    price: 100,
+    price: 40,
   },
   {
     name: "Paneer",
     description:
-      "love the food",
+      "A rich and creamy North Indian dish made with paneer (Indian cheese) in a tomato-based gravy.",
     image: Paneer,
-    price: 400,
+    price: 80,
   },
   {
-    name: "Gujarati",
+    name: "Gujarati Thali",
     description:
-      "love the food",
+      "A traditional Gujarati meal consisting of a variety of dishes served on a single platter.",
     image: Gujrati,
-    price: 500,
+    price: 90,
   },
 ];

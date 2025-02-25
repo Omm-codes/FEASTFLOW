@@ -4,8 +4,12 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { Helmet } from "react-helmet";
 import { Toaster } from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 
 const Layout = ({ children, title, description, keywords, author }) => {
+  const location = useLocation();
+  const showFooter = location.pathname === "/about" || location.pathname === "/contact";
+
   return (
     <div>
       <Helmet>
@@ -20,7 +24,7 @@ const Layout = ({ children, title, description, keywords, author }) => {
         <Toaster />
         {children}
       </main>
-      <Footer />
+      {showFooter && <Footer />}
     </div>
   );
 };
