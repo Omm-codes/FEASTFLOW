@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "./../components/Layout/Layout";
 import { Link } from "react-router-dom";
-import Banner from "../images/n.jpg";
+import Banner from "../images/mm.jpg";
 import "../styles/HomeStyles.css";
 import { Box, Card, CardActionArea, CardContent, CardMedia, Typography, Grid } from "@mui/material";
 import { MenuList } from "../data/data";
