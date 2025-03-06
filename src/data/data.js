@@ -15,7 +15,7 @@ export const MenuList = [
     price: 30,
   },
   {
-    name: "Chola",
+    name: "Chole Puri",
     description:
       "A flavorful North Indian dish made with chickpeas in a spicy gravy.",
     image: Chola,

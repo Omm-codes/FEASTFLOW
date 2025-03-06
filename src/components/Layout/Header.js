@@ -37,16 +37,8 @@ const Header = () => {
   };
 
   const menuItems = [
-    {
-      link: "/",
-      name: "Home",
-      icon: <HomeIcon />,
-    },
-    {
-      link: "/menu",
-      name: "Menu",
-      icon: <MenuBookIcon />,
-    },
+    { link: "/", name: "Home", icon: <HomeIcon /> },
+    { link: "/menu", name: "Menu", icon: <MenuBookIcon /> },
     {
       link: "/myorders",
       name: "My Orders",
@@ -56,24 +48,24 @@ const Header = () => {
         </Badge>
       ),
     },
-    {
-      link: "/about",
-      name: "About",
-      icon: <InfoIcon />,
-    },
-    {
-      link: "/contact",
-      name: "Contact",
-      icon: <ContactMailIcon />,
-    },
+    { link: "/about", name: "About", icon: <InfoIcon /> },
+    { link: "/contact", name: "Contact", icon: <ContactMailIcon /> },
   ];
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+      {/* Fixed Empty Typography Issue - Added FeastFlow branding */}
       <Typography
         variant="h6"
-        component="div"
-        sx={{ flexGrow: 1, my: 2, color: "goldenrod" }}
+        sx={{
+          flexGrow: 1,
+          my: 2,
+          color: "goldenrod",
+          fontWeight: "bold",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
         <RestaurantIcon sx={{ mr: 1 }} />
         
@@ -111,12 +103,15 @@ const Header = () => {
             boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
         >
-          <Toolbar sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: { xs: '0 16px', sm: '0 24px' }
-          }}>
+          <Toolbar
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: { xs: "0 16px", sm: "0 24px" },
+            }}
+          >
+            {/* Mobile Menu Icon */}
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -126,45 +121,58 @@ const Header = () => {
             >
               <MenuIcon />
             </IconButton>
-            <Box
-              component="img"
-              src={Logo}
-              alt="logo"
-              height="50px"
-              sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}
-            />
+
+            {/* Clickable Logo */}
+            <NavLink to="/">
+              <Box
+                component="img"
+                src={Logo}
+                alt="logo"
+                height="50px"
+                sx={{ display: { xs: "none", sm: "block" }, mr: 2 }}
+              />
+            </NavLink>
+
+            {/* Branding (Mobile) */}
             <Typography
               variant="h6"
-              component="div"
               sx={{
                 flexGrow: 1,
                 color: "goldenrod",
                 display: "flex",
                 alignItems: "center",
                 fontWeight: "bold",
-                textAlign: { xs: 'center', sm: 'left' }
+                textAlign: { xs: "center", sm: "left" },
               }}
             >
               <RestaurantIcon sx={{ mr: 1, display: { xs: "block", sm: "none" } }} />
-             
+            
             </Typography>
+
+            {/* Desktop Navigation */}
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               {menuItems.map((item) => (
-                <NavLink key={item.name} to={item.link} className="navigation-link">
+                <NavLink
+                  key={item.name}
+                  to={item.link}
+                  className={({ isActive }) =>
+                    isActive ? "navigation-link active" : "navigation-link"
+                  }
+                >
                   {item.name}
                 </NavLink>
               ))}
             </Box>
           </Toolbar>
         </AppBar>
+
+        {/* Mobile Drawer */}
         <Box component="nav">
           <Drawer
             variant="temporary"
             open={mobileOpen}
             onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true,
-            }}
+            ModalProps={{ keepMounted: true }}
             sx={{
               display: { xs: "block", sm: "none" },
               "& .MuiDrawer-paper": {
@@ -177,6 +185,8 @@ const Header = () => {
             {drawer}
           </Drawer>
         </Box>
+
+        {/* Push content down */}
         <Box>
           <Toolbar />
         </Box>

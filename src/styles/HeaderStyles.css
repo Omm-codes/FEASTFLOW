@@ -11,16 +11,19 @@
   text-decoration: none;
   color: white;
 }
+
+/* Active state */
 .active {
   color: goldenrod !important;
   font-weight: bold !important;
 }
-/* mobile view */
+
+/* Mobile view */
 .mobile-navigation {
   list-style: none;
 }
 .mobile-navigation li {
-  margin-top: 20px;
+  margin-top: 15px; /* Reduced margin for better spacing */
 }
 .mobile-navigation li a {
   text-decoration: none;
@@ -28,6 +31,7 @@
   color: black;
 }
 
+/* Navigation link styles */
 .navigation-link {
   text-decoration: none;
   color: #333;
@@ -45,6 +49,7 @@
   color: goldenrod;
   border-bottom: 2px solid goldenrod;
   padding-bottom: 5px;
+  border-radius: 2px; /* Slight rounding for smoother effect */
 }
 
 /* Drawer styles */
@@ -55,6 +60,7 @@
 
 .MuiListItemButton-root {
   color: #333 !important;
+  padding: 10px 16px !important; /* Improved padding for better tap targets */
 }
 
 .MuiListItemButton-root:hover {
