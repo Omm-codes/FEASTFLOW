@@ -17,7 +17,7 @@
   width: auto;
   margin-left: 30px;
   padding: 15px;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for better readability */
+  background-color: rgba(202, 194, 194, 0.8); /* Semi-transparent background for better readability */
   border-radius: 8px;
   max-width: 500px;
 }
@@ -229,7 +229,7 @@
   top: 10px;
   right: -30px;
   background-color: #291010; /* Changed to match your offer banner */
-  color: white;
+  color: rgb(61, 59, 59);
   padding: 5px 30px;
   transform: rotate(45deg);
   font-weight: bold;

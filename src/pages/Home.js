@@ -123,15 +123,7 @@ const Home = () => {
             </Grid>
           ))}
         </Grid>
-        <Button 
-          component={Link} 
-          to="/menu" 
-          variant="contained" 
-          className="view-all-btn" 
-          sx={{ mt: 3 }}
-        >
-          View Full Menu
-        </Button>
+        
       </Box>
 
       {/* Categories Section - MOVED TO TOP */}
