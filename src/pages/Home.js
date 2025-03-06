@@ -55,7 +55,7 @@ const Home = () => {
         </div>
       </div>
       
-      {/* Hero Section */}
+      {/* Hero Section - MADE SMALLER */}
       <div className="home" style={{ backgroundImage: `url(${Banner})` }}>
         <div className="headerContainer">
           <h1>Effortless Ordering</h1>
@@ -68,28 +68,28 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Today's Special Section - MOVED TO TOP */}
-      <Box sx={{ py: 8, textAlign: "center", bgcolor: "#f9f9f9" }}>
+      {/* Today's Special Section - Immediately visible */}
+      <Box sx={{ py: 3, textAlign: "center", bgcolor: "#f9f9f9" }}>
         <Typography 
           variant="h4" 
           sx={{ 
             fontWeight: "bold", 
-            mb: 4,
+            mb: 2,
             fontFamily: "'Playfair Display', serif",
-            fontSize: { xs: "2rem", md: "2.5rem" }
+            fontSize: { xs: "1.8rem", md: "2.3rem" }
           }}
         >
           Today's Specials
         </Typography>
-        <Grid container spacing={3} justifyContent="center">
+        <Grid container spacing={2} justifyContent="center">
           {todaysSpecials.map((item) => (
             <Grid item xs={12} sm={6} md={4} key={item.name}>
-              <Card sx={{ maxWidth: 345, mx: "auto" }} className="special-card">
+              <Card sx={{ maxWidth: 345, mx: "auto", height: '100%' }} className="special-card">
                 <CardActionArea component={Link} to="/menu" aria-label={`View details of ${item.name}`}>
                   <div className="card-badge">Special</div>
                   <CardMedia
                     component="img"
-                    height="200"
+                    height="160"  // Reduced from 200px
                     image={item.image}
                     alt={item.name}
                     loading="lazy"
@@ -100,7 +100,8 @@ const Home = () => {
                       component="div"
                       sx={{
                         fontFamily: "'Playfair Display', serif",
-                        fontWeight: 600
+                        fontWeight: 600,
+                        fontSize: { xs: '1.1rem', md: '1.25rem' }
                       }}
                     >
                       {item.name}
@@ -110,8 +111,8 @@ const Home = () => {
                       sx={{
                         color: "#666",
                         fontFamily: "'Poppins', sans-serif",
-                        fontSize: "0.95rem",
-                        lineHeight: 1.6
+                        fontSize: "0.9rem",
+                        lineHeight: 1.5
                       }}
                     >
                       {item.description}
@@ -127,7 +128,7 @@ const Home = () => {
           to="/menu" 
           variant="contained" 
           className="view-all-btn" 
-          sx={{ mt: 5 }}
+          sx={{ mt: 3 }}
         >
           View Full Menu
         </Button>
@@ -201,7 +202,7 @@ const Home = () => {
                   <LocalShippingIcon fontSize="large" />
                 </div>
                 <Typography variant="h6" sx={{ my: 2, fontWeight: "bold" }}>3. Fast Delivery</Typography>
-                <Typography>Enjoy your meal at home or pick up from our restaurant</Typography>
+                <Typography>Enjoy your meal right on time by getting fast delivery</Typography>
               </div>
             </Grid>
           </Grid>
