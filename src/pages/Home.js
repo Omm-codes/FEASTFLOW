@@ -3,12 +3,12 @@ import Layout from "./../components/Layout/Layout";
 import { Link } from "react-router-dom";
 import Banner from "../images/mm.jpg";
 import "../styles/HomeStyles.css";
-import { Box, Card, CardActionArea, CardContent, CardMedia, Typography, Grid, Paper, Container, Button } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, CardMedia, Typography, Grid, Paper, Container, Button, Chip, Divider } from "@mui/material";
 import { MenuList } from "../data/data";
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
 import StarIcon from '@mui/icons-material/Star';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 // Function to get unique random items
 const getRandomSpecials = (menu, count) => {
@@ -20,12 +20,12 @@ const Home = () => {
   // Memoize today's specials to prevent unnecessary recalculations
   const todaysSpecials = useMemo(() => getRandomSpecials(MenuList, 3), []);
   
-  // Offers for scrolling banner
+  // Updated offers for canteen-style promotions
   const offers = [
-    "🔥 Special Offer: 20% off on your first order with code WELCOME20",
-    "🚚 Free delivery on orders above $30",
-    "🎁 Buy one get one free on selected items this weekend",
-    "⏰ Limited time offer: Order within 30 minutes for express delivery"
+    "🍱 Today's Special: Combo meal at ₹149 only!",
+    "☕ Coffee & Snack Combo: Any coffee with sandwich for ₹99",
+    "🥗 Student Special: Show ID for 15% off on all meals",
+    "🍲 Bulk Order: 10% off when you order 5+ meals"
   ];
   
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
@@ -38,26 +38,83 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [offers.length]);
 
-  // Popular categories
-  const categories = [
-    { name: "Lunch", image: "http://localhost:3000/static/media/paneer.f04d2c563fe596463e47.jpg" },
-    { name: "Breakfast", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCBz6HYNpKyms3IzOB9uOYfGaOrcfATBWmVw&s" },
-    { name: "Salads", image: "https://images.pexels.com/photos/1213710/pexels-photo-1213710.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { name: "Desserts", image: "https://images.pexels.com/photos/2144112/pexels-photo-2144112.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  // Featured quick categories (smaller version for hero section)
+  const quickCategories = [
+    { name: "Breakfast", icon: "🍳" },
+    { name: "Fastfood", icon: "🍔" },
+    { name: "Snacks", icon: "🍿" },
+    { name: "Desserts", icon: "🍨" },
+    { name: "Lunch", icon: "🍛" }
   ];
 
   return (
     <Layout>
-      {/* Scrolling Offers Banner */}
-      <div className="offers-scroll-container">
-        <div className="offers-scroll-content">
-          <p>{offers[currentOfferIndex]}</p>
+      {/* Improved Scrolling Offers Banner */}
+      <div className="offers-scroll-container" style={{
+        backgroundColor: "#552a0f",
+        color: "white",
+        padding: "8px 0",
+        overflow: "hidden",
+        position: "relative",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        borderBottom: "2px solid #ffd54f"
+      }}>
+        <div className="offers-scroll-content" style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 15px"
+        }}>
+          <Box 
+            component="span" 
+            sx={{ 
+              mr: 2, 
+              backgroundColor: "#ffd54f", 
+              color: "#552a0f",
+              px: 1.5,
+              py: 0.3,
+              fontSize: "0.75rem",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              letterSpacing: "0.5px",
+              textTransform: "uppercase",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+            }}
+          >
+            OFFER
+          </Box>
+          <Typography 
+            component="p" 
+            sx={{ 
+              fontSize: "0.9rem", 
+              fontWeight: "500",
+              fontFamily: "'Poppins', sans-serif",
+              letterSpacing: "0.3px"
+            }}
+          >
+            {offers[currentOfferIndex]}
+          </Typography>
         </div>
       </div>
       
-      {/* Hero Section - MADE SMALLER */}
-      <div className="home" style={{ backgroundImage: `url(${Banner})` }}>
-        <div className="headerContainer">
+      {/* Hero Section */}
+      <div className="home" style={{ 
+        backgroundImage: `url(${Banner})`, 
+        height: '65vh', 
+        position: 'relative',
+        backgroundPosition: 'center',
+        backgroundSize: 'cover'
+      }}>
+        <div className="overlay" style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          zIndex: 1
+        }}></div>
+        <div className="headerContainer" style={{ position: 'relative', zIndex: 2 }}>
           <h1>Effortless Ordering</h1>
           <h1>Quick Service</h1>
           <h1>Delicious Bites!</h1>
@@ -68,153 +125,239 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Today's Special Section - Immediately visible */}
-      <Box sx={{ py: 3, textAlign: "center", bgcolor: "#f9f9f9" }}>
-        <Typography 
-          variant="h4" 
-          sx={{ 
-            fontWeight: "bold", 
-            mb: 2,
-            fontFamily: "'Playfair Display', serif",
-            fontSize: { xs: "1.8rem", md: "2.3rem" }
-          }}
-        >
-          Today's Specials
-        </Typography>
-        <Grid container spacing={2} justifyContent="center">
-          {todaysSpecials.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.name}>
-              <Card sx={{ maxWidth: 345, mx: "auto", height: '100%' }} className="special-card">
-                <CardActionArea component={Link} to="/menu" aria-label={`View details of ${item.name}`}>
-                  <div className="card-badge">Special</div>
-                  <CardMedia
-                    component="img"
-                    height="160"  // Reduced from 200px
-                    image={item.image}
-                    alt={item.name}
-                    loading="lazy"
+      {/* Enhanced Quick Categories - RIGHT AFTER HERO */}
+      <Container maxWidth="lg" sx={{ mt: -5, mb: 5, position: 'relative', zIndex: 3 }}>
+        <Paper elevation={3} sx={{ 
+          borderRadius: '16px', 
+          py: 2.5, 
+          px: 3.5,
+          background: 'linear-gradient(to right, #fff, #f8f9fa)',
+          border: '1px solid #e8e8e8',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 1
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  fontWeight: 'bold',
+                  fontFamily: "'Playfair Display', serif",
+                  mr: 2,
+                  fontSize: '1.1rem',
+                  color: '#1f1f1f'
+                }}
+              >
+                Categories:
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                {quickCategories.map((cat) => (
+                  <Chip 
+                    key={cat.name}
+                    label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                      <span style={{ fontSize: '1.2rem' }}>{cat.icon}</span>
+                      <span>{cat.name}</span>
+                    </Box>}
+                    component={Link}
+                    to="/menu"
+                    clickable
+                    sx={{ 
+                      borderRadius: '20px',
+                      padding: '8px 4px',
+                      backgroundColor: '#fff',
+                      border: '1px solid #e0e0e0',
+                      fontWeight: 500,
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: '#f5f5f5',
+                        boxShadow: '0 3px 8px rgba(0,0,0,0.1)',
+                        transform: 'translateY(-2px)'
+                      }
+                    }}
                   />
-                  <CardContent>
-                    <Typography 
-                      variant="h5" 
-                      component="div"
-                      sx={{
-                        fontFamily: "'Playfair Display', serif",
-                        fontWeight: 600,
-                        fontSize: { xs: '1.1rem', md: '1.25rem' }
-                      }}
-                    >
-                      {item.name}
-                    </Typography>
-                    <Typography 
-                      variant="body2"
-                      sx={{
-                        color: "#666",
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: "0.9rem",
-                        lineHeight: 1.5
-                      }}
-                    >
-                      {item.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-        
-      </Box>
+                ))}
+              </Box>
+            </Box>
+            <Button 
+              component={Link}
+              to="/menu"
+              size="small"
+              endIcon={<ArrowForwardIcon />}
+              sx={{ 
+                textTransform: 'none',
+                color: '#291010',
+                fontWeight: 'bold',
+                fontSize: '0.9rem',
+                '&:hover': { 
+                  textDecoration: 'underline',
+                  backgroundColor: 'rgba(0,0,0,0.04)'
+                }
+              }}
+            >
+              See all
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
 
-      {/* Categories Section - MOVED TO TOP */}
-      <Container maxWidth="lg">
-        <Box sx={{ py: 6, textAlign: "center" }}>
+      {/* Minimalist Today's Special Section */}
+      <Box sx={{ 
+        py: 5, 
+        textAlign: "center", 
+        bgcolor: "#f5f7fa",  /* Changed background color */
+        borderTop: '1px solidrgb(136, 139, 146)',
+        position: 'relative'
+      }}>
+        <Container maxWidth="lg">
           <Typography 
-            variant="h4" 
+            variant="h5" 
             sx={{ 
-              fontWeight: "bold", 
+              fontWeight: "600", 
               mb: 4,
               fontFamily: "'Playfair Display', serif",
-              fontSize: { xs: "1.8rem", md: "2.3rem" }
+              position: 'relative',
+              display: 'inline-block',
+              color: '#333'
             }}
           >
-            Popular Categories
+            Today's Specials
           </Typography>
+          
           <Grid container spacing={2} justifyContent="center">
-            {categories.map((category) => (
-              <Grid item xs={6} sm={3} key={category.name}>
-                <Link to="/menu" className="category-link">
-                  <div className="category-card">
-                    <img src={category.image} alt={category.name} />
-                    <h3>{category.name}</h3>
-                  </div>
-                </Link>
+            {todaysSpecials.map((item) => (
+              <Grid item xs={12} sm={4} key={item.name}>
+                <Card sx={{ 
+                  maxWidth: 300, 
+                  mx: "auto", 
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+                  }
+                }}>
+                  <CardActionArea component={Link} to="/menu">
+                    <CardMedia
+                      component="img"
+                      height="150"
+                      image={item.image}
+                      alt={item.name}
+                      loading="lazy"
+                    />
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Typography 
+                          variant="subtitle1" 
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            color: '#333',
+                            textAlign: 'left'
+                          }}
+                        >
+                          {item.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'goldenrod',
+                            fontWeight: 600,
+                          }}
+                        >
+                          ₹{item.price}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
               </Grid>
             ))}
           </Grid>
-        </Box>
-      </Container>
-
-      {/* How It Works Section */}
-      <Container maxWidth="lg">
-        <Box sx={{ py: 8, textAlign: "center" }}>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontWeight: "bold", 
-              mb: 5,
-              fontFamily: "'Playfair Display', serif",
-              fontSize: { xs: "1.8rem", md: "2.3rem" }
+          
+          <Button
+            component={Link}
+            to="/menu"
+            size="small"
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              mt: 4,
+              color: '#555',
+              textTransform: 'none',
+              fontWeight: 'medium',
+              fontSize: '0.9rem',
+              '&:hover': { 
+                backgroundColor: 'transparent',
+                color: '#000',
+                textDecoration: 'underline'
+              }
             }}
           >
-            How It Works
-          </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={4}>
-              <div className="how-it-works-step">
-                <div className="step-icon">
-                  <RestaurantIcon fontSize="large" />
-                </div>
-                <Typography variant="h6" sx={{ my: 2, fontWeight: "bold" }}>1. Choose Your Food</Typography>
-                <Typography>Browse our menu and select your favorite dishes</Typography>
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <div className="how-it-works-step">
-                <div className="step-icon">
-                  <AccessTimeIcon fontSize="large" />
-                </div>
-                <Typography variant="h6" sx={{ my: 2, fontWeight: "bold" }}>2. Quick Preparation</Typography>
-                <Typography>Our chefs prepare your order with fresh ingredients</Typography>
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <div className="how-it-works-step">
-                <div className="step-icon">
-                  <LocalShippingIcon fontSize="large" />
-                </div>
-                <Typography variant="h6" sx={{ my: 2, fontWeight: "bold" }}>3. Fast Delivery</Typography>
-                <Typography>Enjoy your meal right on time by getting fast delivery</Typography>
-              </div>
-            </Grid>
-          </Grid>
-        </Box>
-      </Container>
+            View full menu
+          </Button>
+        </Container>
+      </Box>
 
-      {/* Testimonials Section */}
-      <Box sx={{ py: 8, textAlign: "center", bgcolor: "#f9f9f9" }}>
+      {/* Enhanced Testimonials Section */}
+      <Box sx={{ 
+        py: 8, 
+        textAlign: "center", 
+        background: "linear-gradient(to bottom,rgb(201, 207, 175),rgb(215, 221, 182))",
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative quotes in background */}
+        <Box sx={{ 
+          position: 'absolute', 
+          top: 40, 
+          left: 40, 
+          fontSize: '120px', 
+          opacity: 0.05,
+          fontFamily: 'serif',
+          color: '#000'
+        }}>
+          "
+        </Box>
+        <Box sx={{ 
+          position: 'absolute', 
+          bottom: 40, 
+          right: 40, 
+          fontSize: '120px', 
+          opacity: 0.05,
+          fontFamily: 'serif',
+          color: '#000'
+        }}>
+          "
+        </Box>
+        
         <Container maxWidth="lg">
           <Typography 
             variant="h4" 
             sx={{ 
               fontWeight: "bold", 
-              mb: 5,
+              mb: 2,
               fontFamily: "'Playfair Display', serif",
-              fontSize: { xs: "1.8rem", md: "2.3rem" }
+              fontSize: { xs: "1.8rem", md: "2.3rem" },
+              position: 'relative',
+              color: '#553C10'
             }}
           >
             What Our Customers Say
           </Typography>
+          
+          <Divider sx={{ 
+            width: '80px', 
+            mx: 'auto', 
+            borderColor: 'goldenrod', 
+            borderWidth: 2, 
+            mb: 5
+          }} />
+          
           <Grid container spacing={3} justifyContent="center">
             {[
               {
@@ -234,14 +377,58 @@ const Home = () => {
               }
             ].map((testimonial, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
-                <Paper className="testimonial-card">
-                  <div className="stars">
+                <Paper elevation={2} sx={{ 
+                  p: 3, 
+                  borderRadius: '10px', 
+                  background: 'white',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '5px',
+                    height: '100%',
+                    backgroundColor: 'goldenrod'
+                  },
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
+                  }
+                }}>
+                  <Box sx={{ display: 'flex', mb: 2, mt: 0.5 }}>
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <StarIcon key={i} fontSize="small" />
+                      <StarIcon key={i} fontSize="small" sx={{ color: 'goldenrod', mr: 0.5 }} />
                     ))}
-                  </div>
-                  <Typography sx={{ my: 2, fontStyle: "italic" }}>"{testimonial.comment}"</Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>- {testimonial.name}</Typography>
+                  </Box>
+                  <Typography 
+                    sx={{ 
+                      my: 2, 
+                      fontStyle: "italic", 
+                      color: '#555', 
+                      textAlign: 'left',
+                      lineHeight: 1.6,
+                      flex: 1
+                    }}
+                  >
+                    "{testimonial.comment}"
+                  </Typography>
+                  <Divider sx={{ width: '30%', my: 1.5 }} />
+                  <Typography 
+                    variant="subtitle1" 
+                    sx={{ 
+                      fontWeight: "bold", 
+                      textAlign: 'left',
+                      color: '#333'
+                    }}
+                  >
+                    {testimonial.name}
+                  </Typography>
                 </Paper>
               </Grid>
             ))}

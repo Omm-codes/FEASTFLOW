@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Layout from "../components/Layout/Layout";
 import { CartContext } from "../context/cartContext";
 import {
@@ -14,21 +14,47 @@ import {
   Button,
   Paper,
   Divider,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  TextField,
+  Snackbar,
+  Alert,
+  Stepper,
+  Step,
+  StepLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
-import { Delete, ShoppingCart } from "@mui/icons-material";
+import { 
+  Delete, 
+  ShoppingCart, 
+  Add, 
+  Remove,
+  LocalShipping,
+  Payment,
+  CheckCircleOutline,
+  NavigateNext
+} from "@mui/icons-material";
 import { styled } from "@mui/system";
+import { Link } from "react-router-dom";
 
 // Styled Components
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  borderRadius: 15,
-  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+  borderRadius: 12,
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
   overflow: 'hidden',
   marginTop: theme.spacing(4),
+  border: '1px solid #f0f0f0',
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontFamily: "'Playfair Display', serif",
-  fontSize: '1.1rem',
+  fontFamily: "'Poppins', sans-serif",
+  fontSize: '0.95rem',
   fontWeight: 600,
   color: '#333',
   padding: theme.spacing(2),
@@ -36,158 +62,774 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: 'rgba(218, 165, 32, 0.05)',
+    backgroundColor: 'rgba(85, 42, 15, 0.02)',
   },
   '&:hover': {
-    backgroundColor: 'rgba(218, 165, 32, 0.1)',
-    transition: 'all 0.3s ease',
+    backgroundColor: 'rgba(85, 42, 15, 0.05)',
+    transition: 'all 0.2s ease',
   },
+  '& td': {
+    borderColor: '#f0f0f0',
+  }
 }));
 
-const ConfirmButton = styled(Button)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #DAA520 30%, #FFD700 90%)',
-  border: 0,
-  borderRadius: 8,
-  boxShadow: '0 3px 5px 2px rgba(218, 165, 32, .3)',
-  color: 'white',
-  height: 48,
-  padding: '0 30px',
-  fontFamily: "'Poppins', sans-serif",
-  fontWeight: 500,
+const QuantityButton = styled(IconButton)(({ theme }) => ({
+  padding: '4px',
+  color: '#552a0f',
+  border: '1px solid #e0e0e0',
+  backgroundColor: '#fff',
   '&:hover': {
-    background: 'linear-gradient(45deg, #FFD700 30%, #DAA520 90%)',
+    backgroundColor: 'rgba(85, 42, 15, 0.08)',
+  },
+  '&.Mui-disabled': {
+    color: '#bdbdbd',
+  }
+}));
+
+const OrderButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#552a0f',
+  color: 'white',
+  borderRadius: '30px',
+  padding: '10px 25px',
+  fontSize: '0.95rem',
+  fontWeight: 600,
+  fontFamily: "'Poppins', sans-serif",
+  textTransform: 'none',
+  boxShadow: '0 4px 12px rgba(85, 42, 15, 0.2)',
+  '&:hover': {
+    backgroundColor: '#3e1e09',
+    boxShadow: '0 6px 15px rgba(85, 42, 15, 0.3)',
+  },
+  '&.Mui-disabled': {
+    backgroundColor: '#d7ccc8',
+    color: '#9e9e9e',
+  }
+}));
+
+const SecondaryButton = styled(Button)(({ theme }) => ({
+  backgroundColor: 'white',
+  color: '#552a0f',
+  border: '1px solid #552a0f',
+  borderRadius: '30px',
+  padding: '9px 20px',
+  fontSize: '0.95rem',
+  fontWeight: 500,
+  fontFamily: "'Poppins', sans-serif",
+  textTransform: 'none',
+  '&:hover': {
+    backgroundColor: 'rgba(85, 42, 15, 0.05)',
   },
 }));
 
 const MyOrders = () => {
   const { cart, setCart } = useContext(CartContext);
+  const [quantities, setQuantities] = useState(() => {
+    // Check if cart already has items (from previous page visits)
+    if (cart && cart.length > 0) {
+      // Initialize all quantities to 1 (or you could store quantities in localStorage)
+      return cart.map(() => 1);
+    }
+    return [];
+  });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [activeStep, setActiveStep] = useState(0);
+  const [orderCompleteOpen, setOrderCompleteOpen] = useState(false);
+  
+  const steps = ['Cart', 'Delivery Details', 'Payment', 'Complete'];
+
+  const calculateItemTotal = (price, index) => {
+    return (price * quantities[index]).toFixed(2);
+  };
 
   const totalPrice = () => {
     let total = 0;
-    cart.forEach((item) => (total += item.price));
+    cart.forEach((item, index) => (total += item.price * quantities[index]));
     return total.toFixed(2);
+  };
+  
+  const deliveryFee = () => {
+    // Free delivery over ₹300, otherwise ₹30
+    return totalPrice() > 300 ? 0 : 30;
+  };
+  
+  const grandTotal = () => {
+    return (parseFloat(totalPrice()) + deliveryFee()).toFixed(2);
+  };
+
+  const handleQuantityChange = (index, delta) => {
+    const newQuantities = [...quantities];
+    newQuantities[index] = Math.max(1, newQuantities[index] + delta);
+    setQuantities(newQuantities);
   };
 
   const handleRemoveItem = (index) => {
     const updatedCart = [...cart];
+    const updatedQuantities = [...quantities];
+    
     updatedCart.splice(index, 1);
+    updatedQuantities.splice(index, 1);
+    
     setCart(updatedCart);
+    setQuantities(updatedQuantities);
+    
+    showSnackbar("Item removed from cart", "info");
+  };
+  
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+  
+  const handleNext = () => {
+    if (activeStep === steps.length - 2) {
+      // Complete order
+      handleConfirmOrder();
+    } else {
+      setActiveStep((prevStep) => prevStep + 1);
+    }
+  };
+  
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
   };
 
   const handleConfirmOrder = () => {
-    alert("Order Confirmed! Thank you for your order.");
+    // Show order complete dialog
+    setActiveStep(steps.length - 1);
+    setOrderCompleteOpen(true);
+    
+    // Clear cart
     setCart([]);
+    setQuantities([]);
+  };
+  
+  const handleCloseOrderComplete = () => {
+    setOrderCompleteOpen(false);
+  };
+
+  const renderCartStep = () => (
+    <>
+      {cart.length === 0 ? (
+        <Box sx={{ 
+          textAlign: 'center', 
+          py: 8,
+          backgroundColor: 'white',
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+          border: '1px dashed #e0e0e0',
+        }}>
+          <ShoppingCart sx={{ fontSize: 60, color: '#552a0f', opacity: 0.3, mb: 2 }} />
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontFamily: "'Poppins', sans-serif",
+              color: '#666',
+              mb: 3
+            }}
+          >
+            Your cart is empty
+          </Typography>
+          <Button
+            component={Link}
+            to="/menu"
+            variant="contained"
+            sx={{
+              backgroundColor: '#552a0f',
+              color: 'white',
+              fontFamily: "'Poppins', sans-serif",
+              textTransform: 'none',
+              borderRadius: '30px',
+              px: 3,
+              '&:hover': {
+                backgroundColor: '#3e1e09',
+              }
+            }}
+          >
+            Browse Menu
+          </Button>
+        </Box>
+      ) : (
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8}>
+            <StyledTableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: 'rgba(85, 42, 15, 0.05)' }}>
+                    <StyledTableCell>Item</StyledTableCell>
+                    <StyledTableCell align="center">Price</StyledTableCell>
+                    <StyledTableCell align="center">Quantity</StyledTableCell>
+                    <StyledTableCell align="right">Total</StyledTableCell>
+                    <StyledTableCell align="center">Actions</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {cart.map((item, index) => (
+                    <StyledTableRow key={index}>
+                      <TableCell sx={{ fontFamily: "'Poppins', sans-serif", display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box
+                          component="img"
+                          src={item.image}
+                          alt={item.name}
+                          sx={{ 
+                            width: 60, 
+                            height: 60, 
+                            borderRadius: 1,
+                            objectFit: 'cover'
+                          }}
+                        />
+                        <Typography variant="body1" fontWeight={500}>
+                          {item.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontFamily: "'Poppins', sans-serif" }}>
+                        ₹{item.price}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <QuantityButton 
+                            size="small" 
+                            onClick={() => handleQuantityChange(index, -1)}
+                            disabled={quantities[index] <= 1}
+                          >
+                            <Remove fontSize="small" />
+                          </QuantityButton>
+                          <Typography sx={{ mx: 1, minWidth: '30px', textAlign: 'center' }}>
+                            {quantities[index]}
+                          </Typography>
+                          <QuantityButton 
+                            size="small" 
+                            onClick={() => handleQuantityChange(index, 1)}
+                          >
+                            <Add fontSize="small" />
+                          </QuantityButton>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>
+                        ₹{calculateItemTotal(item.price, index)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton 
+                          onClick={() => handleRemoveItem(index)}
+                          sx={{ 
+                            color: '#d32f2f',
+                            '&:hover': { 
+                              backgroundColor: 'rgba(211, 47, 47, 0.04)',
+                              transform: 'scale(1.1)',
+                            }
+                          }}
+                        >
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      </TableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </StyledTableContainer>
+            
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+              <SecondaryButton 
+                component={Link} 
+                to="/menu"
+                startIcon={<ShoppingCart />}
+              >
+                Continue Shopping
+              </SecondaryButton>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={12} md={4}>
+            <Card sx={{ 
+              borderRadius: 3,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              overflow: 'hidden',
+              border: '1px solid #f0f0f0',
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontFamily: "'Playfair Display', serif",
+                    fontWeight: 600,
+                    color: '#333',
+                    mb: 2
+                  }}
+                >
+                  Order Summary
+                </Typography>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  mb: 1,
+                  color: '#666'
+                }}>
+                  <Typography variant="body2">Subtotal</Typography>
+                  <Typography variant="body2" fontWeight={500}>₹{totalPrice()}</Typography>
+                </Box>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  mb: 1,
+                  color: '#666'
+                }}>
+                  <Typography variant="body2">Delivery Fee</Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {deliveryFee() === 0 ? 'FREE' : `₹${deliveryFee()}`}
+                  </Typography>
+                </Box>
+                
+                {parseFloat(totalPrice()) < 300 && (
+                  <Box sx={{ 
+                    bgcolor: 'rgba(85, 42, 15, 0.05)', 
+                    p: 1.5, 
+                    borderRadius: 1,
+                    mb: 2,
+                    mt: 1
+                  }}>
+                    <Typography variant="caption" sx={{ color: '#552a0f' }}>
+                      Add ₹{(300 - parseFloat(totalPrice())).toFixed(2)} more for free delivery
+                    </Typography>
+                  </Box>
+                )}
+                
+                <Divider sx={{ my: 2 }} />
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  mb: 3
+                }}>
+                  <Typography variant="subtitle1" fontWeight={600}>Total Amount</Typography>
+                  <Typography variant="subtitle1" fontWeight={700} color="#552a0f">₹{grandTotal()}</Typography>
+                </Box>
+                
+                <OrderButton
+                  fullWidth
+                  endIcon={<NavigateNext />}
+                  onClick={handleNext}
+                >
+                  Proceed to Checkout
+                </OrderButton>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
+    </>
+  );
+  
+  const renderDeliveryStep = () => (
+    <Grid container spacing={4}>
+      <Grid item xs={12} md={8}>
+        <Paper sx={{ p: 3, borderRadius: 3 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 600,
+              mb: 3
+            }}
+          >
+            Delivery Details
+          </Typography>
+          
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Full Name"
+                variant="outlined"
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': { borderColor: '#552a0f' }
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': { color: '#552a0f' }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Phone Number"
+                variant="outlined"
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': { borderColor: '#552a0f' }
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': { color: '#552a0f' }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email Address"
+                variant="outlined"
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': { borderColor: '#552a0f' }
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': { color: '#552a0f' }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Delivery Address"
+                variant="outlined"
+                multiline
+                rows={2}
+                required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': { borderColor: '#552a0f' }
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': { color: '#552a0f' }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Special Instructions (Optional)"
+                variant="outlined"
+                multiline
+                rows={2}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': { borderColor: '#552a0f' }
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': { color: '#552a0f' }
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Paper>
+        
+        <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+          <SecondaryButton onClick={handleBack}>
+            Back to Cart
+          </SecondaryButton>
+        </Box>
+      </Grid>
+      
+      <Grid item xs={12} md={4}>
+        <Card sx={{ 
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+          border: '1px solid #f0f0f0',
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 600,
+                color: '#333',
+                mb: 2
+              }}
+            >
+              Order Summary
+            </Typography>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              mb: 1,
+              color: '#666'
+            }}>
+              <Typography variant="body2">Subtotal</Typography>
+              <Typography variant="body2" fontWeight={500}>₹{totalPrice()}</Typography>
+            </Box>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              mb: 1,
+              color: '#666'
+            }}>
+              <Typography variant="body2">Delivery Fee</Typography>
+              <Typography variant="body2" fontWeight={500}>
+                {deliveryFee() === 0 ? 'FREE' : `₹${deliveryFee()}`}
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              mb: 3
+            }}>
+              <Typography variant="subtitle1" fontWeight={600}>Total Amount</Typography>
+              <Typography variant="subtitle1" fontWeight={700} color="#552a0f">₹{grandTotal()}</Typography>
+            </Box>
+            
+            <OrderButton
+              fullWidth
+              endIcon={<NavigateNext />}
+              onClick={handleNext}
+            >
+              Proceed to Payment
+            </OrderButton>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+  
+  const renderPaymentStep = () => (
+    <Grid container spacing={4}>
+      <Grid item xs={12} md={8}>
+        <Paper sx={{ p: 3, borderRadius: 3 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 600,
+              mb: 3
+            }}
+          >
+            Payment Method
+          </Typography>
+          
+          {/* Just a simple form for demonstration */}
+          <Box sx={{ 
+            p: 2, 
+            border: '2px solid #552a0f',
+            borderRadius: 2,
+            mb: 3
+          }}>
+            <Typography fontWeight={500}>Cash on Delivery</Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+              Pay when your order arrives
+            </Typography>
+          </Box>
+          
+          <Box sx={{ 
+            p: 2, 
+            border: '1px solid #e0e0e0',
+            borderRadius: 2,
+            mb: 2,
+            opacity: 0.6
+          }}>
+            <Typography fontWeight={500}>Credit/Debit Card</Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+              Coming soon
+            </Typography>
+          </Box>
+          
+          <Box sx={{ 
+            p: 2, 
+            border: '1px solid #e0e0e0',
+            borderRadius: 2,
+            opacity: 0.6
+          }}>
+            <Typography fontWeight={500}>UPI</Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+              Coming soon
+            </Typography>
+          </Box>
+        </Paper>
+        
+        <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+          <SecondaryButton onClick={handleBack}>
+            Back to Delivery
+          </SecondaryButton>
+        </Box>
+      </Grid>
+      
+      <Grid item xs={12} md={4}>
+        <Card sx={{ 
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+          border: '1px solid #f0f0f0',
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 600,
+                color: '#333',
+                mb: 2
+              }}
+            >
+              Order Summary
+            </Typography>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              mb: 1,
+              color: '#666'
+            }}>
+              <Typography variant="body2">Subtotal</Typography>
+              <Typography variant="body2" fontWeight={500}>₹{totalPrice()}</Typography>
+            </Box>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              mb: 1,
+              color: '#666'
+            }}>
+              <Typography variant="body2">Delivery Fee</Typography>
+              <Typography variant="body2" fontWeight={500}>
+                {deliveryFee() === 0 ? 'FREE' : `₹${deliveryFee()}`}
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              mb: 3
+            }}>
+              <Typography variant="subtitle1" fontWeight={600}>Total Amount</Typography>
+              <Typography variant="subtitle1" fontWeight={700} color="#552a0f">₹{grandTotal()}</Typography>
+            </Box>
+            
+            <OrderButton
+              fullWidth
+              endIcon={<CheckCircleOutline />}
+              onClick={handleNext}
+            >
+              Place Order
+            </OrderButton>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+  
+  const renderCurrentStep = () => {
+    switch (activeStep) {
+      case 0:
+        return renderCartStep();
+      case 1:
+        return renderDeliveryStep();
+      case 2:
+        return renderPaymentStep();
+      case 3:
+        return null; // Order complete is shown in a dialog
+      default:
+        return renderCartStep();
+    }
   };
 
   return (
     <Layout>
-      <Box sx={{ 
-        m: { xs: 2, md: 6 }, 
-        fontFamily: "'Poppins', sans-serif",
-        maxWidth: 1200,
-        mx: 'auto',
-      }}>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography
-            variant="h3"
+            variant="h4"
             sx={{
               fontFamily: "'Playfair Display', serif",
               fontWeight: 700,
-              color: '#2C3E50',
+              color: '#333',
               mb: 1,
-              fontSize: { xs: '2rem', md: '3rem' }
+              fontSize: { xs: '1.8rem', md: '2.2rem' }
             }}
           >
-            My Orders
+            My Order
           </Typography>
-          <Divider sx={{ maxWidth: 100, mx: 'auto', borderColor: 'goldenrod', borderWidth: 2 }} />
+          <Divider sx={{ maxWidth: 100, mx: 'auto', borderColor: '#552a0f', borderWidth: 2, mb: 4 }} />
+          
+          <Stepper 
+            activeStep={activeStep} 
+            alternativeLabel
+            sx={{ 
+              mb: 4,
+              '& .MuiStepIcon-root.Mui-active': { 
+                color: '#552a0f'
+              },
+              '& .MuiStepIcon-root.Mui-completed': {
+                color: '#552a0f'
+              },
+              display: cart.length === 0 && activeStep === 0 ? 'none' : 'flex'
+            }}
+          >
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
         </Box>
 
-        {cart.length === 0 ? (
-          <Box sx={{ 
-            textAlign: 'center', 
-            py: 8,
-            backgroundColor: 'rgba(218, 165, 32, 0.05)',
-            borderRadius: 2
-          }}>
-            <ShoppingCart sx={{ fontSize: 60, color: 'goldenrod', mb: 2 }} />
-            <Typography 
-              variant="h6" 
-              sx={{ 
+        {renderCurrentStep()}
+        
+        {/* Order Complete Dialog */}
+        <Dialog
+          open={orderCompleteOpen}
+          onClose={handleCloseOrderComplete}
+          maxWidth="sm"
+          fullWidth
+          sx={{
+            '& .MuiPaper-root': {
+              borderRadius: '12px',
+            }
+          }}
+        >
+          <DialogContent sx={{ textAlign: 'center', py: 4 }}>
+            <CheckCircleOutline sx={{ fontSize: 80, color: '#66bb6a', mb: 2 }} />
+            <Typography variant="h5" sx={{ mb: 2, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>
+              Order Placed Successfully!
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
+              Thank you for your order. It will be delivered to you shortly.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+            <Button
+              component={Link}
+              to="/menu"
+              variant="contained"
+              sx={{
+                backgroundColor: '#552a0f',
+                color: 'white',
                 fontFamily: "'Poppins', sans-serif",
-                color: '#666'
+                textTransform: 'none',
+                borderRadius: '30px',
+                px: 3,
+                '&:hover': {
+                  backgroundColor: '#3e1e09',
+                }
               }}
             >
-              Your cart is empty
-            </Typography>
-          </Box>
-        ) : (
-          <StyledTableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: 'rgba(218, 165, 32, 0.1)' }}>
-                  <StyledTableCell>Item Name</StyledTableCell>
-                  <StyledTableCell align="center">Price</StyledTableCell>
-                  <StyledTableCell align="center">Actions</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {cart.map((item, index) => (
-                  <StyledTableRow key={index}>
-                    <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>
-                      {item.name}
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontFamily: "'Poppins', sans-serif" }}>
-                      ₹{item.price}
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton 
-                        onClick={() => handleRemoveItem(index)}
-                        sx={{ 
-                          '&:hover': { 
-                            color: 'red',
-                            transform: 'scale(1.1)',
-                            transition: 'all 0.3s ease'
-                          }
-                        }}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
-        )}
-
-        <Box sx={{ 
-          mt: 4, 
-          textAlign: 'right',
-          p: 3,
-          backgroundColor: 'white',
-          borderRadius: 2,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-        }}>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              fontFamily: "'Playfair Display', serif",
-              fontWeight: 600,
-              color: '#2C3E50'
-            }}
+              Continue Shopping
+            </Button>
+          </DialogActions>
+        </Dialog>
+        
+        <Snackbar 
+          open={snackbarOpen} 
+          autoHideDuration={6000} 
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert 
+            onClose={() => setSnackbarOpen(false)} 
+            severity={snackbarSeverity} 
+            sx={{ width: '100%' }}
           >
-            Total: ₹{totalPrice()}
-          </Typography>
-          <ConfirmButton
-            onClick={handleConfirmOrder}
-            disabled={cart.length === 0}
-            sx={{ mt: 2 }}
-          >
-            Confirm Order
-          </ConfirmButton>
-        </Box>
-      </Box>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Container>
     </Layout>
   );
 };
