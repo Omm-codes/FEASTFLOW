@@ -149,13 +149,8 @@ const MyOrders = () => {
     return total.toFixed(2);
   };
   
-  const deliveryFee = () => {
-    // Free delivery over ₹300, otherwise ₹30
-    return totalPrice() > 300 ? 0 : 30;
-  };
-  
   const grandTotal = () => {
-    return (parseFloat(totalPrice()) + deliveryFee()).toFixed(2);
+    return parseFloat(totalPrice()).toFixed(2);
   };
 
   const handleQuantityChange = (index, delta) => {
@@ -371,32 +366,6 @@ const MyOrders = () => {
                   <Typography variant="body2" fontWeight={500}>₹{totalPrice()}</Typography>
                 </Box>
                 
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between',
-                  mb: 1,
-                  color: '#666'
-                }}>
-                  <Typography variant="body2">Delivery Fee</Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    {deliveryFee() === 0 ? 'FREE' : `₹${deliveryFee()}`}
-                  </Typography>
-                </Box>
-                
-                {parseFloat(totalPrice()) < 300 && (
-                  <Box sx={{ 
-                    bgcolor: 'rgba(85, 42, 15, 0.05)', 
-                    p: 1.5, 
-                    borderRadius: 1,
-                    mb: 2,
-                    mt: 1
-                  }}>
-                    <Typography variant="caption" sx={{ color: '#552a0f' }}>
-                      Add ₹{(300 - parseFloat(totalPrice())).toFixed(2)} more for free delivery
-                    </Typography>
-                  </Box>
-                )}
-                
                 <Divider sx={{ my: 2 }} />
                 
                 <Box sx={{ 
@@ -484,11 +453,10 @@ const MyOrders = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Delivery Address"
+                label="Delivery Time"
                 variant="outlined"
-                multiline
-                rows={2}
                 required
+                placeholder="e.g., Today at 1:00 PM"
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#552a0f' }
@@ -550,18 +518,6 @@ const MyOrders = () => {
             }}>
               <Typography variant="body2">Subtotal</Typography>
               <Typography variant="body2" fontWeight={500}>₹{totalPrice()}</Typography>
-            </Box>
-            
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              mb: 1,
-              color: '#666'
-            }}>
-              <Typography variant="body2">Delivery Fee</Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {deliveryFee() === 0 ? 'FREE' : `₹${deliveryFee()}`}
-              </Typography>
             </Box>
             
             <Divider sx={{ my: 2 }} />
@@ -677,18 +633,6 @@ const MyOrders = () => {
             }}>
               <Typography variant="body2">Subtotal</Typography>
               <Typography variant="body2" fontWeight={500}>₹{totalPrice()}</Typography>
-            </Box>
-            
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              mb: 1,
-              color: '#666'
-            }}>
-              <Typography variant="body2">Delivery Fee</Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {deliveryFee() === 0 ? 'FREE' : `₹${deliveryFee()}`}
-              </Typography>
             </Box>
             
             <Divider sx={{ my: 2 }} />
