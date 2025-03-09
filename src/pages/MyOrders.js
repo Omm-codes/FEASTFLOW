@@ -40,7 +40,8 @@ import {
   CheckCircleOutline,
   NavigateNext,
   ExpandMore,
-  Cancel
+  Cancel,
+  DeleteOutlined
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { Link, useNavigate } from "react-router-dom";
@@ -292,6 +293,17 @@ const MyOrders = () => {
     
     showSnackbar("Order has been cancelled", "info");
     setOrderCompleteOpen(false);
+  };
+
+  // Add this function with your other handlers
+  const handleClearOrderHistory = () => {
+    // Show confirmation dialog before clearing
+    if (window.confirm("Are you sure you want to clear your order history? This action cannot be undone.")) {
+      // Clear order history
+      setOrderHistory([]);
+      localStorage.removeItem('orderHistory');
+      showSnackbar("Order history cleared successfully", "success");
+    }
   };
 
   const handleFormChange = (e) => {
@@ -1013,17 +1025,46 @@ const MyOrders = () => {
         {/* Order History Section */}
         {orderHistory.length > 0 && (
           <Box sx={{ mt: 8 }}>
-            <Typography
-              variant="h5"
-              sx={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 600,
-                color: '#333',
-                mb: 3
-              }}
-            >
-              Your Order History
-            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              mb: 3,
+              flexWrap: 'wrap',
+              gap: 2
+            }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontWeight: 600,
+                  color: '#333'
+                }}
+              >
+                Your Order History
+              </Typography>
+              
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                onClick={handleClearOrderHistory}
+                startIcon={<DeleteOutlined />}
+                sx={{
+                  borderRadius: 30,
+                  textTransform: 'none',
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '0.85rem',
+                  borderColor: '#d32f2f',
+                  '&:hover': {
+                    backgroundColor: 'rgba(211, 47, 47, 0.04)',
+                    borderColor: '#b71c1c'
+                  }
+                }}
+              >
+                Clear History
+              </Button>
+            </Box>
             
             <Grid container spacing={3}>
               {orderHistory.map((order) => (
