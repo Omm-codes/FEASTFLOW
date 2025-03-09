@@ -13,33 +13,23 @@ import {
   Container,
   Divider,
   Chip,
-  Tab,
-  Tabs,
   Paper,
   Snackbar,
   Alert,
   IconButton,
-  InputBase,
-  Badge,
   Skeleton,
   Rating,
   Tooltip,
-  Stack,
-  FormGroup,
-  FormControlLabel,
-  Switch
+  Stack
 } from "@mui/material";
 import { CartContext } from "../context/cartContext";
 import { styled, alpha } from "@mui/system";
 import { 
   AddShoppingCart, 
-  Search as SearchIcon, 
   Favorite, 
   FavoriteBorder,
   LocalOffer,
   RestaurantMenu,
-  FilterList,
-  Sort,
   KeyboardArrowUp
 } from "@mui/icons-material";
 
@@ -74,39 +64,6 @@ const MenuButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: '24px',
-  backgroundColor: alpha('#ffffff', 0.9),
-  '&:hover': {
-    backgroundColor: alpha('#ffffff', 1),
-  },
-  width: '100%',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-  border: '1px solid #f0f0f0',
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: '0 16px',
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#552a0f',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: '10px 16px 10px 48px',
-    width: '100%',
-    fontFamily: "'Poppins', sans-serif",
-  },
-}));
-
 const PopularBadge = styled('div')(({ theme }) => ({
   position: 'absolute',
   top: 12,
@@ -122,48 +79,8 @@ const PopularBadge = styled('div')(({ theme }) => ({
   fontFamily: "'Poppins', sans-serif",
 }));
 
-const VegBadge = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  top: 12,
-  left: 12,
-  backgroundColor: '#4caf50',
-  color: 'white',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  fontSize: '0.7rem',
-  fontWeight: 'bold',
-  zIndex: 2,
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  fontFamily: "'Poppins', sans-serif",
-}));
-
-const NonVegBadge = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  top: 12,
-  left: 12,
-  backgroundColor: '#ff7043',
-  color: 'white',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  fontSize: '0.7rem',
-  fontWeight: 'bold',
-  zIndex: 2,
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  fontFamily: "'Poppins', sans-serif",
-}));
-
-// Function to get unique categories
-const getCategories = (menuItems) => {
-  const categorySet = new Set(menuItems.map(item => item.category));
-  return ['All', ...Array.from(categorySet)];
-};
-
 const Menu = () => {
   const { cart, setCart } = useContext(CartContext);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const categories = getCategories(MenuList);
-  const [quantities, setQuantities] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -222,10 +139,6 @@ const Menu = () => {
     }
   };
 
-  const handleCategoryChange = (event, newValue) => {
-    setActiveCategory(newValue);
-  };
-
   const toggleFavorite = (itemName) => {
     if (favorites.includes(itemName)) {
       setFavorites(favorites.filter(name => name !== itemName));
@@ -240,13 +153,6 @@ const Menu = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filter menu based on category, search term and veg preference
-  const filteredMenu = MenuList
-    .filter(item => activeCategory === 'All' || item.category === activeCategory)
-    .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                   item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                   item.category.toLowerCase().includes(searchTerm.toLowerCase()));
-
   return (
     <Layout>
       <Box sx={{ 
@@ -256,7 +162,7 @@ const Menu = () => {
         pb: 8
       }}>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Box sx={{ textAlign: 'center', mb: 5 }}>
             <Typography
               variant="h4"
               sx={{
@@ -277,102 +183,12 @@ const Menu = () => {
                 maxWidth: '600px',
                 mx: 'auto',
                 fontSize: '0.95rem',
-                mb: 3
+                mb: 1
               }}
             >
               Explore our delicious offerings crafted with fresh ingredients and culinary passion
             </Typography>
-            
-            {/* Search Box */}
-            <Box sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
-              <Search>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search for dishes, categories or ingredients..."
-                  inputProps={{ 'aria-label': 'search' }}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </Search>
-            </Box>
           </Box>
-
-          {/* Controls Row */}
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            mb: 2,
-            flexWrap: 'wrap',
-            gap: 2
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  mr: 1, 
-                  fontFamily: "'Poppins', sans-serif",
-                  color: '#666'
-                }}
-              >
-                {filteredMenu.length} items found
-              </Typography>
-              <Chip 
-                label={activeCategory} 
-                onDelete={activeCategory !== 'All' ? () => setActiveCategory('All') : undefined}
-                sx={{ 
-                  backgroundColor: 'rgba(85, 42, 15, 0.08)',
-                  color: '#552a0f',
-                  display: activeCategory !== 'All' ? 'inline-flex' : 'none'
-                }} 
-              />
-            </Box>
-          </Box>
-
-          {/* Category Tabs */}
-          <Paper 
-            elevation={0}
-            sx={{ 
-              width: '100%', 
-              mb: 4, 
-              display: 'flex', 
-              justifyContent: 'center',
-              backgroundColor: 'rgba(255,255,255,0.7)',
-              borderRadius: '12px',
-              py: 1.5
-            }}
-          >
-            <Tabs
-              value={activeCategory}
-              onChange={handleCategoryChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                '& .MuiTab-root': {
-                  textTransform: 'none',
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: '0.9rem',
-                  fontWeight: 500,
-                  color: '#555',
-                  minWidth: 'auto',
-                  mx: 1
-                },
-                '& .Mui-selected': {
-                  color: '#552a0f',
-                  fontWeight: 600
-                },
-                '& .MuiTabs-indicator': {
-                  backgroundColor: '#552a0f'
-                }
-              }}
-            >
-              {categories.map((category) => (
-                <Tab key={category} label={category} value={category} />
-              ))}
-            </Tabs>
-          </Paper>
 
           {loading ? (
             // Loading skeletons
@@ -395,199 +211,154 @@ const Menu = () => {
               ))}
             </Grid>
           ) : (
-            <>
-              {filteredMenu.length === 0 ? (
-                <Box sx={{ 
-                  textAlign: 'center', 
-                  py: 5,
-                  backgroundColor: 'white',
-                  borderRadius: 3,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                  border: '1px dashed #e0e0e0',
-                }}>
-                  <RestaurantMenu sx={{ fontSize: 60, color: '#552a0f', opacity: 0.3, mb: 2 }} />
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontFamily: "'Poppins', sans-serif",
-                      color: '#666',
-                      mb: 3
-                    }}
-                  >
-                    No dishes found matching your criteria
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      setActiveCategory('All');
-                      setSearchTerm('');
-                    }}
-                    sx={{
-                      backgroundColor: '#552a0f',
-                      color: 'white',
-                      fontFamily: "'Poppins', sans-serif",
-                      textTransform: 'none',
-                      borderRadius: '30px',
-                      px: 3,
-                      '&:hover': {
-                        backgroundColor: '#3e1e09',
-                      }
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
-                </Box>
-              ) : (
-                <Grid container spacing={3}>
-                  {filteredMenu.map((menu) => (
-                    <Grid item xs={12} sm={6} md={4} key={menu.name}>
-                      <StyledCard>
-                        {menu.popular && <PopularBadge>Popular</PopularBadge>}
-                        <CardActionArea>
-                          <CardMedia
-                            sx={{ 
-                              height: 180,
-                              position: 'relative',
-                              transition: 'transform 0.3s ease',
-                              '&:hover': {
-                                transform: 'scale(1.05)'
-                              }
-                            }}
-                            component="img"
-                            image={menu.image}
-                            alt={menu.name}
-                            loading="lazy"
-                          />
-                        </CardActionArea>
-                        
-                        <CardContent sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                fontFamily: "'Playfair Display', serif",
-                                fontWeight: 600,
-                                color: '#333',
-                                fontSize: '1.1rem'
-                              }}
-                            >
-                              {menu.name}
-                            </Typography>
-                            <Typography
-                              variant="subtitle1"
-                              sx={{
-                                fontFamily: "'Poppins', sans-serif",
-                                fontWeight: 600,
-                                color: '#552a0f',
-                                ml: 1
-                              }}
-                            >
-                              ₹{menu.price}
-                            </Typography>
-                          </Box>
+            <Grid container spacing={3}>
+              {MenuList.map((menu) => (
+                <Grid item xs={12} sm={6} md={4} key={menu.name}>
+                  <StyledCard>
+                    {menu.popular && <PopularBadge>Popular</PopularBadge>}
+                    <CardActionArea>
+                      <CardMedia
+                        sx={{ 
+                          height: 180,
+                          position: 'relative',
+                          transition: 'transform 0.3s ease',
+                          '&:hover': {
+                            transform: 'scale(1.05)'
+                          }
+                        }}
+                        component="img"
+                        image={menu.image}
+                        alt={menu.name}
+                        loading="lazy"
+                      />
+                    </CardActionArea>
+                    
+                    <CardContent sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontFamily: "'Playfair Display', serif",
+                            fontWeight: 600,
+                            color: '#333',
+                            fontSize: '1.1rem'
+                          }}
+                        >
+                          {menu.name}
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            fontFamily: "'Poppins', sans-serif",
+                            fontWeight: 600,
+                            color: '#552a0f',
+                            ml: 1
+                          }}
+                        >
+                          ₹{menu.price}
+                        </Typography>
+                      </Box>
 
-                          <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-                            <Rating 
-                              value={menu.rating || 4.5} 
-                              precision={0.5} 
-                              size="small" 
-                              readOnly 
-                              sx={{
-                                '& .MuiRating-iconFilled': {
-                                  color: '#ffc107'
-                                }
-                              }}
-                            />
-                            <Typography 
-                              variant="body2" 
-                              sx={{ 
-                                ml: 0.5, 
-                                color: '#666',
-                                fontSize: '0.75rem'
-                              }}
-                            >
-                              ({menu.ratingCount || Math.floor(Math.random() * 50) + 10})
-                            </Typography>
-                          </Box>
-                          
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              mb: 2,
-                              fontFamily: "'Poppins', sans-serif",
-                              color: '#666',
-                              fontSize: '0.85rem',
-                              lineHeight: 1.5,
-                              flexGrow: 1
-                            }}
-                          >
-                            {menu.description}
-                          </Typography>
-                          
-                          <Box sx={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center',
-                            mt: 'auto'
-                          }}>
-                            <Stack direction="row" spacing={1}>
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                        <Rating 
+                          value={menu.rating || 4.5} 
+                          precision={0.5} 
+                          size="small" 
+                          readOnly 
+                          sx={{
+                            '& .MuiRating-iconFilled': {
+                              color: '#ffc107'
+                            }
+                          }}
+                        />
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            ml: 0.5, 
+                            color: '#666',
+                            fontSize: '0.75rem'
+                          }}
+                        >
+                          ({menu.ratingCount || Math.floor(Math.random() * 50) + 10})
+                        </Typography>
+                      </Box>
+                      
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mb: 2,
+                          fontFamily: "'Poppins', sans-serif",
+                          color: '#666',
+                          fontSize: '0.85rem',
+                          lineHeight: 1.5,
+                          flexGrow: 1
+                        }}
+                      >
+                        {menu.description}
+                      </Typography>
+                      
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mt: 'auto'
+                      }}>
+                        <Stack direction="row" spacing={1}>
+                          <Chip 
+                            label={menu.category} 
+                            size="small"
+                            sx={{ 
+                              fontSize: '0.7rem', 
+                              backgroundColor: 'rgba(85, 42, 15, 0.08)',
+                              color: '#552a0f',
+                              fontWeight: 500,
+                              borderRadius: '16px'
+                            }} 
+                          />
+                          {menu.spicy && (
+                            <Tooltip title="Spicy">
                               <Chip 
-                                label={menu.category} 
+                                icon={<LocalOffer sx={{ fontSize: '0.9rem', color: '#f44336' }} />}
+                                label="Spicy" 
                                 size="small"
                                 sx={{ 
                                   fontSize: '0.7rem', 
-                                  backgroundColor: 'rgba(85, 42, 15, 0.08)',
-                                  color: '#552a0f',
+                                  backgroundColor: 'rgba(244, 67, 54, 0.08)',
+                                  color: '#f44336',
                                   fontWeight: 500,
                                   borderRadius: '16px'
                                 }} 
                               />
-                              {menu.spicy && (
-                                <Tooltip title="Spicy">
-                                  <Chip 
-                                    icon={<LocalOffer sx={{ fontSize: '0.9rem', color: '#f44336' }} />}
-                                    label="Spicy" 
-                                    size="small"
-                                    sx={{ 
-                                      fontSize: '0.7rem', 
-                                      backgroundColor: 'rgba(244, 67, 54, 0.08)',
-                                      color: '#f44336',
-                                      fontWeight: 500,
-                                      borderRadius: '16px'
-                                    }} 
-                                  />
-                                </Tooltip>
-                              )}
-                            </Stack>
-                            
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Tooltip title={favorites.includes(menu.name) ? "Remove from favorites" : "Add to favorites"}>
-                                <IconButton 
-                                  size="small" 
-                                  onClick={() => toggleFavorite(menu.name)}
-                                  sx={{ 
-                                    color: favorites.includes(menu.name) ? '#f44336' : '#bdbdbd',
-                                    '&:hover': { color: favorites.includes(menu.name) ? '#e53935' : '#f44336' }
-                                  }}
-                                >
-                                  {favorites.includes(menu.name) ? <Favorite /> : <FavoriteBorder />}
-                                </IconButton>
-                              </Tooltip>
-                              <MenuButton
-                                startIcon={<AddShoppingCart fontSize="small" />}
-                                onClick={() => handleAddToCart(menu)}
-                              >
-                                Add
-                              </MenuButton>
-                            </Box>
-                          </Box>
-                        </CardContent>
-                      </StyledCard>
-                    </Grid>
-                  ))}
+                            </Tooltip>
+                          )}
+                        </Stack>
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Tooltip title={favorites.includes(menu.name) ? "Remove from favorites" : "Add to favorites"}>
+                            <IconButton 
+                              size="small" 
+                              onClick={() => toggleFavorite(menu.name)}
+                              sx={{ 
+                                color: favorites.includes(menu.name) ? '#f44336' : '#bdbdbd',
+                                '&:hover': { color: favorites.includes(menu.name) ? '#e53935' : '#f44336' }
+                              }}
+                            >
+                              {favorites.includes(menu.name) ? <Favorite /> : <FavoriteBorder />}
+                            </IconButton>
+                          </Tooltip>
+                          <MenuButton
+                            startIcon={<AddShoppingCart fontSize="small" />}
+                            onClick={() => handleAddToCart(menu)}
+                          >
+                            Add
+                          </MenuButton>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </StyledCard>
                 </Grid>
-              )}
-            </>
+              ))}
+            </Grid>
           )}
           
           {/* Scroll to top button */}
