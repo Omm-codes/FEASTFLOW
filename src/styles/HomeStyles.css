@@ -41,7 +41,8 @@
 }
 
 .headerContainer button {
-  background-color: #291010; /* Changed to match your offer banner color for consistency */
+  background-color: #d4af37;
+  transition: 0.3s ease-in-out;
   margin-top: 15px; /* Reduced from 20px */
   border: none;
   border-radius: 5px;
@@ -54,9 +55,9 @@
 }
 
 .headerContainer button:hover {
-  background-color: #ff6b6b; /* Changed to match other hover elements */
+  background-color: #b8860b;
+  transition: 0.3s ease-in-out;
   cursor: pointer;
-  transition: 0.3s ease-in;
 }
 
 /* Mobile view */

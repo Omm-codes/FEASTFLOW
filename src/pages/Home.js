@@ -49,15 +49,15 @@ const Home = () => {
 
   return (
     <Layout>
-      {/* Improved Scrolling Offers Banner */}
+      {/* Updated scroll banner with golden theme */}
       <div className="offers-scroll-container" style={{
-        backgroundColor: "#552a0f",
+        backgroundColor: "#d4af37", // Changed to gold from green
         color: "white",
-        padding: "8px 0",
+        padding: "10px 0",
         overflow: "hidden",
         position: "relative",
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-        borderBottom: "2px solid #ffd54f"
+        borderBottom: "2px solid #f5e7b3" // Light gold border
       }}>
         <div className="offers-scroll-content" style={{
           display: "flex",
@@ -69,11 +69,11 @@ const Home = () => {
             component="span" 
             sx={{ 
               mr: 2, 
-              backgroundColor: "#ffd54f", 
-              color: "#552a0f",
+              backgroundColor: "#fff8e1", // Light gold background
+              color: "#b8860b", // Golden text
               px: 1.5,
-              py: 0.3,
-              fontSize: "0.75rem",
+              py: 0.5,
+              fontSize: "0.8rem",
               fontWeight: "bold",
               borderRadius: "4px",
               letterSpacing: "0.5px",
@@ -81,12 +81,12 @@ const Home = () => {
               boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
             }}
           >
-            OFFER
+            TODAY
           </Box>
           <Typography 
             component="p" 
             sx={{ 
-              fontSize: "0.9rem", 
+              fontSize: "0.95rem", 
               fontWeight: "500",
               fontFamily: "'Poppins', sans-serif",
               letterSpacing: "0.3px"
@@ -125,14 +125,14 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Enhanced Quick Categories - RIGHT AFTER HERO */}
+      {/* Enhanced Quick Categories with golden theme */}
       <Container maxWidth="lg" sx={{ mt: -5, mb: 5, position: 'relative', zIndex: 3 }}>
         <Paper elevation={3} sx={{ 
           borderRadius: '16px', 
-          py: 2.5, 
-          px: 3.5,
-          background: 'linear-gradient(to right, #fff, #f8f9fa)',
-          border: '1px solid #e8e8e8',
+          py: 3,
+          px: 4,
+          background: 'linear-gradient(to right, #fff8e1, #fffde7)', // Light gold gradient
+          border: '1px solid #f5e7b3',
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
         }}>
           <Box sx={{ 
@@ -140,22 +140,36 @@ const Home = () => {
             justifyContent: 'space-between', 
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: 1
+            gap: 2
           }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Typography 
-                variant="subtitle1" 
+                variant="h6" 
                 sx={{ 
-                  fontWeight: 'bold',
-                  fontFamily: "'Playfair Display', serif",
-                  mr: 2,
-                  fontSize: '1.1rem',
-                  color: '#1f1f1f'
+                  fontWeight: '600',
+                  fontFamily: "'Poppins', sans-serif",
+                  color: '#b8860b', // Dark gold
+                  position: 'relative',
+                  "&:after": {
+                    content: '""',
+                    position: 'absolute',
+                    width: '40%',
+                    height: '3px',
+                    backgroundColor: '#d4af37', // Medium gold
+                    bottom: '-8px',
+                    left: '0'
+                  }
                 }}
               >
-                Categories:
+                Browse Categories
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 1.5, 
+                flexWrap: 'wrap', 
+                mt: { xs: 2, sm: 0 },
+                ml: { xs: 0, md: 2 }
+              }}>
                 {quickCategories.map((cat) => (
                   <Chip 
                     key={cat.name}
@@ -167,16 +181,18 @@ const Home = () => {
                     to="/menu"
                     clickable
                     sx={{ 
-                      borderRadius: '20px',
-                      padding: '8px 4px',
-                      backgroundColor: '#fff',
-                      border: '1px solid #e0e0e0',
+                      borderRadius: '50px', // More rounded
+                      padding: '20px 10px',
+                      backgroundColor: 'white',
+                      border: '1px solid #c8e6c9', // Light green border
                       fontWeight: 500,
+                      fontSize: '0.9rem',
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        backgroundColor: '#f5f5f5',
-                        boxShadow: '0 3px 8px rgba(0,0,0,0.1)',
-                        transform: 'translateY(-2px)'
+                        backgroundColor: '#d4af37', // Gold background on hover
+                        color: 'white', // White text on hover
+                        boxShadow: '0 4px 12px rgba(212, 175, 55, 0.2)', // Golden shadow
+                        transform: 'translateY(-3px)'
                       }
                     }}
                   />
@@ -186,20 +202,24 @@ const Home = () => {
             <Button 
               component={Link}
               to="/menu"
-              size="small"
+              variant="outlined"
               endIcon={<ArrowForwardIcon />}
               sx={{ 
                 textTransform: 'none',
-                color: '#291010',
-                fontWeight: 'bold',
+                color: '#b8860b', // Gold text
+                border: '2px solid #b8860b', // Gold border
+                borderRadius: '50px',
+                fontWeight: '600',
                 fontSize: '0.9rem',
+                padding: '8px 20px',
                 '&:hover': { 
-                  textDecoration: 'underline',
-                  backgroundColor: 'rgba(0,0,0,0.04)'
+                  backgroundColor: '#d4af37', // Gold background on hover
+                  color: 'white', // White text on hover
+                  boxShadow: '0 4px 12px rgba(212, 175, 55, 0.2)' // Gold shadow
                 }
               }}
             >
-              See all
+              Full Menu
             </Button>
           </Box>
         </Paper>
