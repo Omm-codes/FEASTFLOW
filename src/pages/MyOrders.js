@@ -18,7 +18,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardMedia,
   TextField,
   Snackbar,
   Alert,
@@ -28,20 +27,23 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from "@mui/material";
 import { 
   Delete, 
   ShoppingCart, 
   Add, 
   Remove,
-  LocalShipping,
-  Payment,
   CheckCircleOutline,
-  NavigateNext
+  NavigateNext,
+  ExpandMore,
+  Cancel
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Styled Components
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
@@ -136,7 +138,27 @@ const MyOrders = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [activeStep, setActiveStep] = useState(0);
   const [orderCompleteOpen, setOrderCompleteOpen] = useState(false);
-  
+  const [orderData, setOrderData] = useState({
+    orderId: '',
+    orderDate: '',
+    deliveryTime: '',
+    name: '',
+    phone: '',
+    email: '',
+    specialInstructions: ''
+  });
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    deliveryTime: '',
+    specialInstructions: ''
+  });
+  const [orderHistory, setOrderHistory] = useState(() => {
+    const savedOrders = localStorage.getItem('orderHistory');
+    return savedOrders ? JSON.parse(savedOrders) : [];
+  });
+
   const steps = ['Cart', 'Delivery Details', 'Payment', 'Complete'];
 
   const calculateItemTotal = (price, index) => {
@@ -179,6 +201,23 @@ const MyOrders = () => {
   };
   
   const handleNext = () => {
+    if (activeStep === 1) {
+      // Validate delivery details
+      if (!formData.name || !formData.phone || !formData.email) {
+        showSnackbar("Please fill in all required fields", "error");
+        return;
+      }
+      // Save form data to order data
+      setOrderData({
+        ...orderData,
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        deliveryTime: formData.deliveryTime,
+        specialInstructions: formData.specialInstructions
+      });
+    }
+    
     if (activeStep === steps.length - 2) {
       // Complete order
       handleConfirmOrder();
@@ -192,6 +231,43 @@ const MyOrders = () => {
   };
 
   const handleConfirmOrder = () => {
+    // Generate random order ID
+    const orderId = Math.floor(100000 + Math.random() * 900000).toString();
+    const orderDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    const newOrder = {
+      orderId,
+      orderDate,
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      deliveryTime: formData.deliveryTime || "As soon as possible",
+      specialInstructions: formData.specialInstructions || "",
+      items: [...cart.map((item, index) => ({
+        ...item,
+        quantity: quantities[index],
+        total: (item.price * quantities[index]).toFixed(2)
+      }))],
+      status: "Processing",
+      total: grandTotal()
+    };
+    
+    // Save order details for display in dialog
+    setOrderData(newOrder);
+    
+    // Add to order history
+    const updatedHistory = [newOrder, ...orderHistory];
+    setOrderHistory(updatedHistory);
+    
+    // Save to localStorage
+    localStorage.setItem('orderHistory', JSON.stringify(updatedHistory));
+    
     // Show order complete dialog
     setActiveStep(steps.length - 1);
     setOrderCompleteOpen(true);
@@ -201,8 +277,49 @@ const MyOrders = () => {
     setQuantities([]);
   };
   
+  // Update the handleCancelOrder function
+  const handleCancelOrder = () => {
+    // Update the order status in history
+    const updatedHistory = orderHistory.map(order => {
+      if (order.orderId === orderData.orderId) {
+        return {...order, status: "Cancelled"};
+      }
+      return order;
+    });
+    
+    setOrderHistory(updatedHistory);
+    localStorage.setItem('orderHistory', JSON.stringify(updatedHistory));
+    
+    showSnackbar("Order has been cancelled", "info");
+    setOrderCompleteOpen(false);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const navigate = useNavigate();
+  
   const handleCloseOrderComplete = () => {
     setOrderCompleteOpen(false);
+    navigate('/menu');
+  };
+
+  const handleCancelHistoryOrder = (orderId) => {
+    const updatedHistory = orderHistory.map(order => {
+      if (order.orderId === orderId) {
+        return {...order, status: "Cancelled"};
+      }
+      return order;
+    });
+    
+    setOrderHistory(updatedHistory);
+    localStorage.setItem('orderHistory', JSON.stringify(updatedHistory));
+    showSnackbar("Order has been cancelled", "info");
   };
 
   const renderCartStep = () => (
@@ -411,9 +528,12 @@ const MyOrders = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
+                name="name"
                 label="Full Name"
                 variant="outlined"
                 required
+                value={formData.name}
+                onChange={handleFormChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#552a0f' }
@@ -425,9 +545,12 @@ const MyOrders = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
+                name="phone"
                 label="Phone Number"
                 variant="outlined"
                 required
+                value={formData.phone}
+                onChange={handleFormChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#552a0f' }
@@ -439,9 +562,12 @@ const MyOrders = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                name="email"
                 label="Email Address"
                 variant="outlined"
                 required
+                value={formData.email}
+                onChange={handleFormChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#552a0f' }
@@ -453,10 +579,13 @@ const MyOrders = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                name="deliveryTime"
                 label="Delivery Time"
                 variant="outlined"
                 required
                 placeholder="e.g., Today at 1:00 PM"
+                value={formData.deliveryTime}
+                onChange={handleFormChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#552a0f' }
@@ -468,10 +597,13 @@ const MyOrders = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                name="specialInstructions"
                 label="Special Instructions (Optional)"
                 variant="outlined"
                 multiline
                 rows={2}
+                value={formData.specialInstructions}
+                onChange={handleFormChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#552a0f' }
@@ -720,7 +852,7 @@ const MyOrders = () => {
         <Dialog
           open={orderCompleteOpen}
           onClose={handleCloseOrderComplete}
-          maxWidth="sm"
+          maxWidth="md"
           fullWidth
           sx={{
             '& .MuiPaper-root': {
@@ -728,19 +860,123 @@ const MyOrders = () => {
             }
           }}
         >
-          <DialogContent sx={{ textAlign: 'center', py: 4 }}>
-            <CheckCircleOutline sx={{ fontSize: 80, color: '#66bb6a', mb: 2 }} />
-            <Typography variant="h5" sx={{ mb: 2, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>
-              Order Placed Successfully!
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
-              Thank you for your order. It will be delivered to you shortly.
-            </Typography>
+          <DialogTitle sx={{ 
+            textAlign: 'center', 
+            pt: 3, 
+            pb: 2,
+            fontFamily: "'Playfair Display', serif", 
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1
+          }}>
+            <CheckCircleOutline sx={{ color: '#66bb6a', fontSize: 30 }} />
+            Order Placed Successfully!
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+              <Paper elevation={0} sx={{ p: 2, border: '1px solid #f0f0f0', borderRadius: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Order ID
+                    </Typography>
+                    <Typography variant="body1" fontWeight={600}>
+                      #{orderData.orderId}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="body2" color="text.secondary">
+                      Order Date
+                    </Typography>
+                    <Typography variant="body1">
+                      {orderData.orderDate}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary">
+                      Delivery Time
+                    </Typography>
+                    <Typography variant="body1">
+                      {orderData.deliveryTime || "As soon as possible"}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Paper>
+
+              <Typography variant="h6" sx={{ mt: 1, fontSize: '1rem', fontWeight: 600 }}>
+                Order Items
+              </Typography>
+              <TableContainer component={Paper} sx={{ borderRadius: 2, border: '1px solid #f0f0f0' }}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: 'rgba(85, 42, 15, 0.05)' }}>
+                      <TableCell>Item</TableCell>
+                      <TableCell align="center">Price</TableCell>
+                      <TableCell align="center">Quantity</TableCell>
+                      <TableCell align="right">Total</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {orderData.items?.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box
+                            component="img"
+                            src={item.image}
+                            alt={item.name}
+                            sx={{ width: 40, height: 40, borderRadius: 1, objectFit: 'cover' }}
+                          />
+                          <Typography variant="body2" fontWeight={500}>
+                            {item.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">₹{item.price}</TableCell>
+                        <TableCell align="center">{item.quantity}</TableCell>
+                        <TableCell align="right">₹{item.total}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end',
+                p: 2, 
+                backgroundColor: 'rgba(85, 42, 15, 0.05)', 
+                borderRadius: 2 
+              }}>
+                <Typography variant="subtitle1" fontWeight={700} color="#552a0f">
+                  Total Amount: ₹{grandTotal()}
+                </Typography>
+              </Box>
+
+              <Box sx={{ mt: 2, px: 1 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Your order has been placed successfully. You can track your order status or cancel if needed.
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#d32f2f', fontStyle: 'italic' }}>
+                  * Cancellation is available within 5 minutes of placing the order
+                </Typography>
+              </Box>
+            </Box>
           </DialogContent>
-          <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 3 }}>
             <Button
-              component={Link}
-              to="/menu"
+              onClick={handleCancelOrder}
+              variant="outlined"
+              color="error"
+              sx={{
+                textTransform: 'none',
+                borderRadius: '30px',
+              }}
+            >
+              Cancel Order
+            </Button>
+            <Button
+              onClick={handleCloseOrderComplete}
               variant="contained"
               sx={{
                 backgroundColor: '#552a0f',
@@ -773,6 +1009,198 @@ const MyOrders = () => {
             {snackbarMessage}
           </Alert>
         </Snackbar>
+
+        {/* Order History Section */}
+        {orderHistory.length > 0 && (
+          <Box sx={{ mt: 8 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 600,
+                color: '#333',
+                mb: 3
+              }}
+            >
+              Your Order History
+            </Typography>
+            
+            <Grid container spacing={3}>
+              {orderHistory.map((order) => (
+                <Grid item xs={12} key={order.orderId}>
+                  <Paper
+                    elevation={1}
+                    sx={{
+                      p: 3,
+                      borderRadius: 2,
+                      border: '1px solid #f0f0f0',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    {/* Status badge */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        backgroundColor: order.status === "Cancelled" ? '#ffcdd2' : 
+                                          order.status === "Delivered" ? '#c8e6c9' : '#fff9c4',
+                        color: order.status === "Cancelled" ? '#c62828' : 
+                                order.status === "Delivered" ? '#2e7d32' : '#f57f17',
+                        fontWeight: 600,
+                        fontSize: '0.8rem',
+                        px: 3,
+                        py: 0.5
+                      }}
+                    >
+                      {order.status}
+                    </Box>
+                    
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={8}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, mb: 3 }}>
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              Order ID
+                            </Typography>
+                            <Typography variant="body1" fontWeight={600}>
+                              #{order.orderId}
+                            </Typography>
+                          </Box>
+                          
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              Order Date
+                            </Typography>
+                            <Typography variant="body1">
+                              {order.orderDate}
+                            </Typography>
+                          </Box>
+                          
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              Delivery Time
+                            </Typography>
+                            <Typography variant="body1">
+                              {order.deliveryTime}
+                            </Typography>
+                          </Box>
+
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              Total
+                            </Typography>
+                            <Typography variant="body1" fontWeight={600}>
+                              ₹{order.total}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        
+                        <Accordion sx={{ 
+                          '&:before': { display: 'none' },
+                          boxShadow: 'none',
+                          border: '1px solid #f0f0f0',
+                          borderRadius: '8px !important',
+                          mb: 2,
+                          overflow: 'hidden'
+                        }}>
+                          <AccordionSummary
+                            expandIcon={<ExpandMore />}
+                            sx={{ backgroundColor: 'rgba(85, 42, 15, 0.02)' }}
+                          >
+                            <Typography fontWeight={500}>
+                              View Order Details
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <TableContainer>
+                              <Table size="small">
+                                <TableHead>
+                                  <TableRow sx={{ backgroundColor: 'rgba(85, 42, 15, 0.02)' }}>
+                                    <TableCell>Item</TableCell>
+                                    <TableCell align="center">Price</TableCell>
+                                    <TableCell align="center">Quantity</TableCell>
+                                    <TableCell align="right">Total</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {order.items.map((item, index) => (
+                                    <TableRow key={index}>
+                                      <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Box
+                                          component="img"
+                                          src={item.image}
+                                          alt={item.name}
+                                          sx={{ width: 40, height: 40, borderRadius: 1, objectFit: 'cover' }}
+                                        />
+                                        <Typography variant="body2" fontWeight={500}>
+                                          {item.name}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell align="center">₹{item.price}</TableCell>
+                                      <TableCell align="center">{item.quantity}</TableCell>
+                                      <TableCell align="right">₹{item.total}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                            
+                            {order.specialInstructions && (
+                              <Box sx={{ mt: 2, p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  Special Instructions:
+                                </Typography>
+                                <Typography variant="body2">
+                                  {order.specialInstructions}
+                                </Typography>
+                              </Box>
+                            )}
+                          </AccordionDetails>
+                        </Accordion>
+                      </Grid>
+                      
+                      <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Box sx={{ 
+                          p: 2,
+                          backgroundColor: 'rgba(85, 42, 15, 0.02)', 
+                          borderRadius: 2,
+                          border: '1px solid #f0f0f0' 
+                        }}>
+                          <Typography variant="body2" color="text.secondary" gutterBottom>
+                            Delivery Address
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>{order.name}</strong><br />
+                            Phone: {order.phone}<br />
+                            Email: {order.email}
+                          </Typography>
+                        </Box>
+                        
+                        {/* Only show cancel button if order is not cancelled or delivered */}
+                        {order.status === "Processing" && (
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() => handleCancelHistoryOrder(order.orderId)}
+                            startIcon={<Cancel />}
+                            sx={{
+                              borderRadius: 30,
+                              textTransform: 'none'
+                            }}
+                          >
+                            Cancel Order
+                          </Button>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
       </Container>
     </Layout>
   );
