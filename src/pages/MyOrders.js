@@ -160,7 +160,7 @@ const MyOrders = () => {
     return savedOrders ? JSON.parse(savedOrders) : [];
   });
 
-  const steps = ['Cart', 'Pick Up Detials', 'Payment', 'Complete'];
+  const steps = ['Cart', 'Delivery Details', 'Payment', 'Complete'];
 
   const calculateItemTotal = (price, index) => {
     return (price * quantities[index]).toFixed(2);
@@ -533,7 +533,7 @@ const MyOrders = () => {
               mb: 3
             }}
           >
-            Pick Up Detials
+            Delivery Details
           </Typography>
           
           <Grid container spacing={2}>
@@ -591,8 +591,8 @@ const MyOrders = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                name="PickUpTime"
-                label="Pick Up Time"
+                name="deliveryTime"
+                label="Delivery Time"
                 variant="outlined"
                 required
                 placeholder="e.g., Today at 1:00 PM"
@@ -908,7 +908,7 @@ const MyOrders = () => {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="body2" color="text.secondary">
-                      Pick Up Time
+                      Delivery Time
                     </Typography>
                     <Typography variant="body1">
                       {orderData.deliveryTime || "As soon as possible"}
