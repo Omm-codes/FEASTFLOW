@@ -49,15 +49,15 @@ const Home = () => {
 
   return (
     <Layout>
-      {/* Updated scroll banner with golden theme */}
+      {/* Updated scroll banner matching About page theme */}
       <div className="offers-scroll-container" style={{
-        backgroundColor: "#d4af37", // Changed to gold from green
+        backgroundColor: "#552a0f", // Changed to match About page brown theme
         color: "white",
         padding: "10px 0",
         overflow: "hidden",
         position: "relative",
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-        borderBottom: "2px solid #f5e7b3" // Light gold border
+        borderBottom: "2px solid #ffd54f" // Gold border to match About page accent
       }}>
         <div className="offers-scroll-content" style={{
           display: "flex",
@@ -69,8 +69,8 @@ const Home = () => {
             component="span" 
             sx={{ 
               mr: 2, 
-              backgroundColor: "#fff8e1", // Light gold background
-              color: "#b8860b", // Golden text
+              backgroundColor: "#ffd54f", // Light gold background
+              color: "#552a0f", // Brown text
               px: 1.5,
               py: 0.5,
               fontSize: "0.8rem",
@@ -120,19 +120,40 @@ const Home = () => {
           <h1>Delicious Bites!</h1>
           <p>Your Food Is Waiting For You</p>
           <Link to="/menu">
-            <button aria-label="Order Now">ORDER NOW</button>
+            <button 
+              aria-label="Order Now" 
+              style={{
+                backgroundColor: "#552a0f",
+                color: "white",
+                padding: "12px 24px",
+                borderRadius: "30px",
+                fontSize: "1rem",
+                fontWeight: "600",
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 4px 15px rgba(85, 42, 15, 0.3)",
+                transition: "all 0.3s ease",
+                fontFamily: "'Poppins', sans-serif",
+                textTransform: "uppercase",
+                letterSpacing: "1px"
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = "#3e1e09"}
+              onMouseOut={(e) => e.target.style.backgroundColor = "#552a0f"}
+            >
+              ORDER NOW
+            </button>
           </Link>
         </div>
       </div>
 
-      {/* Enhanced Quick Categories with golden theme */}
+      {/* Enhanced Quick Categories matching About page theme */}
       <Container maxWidth="lg" sx={{ mt: -5, mb: 5, position: 'relative', zIndex: 3 }}>
         <Paper elevation={3} sx={{ 
           borderRadius: '16px', 
           py: 3,
           px: 4,
-          background: 'linear-gradient(to right, #fff8e1, #fffde7)', // Light gold gradient
-          border: '1px solid #f5e7b3',
+          background: '#f9f7f4', // Match About page background
+          border: '1px solid #eaeaea',
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
         }}>
           <Box sx={{ 
@@ -147,15 +168,15 @@ const Home = () => {
                 variant="h6" 
                 sx={{ 
                   fontWeight: '600',
-                  fontFamily: "'Poppins', sans-serif",
-                  color: '#b8860b', // Dark gold
+                  fontFamily: "'Playfair Display', serif", // Match About page font
+                  color: '#552a0f', // Brown from About page
                   position: 'relative',
                   "&:after": {
                     content: '""',
                     position: 'absolute',
                     width: '40%',
                     height: '3px',
-                    backgroundColor: '#d4af37', // Medium gold
+                    backgroundColor: '#ffd54f', // Gold accent from About page
                     bottom: '-8px',
                     left: '0'
                   }
@@ -178,20 +199,20 @@ const Home = () => {
                       <span>{cat.name}</span>
                     </Box>}
                     component={Link}
-                    to="/menu"
+                    to={`/menu?category=${cat.name}`}  // Changed to pass category as URL parameter
                     clickable
                     sx={{ 
-                      borderRadius: '50px', // More rounded
+                      borderRadius: '50px', 
                       padding: '20px 10px',
                       backgroundColor: 'white',
-                      border: '1px solid #c8e6c9', // Light green border
+                      border: '1px solid #eaeaea', 
                       fontWeight: 500,
                       fontSize: '0.9rem',
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        backgroundColor: '#d4af37', // Gold background on hover
-                        color: 'white', // White text on hover
-                        boxShadow: '0 4px 12px rgba(212, 175, 55, 0.2)', // Golden shadow
+                        backgroundColor: '#552a0f', // Brown on hover
+                        color: 'white', 
+                        boxShadow: '0 4px 12px rgba(85, 42, 15, 0.2)', 
                         transform: 'translateY(-3px)'
                       }
                     }}
@@ -206,16 +227,16 @@ const Home = () => {
               endIcon={<ArrowForwardIcon />}
               sx={{ 
                 textTransform: 'none',
-                color: '#b8860b', // Gold text
-                border: '2px solid #b8860b', // Gold border
+                color: '#552a0f', // Brown text
+                border: '2px solid #552a0f', // Brown border
                 borderRadius: '50px',
                 fontWeight: '600',
                 fontSize: '0.9rem',
                 padding: '8px 20px',
                 '&:hover': { 
-                  backgroundColor: '#d4af37', // Gold background on hover
-                  color: 'white', // White text on hover
-                  boxShadow: '0 4px 12px rgba(212, 175, 55, 0.2)' // Gold shadow
+                  backgroundColor: '#552a0f', // Brown background on hover
+                  color: 'white',
+                  boxShadow: '0 4px 12px rgba(85, 42, 15, 0.2)'
                 }
               }}
             >
@@ -225,73 +246,145 @@ const Home = () => {
         </Paper>
       </Container>
 
-      {/* Minimalist Today's Special Section */}
+      {/* Enhanced Today's Special Section */}
       <Box sx={{ 
-        py: 5, 
+        py: 6, 
         textAlign: "center", 
-        bgcolor: "#f5f7fa",  /* Changed background color */
-        borderTop: '1px solidrgb(136, 139, 146)',
+        bgcolor: "#f9f7f4",  /* Matching About page background */
+        borderTop: '1px solid #eaeaea',
         position: 'relative'
       }}>
         <Container maxWidth="lg">
           <Typography 
-            variant="h5" 
+            variant="h4" 
             sx={{ 
-              fontWeight: "600", 
+              fontWeight: "700", 
               mb: 4,
               fontFamily: "'Playfair Display', serif",
               position: 'relative',
               display: 'inline-block',
-              color: '#333'
+              color: '#552a0f',
+              "&:after": {
+                content: '""',
+                position: "absolute",
+                bottom: "-10px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "80px",
+                borderBottom: "3px solid #ffd54f"
+              }
             }}
           >
             Today's Specials
           </Typography>
           
-          <Grid container spacing={2} justifyContent="center">
-            {todaysSpecials.map((item) => (
-              <Grid item xs={12} sm={4} key={item.name}>
+          <Grid container spacing={3} justifyContent="center">
+            {/* Update the number of items to display from 3 to 6 */}
+            {getRandomSpecials(MenuList, 6).map((item) => (
+              <Grid item xs={12} sm={6} md={4} key={item.name}>
                 <Card sx={{ 
-                  maxWidth: 300, 
                   mx: "auto", 
                   boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  height: '100%',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
                   }
                 }}>
-                  <CardActionArea component={Link} to="/menu">
+                  <CardActionArea 
+                    component={Link} 
+                    to={`/menu?category=${item.category}`}  // Changed to pass category as URL parameter
+                    sx={{ height: '100%' }}
+                  >
                     <CardMedia
                       component="img"
-                      height="150"
+                      height="180"
                       image={item.image}
                       alt={item.name}
                       loading="lazy"
                     />
-                    <CardContent sx={{ p: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <Typography 
-                          variant="subtitle1" 
-                          sx={{
+                    {/* Price badge */}
+                    <Box sx={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      backgroundColor: '#ffd54f',
+                      color: '#552a0f',
+                      padding: '6px 12px',
+                      fontWeight: 'bold',
+                      borderRadius: '0 0 0 12px',
+                      fontSize: '0.85rem',
+                      fontFamily: "'Poppins', sans-serif"
+                    }}>
+                      ₹{item.price}
+                    </Box>
+                    {/* Random badges on some items */}
+                    {Math.random() > 0.5 && (
+                      <Box sx={{
+                        position: 'absolute',
+                        top: 10,
+                        left: 10,
+                        backgroundColor: '#552a0f',
+                        color: 'white',
+                        padding: '4px 10px',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                        fontFamily: "'Poppins', sans-serif",
+                        textTransform: 'uppercase'
+                      }}>
+                        {Math.random() > 0.5 ? "Best Seller" : "New"}
+                      </Box>
+                    )}
+                    <CardContent sx={{ p: 3 }}>
+                      <Typography 
+                        variant="h6" 
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: '1.1rem',
+                          color: '#333',
+                          fontFamily: "'Playfair Display', serif",
+                          mb: 1
+                        }}
+                      >
+                        {item.name}
+                      </Typography>
+                      
+                      {/* Rating stars - random between 4 and 5 */}
+                      <Box sx={{ display: 'flex', mb: 1.5, justifyContent: 'center' }}>
+                        {[...Array(Math.floor(Math.random() > 0.7 ? 5 : 4))].map((_, i) => (
+                          <StarIcon key={i} fontSize="small" sx={{ color: '#ffd54f', mr: 0.5 }} />
+                        ))}
+                      </Box>
+                      
+                      <Box sx={{ 
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        mt: 2,
+                        borderTop: '1px dashed #e0e0e0',
+                        pt: 2
+                      }}>
+                        <Button
+                          startIcon={<ShoppingBasketIcon />}
+                          component={Link}
+                          to="/menu"
+                          sx={{ 
                             fontWeight: 600,
-                            fontSize: '1rem',
-                            color: '#333',
-                            textAlign: 'left'
+                            color: '#552a0f',
+                            fontSize: '0.9rem',
+                            textTransform: 'none',
+                            '&:hover': {
+                              backgroundColor: 'rgba(85, 42, 15, 0.1)'
+                            }
                           }}
                         >
-                          {item.name}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: 'goldenrod',
-                            fontWeight: 600,
-                          }}
-                        >
-                          ₹{item.price}
-                        </Typography>
+                          Order Now
+                        </Button>
                       </Box>
                     </CardContent>
                   </CardActionArea>
@@ -302,23 +395,28 @@ const Home = () => {
           
           <Button
             component={Link}
-            to="/menu"
-            size="small"
+            to="/menu"  // Keep this as is to show all items
+            variant="contained"
             endIcon={<ArrowForwardIcon />}
             sx={{
-              mt: 4,
-              color: '#555',
-              textTransform: 'none',
-              fontWeight: 'medium',
-              fontSize: '0.9rem',
-              '&:hover': { 
-                backgroundColor: 'transparent',
-                color: '#000',
-                textDecoration: 'underline'
+              mt: 5,
+              bgcolor: "#552a0f",
+              color: "white",
+              borderRadius: "30px",
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: "1rem",
+              py: 1.5,
+              px: 4,
+              fontFamily: "'Poppins', sans-serif",
+              boxShadow: "0 4px 15px rgba(85, 42, 15, 0.3)",
+              '&:hover': {
+                bgcolor: '#3e1e09',
+                boxShadow: '0 6px 20px rgba(85, 42, 15, 0.4)',
               }
             }}
           >
-            View full menu
+            Explore Full Menu
           </Button>
         </Container>
       </Box>
