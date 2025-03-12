@@ -1,0 +1,38 @@
+{
+  "files": {
+    "main.css": "/FEASTFLOW/static/css/main.cd670ee5.css",
+    "main.js": "/FEASTFLOW/static/js/main.ca43f266.js",
+    "static/js/787.57d0b615.chunk.js": "/FEASTFLOW/static/js/787.57d0b615.chunk.js",
+    "static/media/mm.jpg": "/FEASTFLOW/static/media/mm.b57d6263cadd4df95045.jpg",
+    "static/media/fruit salad.jpg": "/FEASTFLOW/static/media/fruit salad.661114a5b526a681bda2.jpg",
+    "static/media/sandwich.jpg": "/FEASTFLOW/static/media/sandwich.9e38a647d5016b1a12bc.jpg",
+    "static/media/aloo paratha.jpg": "/FEASTFLOW/static/media/aloo paratha.99bdc9c6710d14ea22f0.jpg",
+    "static/media/vada sambar.jpg": "/FEASTFLOW/static/media/vada sambar.9322c6b5350078b1a52f.jpg",
+    "static/media/pav bhaji.jpg": "/FEASTFLOW/static/media/pav bhaji.4901d3225f4d0a1df7a4.jpg",
+    "static/media/masala chai.jpg": "/FEASTFLOW/static/media/masala chai.9dbbfdb2bdb82524e9ce.jpg",
+    "static/media/chocolate cake.jpg": "/FEASTFLOW/static/media/chocolate cake.8d9ff4574671d19ef3fb.jpg",
+    "static/media/veg burger.jpg": "/FEASTFLOW/static/media/veg burger.fd682afe71e1620b0db7.jpg",
+    "static/media/samosa.jpg": "/FEASTFLOW/static/media/samosa.ef83c0bf0d4dc81311c5.jpg",
+    "static/media/veg biryani.jpg": "/FEASTFLOW/static/media/veg biryani.fb73f4b7c7bd0cd1d506.jpg",
+    "static/media/lassi.jpg": "/FEASTFLOW/static/media/lassi.15a8927ba23201174208.jpg",
+    "static/media/fries.jpg": "/FEASTFLOW/static/media/fries.1785e966564bd6854ac7.jpg",
+    "static/media/masala.jpg": "/FEASTFLOW/static/media/masala.f4dd64f4906d42ddcbdb.jpg",
+    "static/media/coffee.jpg": "/FEASTFLOW/static/media/coffee.99b7b4419e2de03733cc.jpg",
+    "static/media/banner.jpeg": "/FEASTFLOW/static/media/banner.05892fe97cce26a5d9e5.jpeg",
+    "static/media/chhola.jpg": "/FEASTFLOW/static/media/chhola.a1458ef1370699c23212.jpg",
+    "static/media/paneer.jpg": "/FEASTFLOW/static/media/paneer.f04d2c563fe596463e47.jpg",
+    "static/media/idli.jpg": "/FEASTFLOW/static/media/idli.dc2d98fda6c7a903c64b.jpg",
+    "static/media/gujrati.jpeg": "/FEASTFLOW/static/media/gujrati.77bd2d3baa11e6cf3dcd.jpeg",
+    "static/media/dosa.jpg": "/FEASTFLOW/static/media/dosa.5c938f456ea86779ba13.jpg",
+    "static/media/logo.png": "/FEASTFLOW/static/media/logo.ad93e8fd197265b812f5.png",
+    "static/media/veg thali.jpeg": "/FEASTFLOW/static/media/veg thali.37df20b47c4b27d597b2.jpeg",
+    "index.html": "/FEASTFLOW/index.html",
+    "main.cd670ee5.css.map": "/FEASTFLOW/static/css/main.cd670ee5.css.map",
+    "main.ca43f266.js.map": "/FEASTFLOW/static/js/main.ca43f266.js.map",
+    "787.57d0b615.chunk.js.map": "/FEASTFLOW/static/js/787.57d0b615.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cd670ee5.css",
+    "static/js/main.ca43f266.js"
+  ]
+}
