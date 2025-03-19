@@ -1,0 +1,27 @@
+{
+  "name": "feastflow-backend",
+  "version": "1.0.0",
+  "description": "Backend for the FeastFlow application",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
