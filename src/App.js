@@ -9,10 +9,13 @@ import MyOrders from "./pages/MyOrders";
 import { CartProvider } from "./context/cartContext";
 
 function App() {
+  // Get the base URL from the environment or use '/'
+  const basename = process.env.PUBLIC_URL || '/';
+  
   return (
     <div>
       <CartProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
