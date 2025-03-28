@@ -1,0 +1,41 @@
+.contact-container {
+  margin-top: 100px;
+}
+
+/* Contact form inputs */
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px; /* Better usability */
+  border: 1px solid #ccc; /* More polished look */
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+/* Smooth focus effect */
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: goldenrod;
+  box-shadow: 0 0 5px rgba(218, 165, 32, 0.5); /* Subtle glow effect */
+}
+
+/* Contact info container */
+.contact-info-container {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Mobile view optimizations */
+@media (max-width: 600px) {
+  .contact-container {
+    margin-top: 60px;
+  }
+  
+  .contact-form input,
+  .contact-form textarea {
+    margin-bottom: 15px; /* Reduced spacing for smaller screens */
+  }
+}

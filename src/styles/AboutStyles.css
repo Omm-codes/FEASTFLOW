@@ -1,0 +1,65 @@
+.about-hero {
+  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+    url("../images/banner.jpeg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.feature-card {
+  transition: all 0.3s ease;
+  background-color: #fff;
+  border: 1px solid #eee;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
+  border-color: goldenrod;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.1);
+}
+
+.about-image {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 3px solid goldenrod;
+}
+
+.section-title {
+  color: goldenrod;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #daa520, #ffd700);
+}
+
+.feature-icon {
+  background: linear-gradient(135deg, rgba(218,165,32,0.1), rgba(255,215,0,0.1));
+  padding: 20px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    height: 300px;
+  }
+}
