@@ -16,14 +16,10 @@ import {
   Container,
   Button,
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
   TextField,
   Tab,
   Tabs,
-  Paper,
-  Avatar,
   FormControlLabel,
   Checkbox
 } from "@mui/material";

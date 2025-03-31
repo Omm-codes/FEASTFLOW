@@ -860,169 +860,169 @@ const MyOrders = () => {
 
         {renderCurrentStep()}
         
-        {/* Order Complete Dialog */}
-        <Dialog
-          open={orderCompleteOpen}
-          onClose={handleCloseOrderComplete}
-          maxWidth="md"
-          fullWidth
-          sx={{
-            '& .MuiPaper-root': {
-              borderRadius: '12px',
-            }
-          }}
-        >
-          <DialogTitle sx={{ 
-            textAlign: 'center', 
-            pt: 3, 
-            pb: 2,
-            fontFamily: "'Playfair Display', serif", 
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 1
-          }}>
-            <CheckCircleOutline sx={{ color: '#66bb6a', fontSize: 30 }} />
-            Order Placed Successfully!
-          </DialogTitle>
-          <DialogContent>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-              <Paper elevation={0} sx={{ p: 2, border: '1px solid #f0f0f0', borderRadius: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Order ID
-                    </Typography>
-                    <Typography variant="body1" fontWeight={600}>
-                      #{orderData.orderId}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Order Date
-                    </Typography>
-                    <Typography variant="body1">
-                      {orderData.orderDate}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">
-                      Delivery Time
-                    </Typography>
-                    <Typography variant="body1">
-                      {orderData.deliveryTime || "As soon as possible"}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Paper>
-
-              <Typography variant="h6" sx={{ mt: 1, fontSize: '1rem', fontWeight: 600 }}>
-                Order Items
-              </Typography>
-              <TableContainer component={Paper} sx={{ borderRadius: 2, border: '1px solid #f0f0f0' }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: 'rgba(85, 42, 15, 0.05)' }}>
-                      <TableCell>Item</TableCell>
-                      <TableCell align="center">Price</TableCell>
-                      <TableCell align="center">Quantity</TableCell>
-                      <TableCell align="right">Total</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {orderData.items?.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Box
-                            component="img"
-                            src={item.image}
-                            alt={item.name}
-                            sx={{ width: 40, height: 40, borderRadius: 1, objectFit: 'cover' }}
-                          />
-                          <Typography variant="body2" fontWeight={500}>
-                            {item.name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">₹{item.price}</TableCell>
-                        <TableCell align="center">{item.quantity}</TableCell>
-                        <TableCell align="right">₹{item.total}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'flex-end',
-                p: 2, 
-                backgroundColor: 'rgba(85, 42, 15, 0.05)', 
-                borderRadius: 2 
-              }}>
-                <Typography variant="subtitle1" fontWeight={700} color="#552a0f">
-                  Total Amount: ₹{grandTotal()}
-                </Typography>
-              </Box>
-
-              <Box sx={{ mt: 2, px: 1 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  Your order has been placed successfully. You can track your order status or cancel if needed.
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#d32f2f', fontStyle: 'italic' }}>
-                  * Cancellation is available within 5 minutes of placing the order
-                </Typography>
-              </Box>
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 3 }}>
-            <Button
-              onClick={handleCancelOrder}
-              variant="outlined"
-              color="error"
-              sx={{
-                textTransform: 'none',
-                borderRadius: '30px',
-              }}
-            >
-              Cancel Order
-            </Button>
-            <Button
-              onClick={handleCloseOrderComplete}
-              variant="contained"
-              sx={{
-                backgroundColor: '#552a0f',
-                color: 'white',
-                fontFamily: "'Poppins', sans-serif",
-                textTransform: 'none',
-                borderRadius: '30px',
-                px: 3,
-                '&:hover': {
-                  backgroundColor: '#3e1e09',
-                }
-              }}
-            >
-              Continue Shopping
-            </Button>
-          </DialogActions>
-        </Dialog>
         
-        <Snackbar 
-          open={snackbarOpen} 
-          autoHideDuration={6000} 
-          onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert 
-            onClose={() => setSnackbarOpen(false)} 
-            severity={snackbarSeverity} 
-            sx={{ width: '100%' }}
+          <Dialog
+            open={orderCompleteOpen}
+            onClose={handleCloseOrderComplete}
+            maxWidth="md"
+            fullWidth
+            sx={{
+              '& .MuiPaper-root': {
+                borderRadius: '12px',
+              }
+            }}
           >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
+            <DialogTitle sx={{ 
+              textAlign: 'center', 
+              pt: 3, 
+              pb: 2,
+              fontFamily: "'Playfair Display', serif", 
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1
+            }}>
+              <CheckCircleOutline sx={{ color: '#66bb6a', fontSize: 30 }} />
+              Order Placed Successfully!
+            </DialogTitle>
+            <DialogContent>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+                <Paper elevation={0} sx={{ p: 2, border: '1px solid #f0f0f0', borderRadius: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Order ID
+                </Typography>
+                <Typography variant="body1" fontWeight={600}>
+                  #{orderData.orderId}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Order Date
+                </Typography>
+                <Typography variant="body1">
+                  {orderData.orderDate}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="body2" color="text.secondary">
+                  Delivery Time
+                </Typography>
+                <Typography variant="body1">
+                  {orderData.deliveryTime || "As soon as possible"}
+                </Typography>
+              </Grid>
+            </Grid>
+                </Paper>
 
-        {/* Order History Section */}
+                <Typography variant="h6" sx={{ mt: 1, fontSize: '1rem', fontWeight: 600 }}>
+            Order Items
+                </Typography>
+                <TableContainer component={Paper} sx={{ borderRadius: 2, border: '1px solid #f0f0f0' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ backgroundColor: 'rgba(85, 42, 15, 0.05)' }}>
+                  <TableCell>Item</TableCell>
+                  <TableCell align="center">Price</TableCell>
+                  <TableCell align="center">Quantity</TableCell>
+                  <TableCell align="right">Total</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {orderData.items?.map((item, index) => (
+                  <TableRow key={index}>
+              <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  component="img"
+                  src={item.image}
+                  alt={item.name}
+                  sx={{ width: 40, height: 40, borderRadius: 1, objectFit: 'cover' }}
+                />
+                <Typography variant="body2" fontWeight={500}>
+                  {item.name}
+                </Typography>
+              </TableCell>
+              <TableCell align="center">₹{item.price}</TableCell>
+              <TableCell align="center">{item.quantity}</TableCell>
+              <TableCell align="right">₹{item.total}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+                </TableContainer>
+
+                <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end',
+            p: 2, 
+            backgroundColor: 'rgba(85, 42, 15, 0.05)', 
+            borderRadius: 2 
+                }}>
+            <Typography variant="subtitle1" fontWeight={700} color="#552a0f">
+              Total Amount: ₹{orderData.total}
+            </Typography>
+                </Box>
+
+                <Box sx={{ mt: 2, px: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Your order has been placed successfully. You can track your order status or cancel if needed.
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#d32f2f', fontStyle: 'italic' }}>
+              * Cancellation is available within 5 minutes of placing the order
+            </Typography>
+                </Box>
+              </Box>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 3 }}>
+              <Button
+                onClick={handleCancelOrder}
+                variant="outlined"
+                color="error"
+                sx={{
+            textTransform: 'none',
+            borderRadius: '30px',
+                }}
+              >
+                Cancel Order
+              </Button>
+              <Button
+                onClick={handleCloseOrderComplete}
+                variant="contained"
+                sx={{
+            backgroundColor: '#552a0f',
+            color: 'white',
+            fontFamily: "'Poppins', sans-serif",
+            textTransform: 'none',
+            borderRadius: '30px',
+            px: 3,
+            '&:hover': {
+              backgroundColor: '#3e1e09',
+            }
+                }}
+              >
+                Continue Shopping
+              </Button>
+            </DialogActions>
+          </Dialog>
+          
+          <Snackbar 
+            open={snackbarOpen} 
+            autoHideDuration={6000} 
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          >
+            <Alert 
+              onClose={() => setSnackbarOpen(false)} 
+              severity={snackbarSeverity} 
+              sx={{ width: '100%' }}
+            >
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
+
+          {/* Order History Section */}
         {orderHistory.length > 0 && (
           <Box sx={{ mt: 8 }}>
             <Box sx={{ 
