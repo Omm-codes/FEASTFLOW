@@ -1,111 +1,118 @@
-import { pool } from '../config/db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { pool } from '../config/db.js';
 
-class AuthController {
-  // Register a new user
-  async register(req, res) {
-    try {
-      const { name, email, password, phone } = req.body;
-      
-      // Check if user already exists
-      const [existingUsers] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
-      if (existingUsers.length > 0) {
-        return res.status(400).json({ message: 'User with this email already exists' });
-      }
-      
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      // Create user
-      const [result] = await pool.query(
-        'INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)',
-        [name, email, hashedPassword, phone]
-      );
-      
-      // Generate token
-      const token = jwt.sign(
-        { userId: result.insertId, email },
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-      
-      res.status(201).json({
-        message: 'User registered successfully',
-        token,
-        userId: result.insertId,
-        name
-      });
-    } catch (error) {
-      console.error('Error registering user:', error);
-      res.status(500).json({ message: 'Failed to register user', error: error.message });
+export const register = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const [result] = await pool.execute(
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+      [name, email, hashedPassword]
+    );
+    
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    console.log('Login attempt:', { email }); // Debug log
+
+    const [users] = await pool.execute(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
+
+    if (users.length === 0) {
+      console.log('User not found'); // Debug log
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
-  }
 
-  // User login
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      
-      // Get user
-      const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-      if (users.length === 0) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }
-      
-      const user = users[0];
-      
-      // Check password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }
-      
-      // Generate token
-      const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-      
-      res.status(200).json({
-        message: 'Login successful',
-        token,
-        userId: user.id,
-        name: user.name,
-        isAdmin: user.is_admin === 1
-      });
-    } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ message: 'Login failed', error: error.message });
+    const user = users[0];
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      console.log('Invalid password'); // Debug log
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
-  }
 
-  // User logout
-  async logout(req, res) {
-    // Logic for user logout
-  }
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-  // Get current user profile
-  async getProfile(req, res) {
-    try {
-      const { userId } = req.user;
-      
-      const [users] = await pool.query(
-        'SELECT id, name, email, phone, created_at FROM users WHERE id = ?',
-        [userId]
-      );
-      
-      if (users.length === 0) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      
-      res.status(200).json(users[0]);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      res.status(500).json({ message: 'Failed to retrieve user profile', error: error.message });
+    console.log('Login successful:', { userId: user.id, role: user.role }); // Debug log
+
+    res.json({
+      token,
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const registerAdmin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Insert admin user
+    const [result] = await pool.execute(
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, 'admin']
+    );
+    
+    res.status(201).json({ 
+      message: 'Admin registered successfully',
+      userId: result.insertId 
+    });
+  } catch (error) {
+    console.error('Admin registration error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const createInitialAdmin = async (req, res) => {
+  try {
+    // Check if admin already exists
+    const [existingAdmin] = await pool.execute(
+      'SELECT * FROM users WHERE role = "admin"'
+    );
+
+    if (existingAdmin.length > 0) {
+      return res.status(400).json({ error: 'Admin already exists' });
     }
-  }
-}
 
-export default AuthController;
+    // Create admin user
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('Admin@123', salt);
+
+    const [result] = await pool.execute(
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      ['Admin User', 'admin@feastflow.com', hashedPassword, 'admin']
+    );
+
+    res.status(201).json({
+      message: 'Admin created successfully',
+      userId: result.insertId
+    });
+  } catch (error) {
+    console.error('Admin creation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: feastflow-backend
+    env: node
+    buildCommand: cd feastflow-backend && npm install
+    startCommand: cd feastflow-backend && npm start
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: JWT_SECRET
+        sync: false
