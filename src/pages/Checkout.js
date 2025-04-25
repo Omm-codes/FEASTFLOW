@@ -22,7 +22,9 @@ const Checkout = () => {
   const [formData, setFormData] = useState({
     address: '',
     phone: '',
-    notes: ''
+    notes: '',
+    name: '',
+    email: ''
   });
   const [error, setError] = useState('');
 
@@ -47,9 +49,20 @@ const Checkout = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          items: cart,
-          totalAmount,
-          ...formData
+          items: cart.map(item => ({
+            menu_item_id: item.id,
+            quantity: item.quantity || 1,
+            price: item.price
+          })),
+          total_amount: totalAmount,
+          payment_method: 'UPI',
+          status: 'pending',
+          customer: {
+            address: formData.address,
+            phone: formData.phone,
+            name: formData.name,
+            email: formData.email
+          }
         })
       });
 
@@ -59,10 +72,8 @@ const Checkout = () => {
       }
 
       const data = await response.json();
-      setCart([]); // Clear cart
-      navigate('/history', { 
-        state: { message: 'Order placed successfully!' }
-      });
+      console.log('Order creation response:', data); // Add this line
+      navigate(`/payment?orderId=${data.id}&amount=${totalAmount}`);
     } catch (err) {
       console.error('Order error:', err);
       setError(err.message || 'Error placing order');
@@ -123,6 +134,24 @@ const Checkout = () => {
                       onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     />
                   </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      label="Name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      label="Email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    />
+                  </Grid>
                 </Grid>
               </form>
             </Paper>
@@ -162,3 +191,4 @@ const Checkout = () => {
 };
 
 export default Checkout;
+

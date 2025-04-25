@@ -9,12 +9,14 @@ import { CartProvider } from "./context/cartContext";
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
-import AdminLogin from './pages/admin/AdminLogin'; // ✅ NEW
+import AdminLogin from './pages/admin/AdminLogin';
 import Profile from './pages/Profile';
 import History from './pages/History';
 import ErrorBoundary from './components/ErrorBoundary';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
+import Payment from './pages/Payment';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 function App() {
   return (
@@ -31,10 +33,12 @@ function App() {
                 <Route path="/myorders" element={<MyOrders />} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-                <Route path="/admin/login" element={<AdminLogin />} /> {/* ✅ NEW */}
+                <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<Dashboard />} />
                 <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
                 <Route path="*" element={<Pagenotfound />} />
               </Routes>
             </BrowserRouter>

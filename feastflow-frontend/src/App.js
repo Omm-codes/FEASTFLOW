@@ -8,10 +8,14 @@ import Home from './components/Home';
 import Menu from './components/Menu';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
-import OrderConfirmation from './components/OrderConfirmation';
 import Login from './components/Login';
 import Register from './components/Register';
 import AdminDashboard from './components/admin/AdminDashboard';
+import Payment from './components/Payment';
+import OrderConfirmation from './components/OrderConfirmation';
+import History from './components/History';
+import HistoryTest from './components/HistoryTest';
+import DebugApiCall from './components/DebugApiCall';
 import './App.css';
 
 function App() {
@@ -27,11 +31,15 @@ function App() {
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/payment" element={<Payment />} />
                 <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/history-test" element={<HistoryTest />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/admin/*" element={<AdminDashboard />} />
               </Routes>
+              {process.env.NODE_ENV === 'development' && <DebugApiCall />}
             </main>
             <Footer />
           </div>

@@ -5,33 +5,80 @@ import './OrderConfirmation.css';
 const OrderConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { orderId } = location.state || {};
   
-  if (!orderId) {
-    // If no orderId is found in state, redirect to home
-    React.useEffect(() => {
-      navigate('/');
-    }, [navigate]);
-    
-    return null;
-  }
+  // Get order details from location state
+  const { orderId, paymentReference, amount, paymentMethod } = location.state || {};
+  
+  // Generate receipt number
+  const receiptNumber = `RCPT-${orderId}-${Date.now().toString().slice(-4)}`;
+  
+  // Format current date
+  const currentDate = new Date().toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  const handlePrint = () => {
+    window.print();
+  };
+  
+  const goToMenu = () => {
+    navigate('/menu');
+  };
   
   return (
-    <div className="order-confirmation">
+    <div className="confirmation-container">
       <div className="confirmation-card">
-        <div className="success-icon">✓</div>
-        <h2>Order Confirmed!</h2>
-        <p>Your order has been successfully placed.</p>
-        <p className="order-id">Order ID: #{orderId}</p>
+        <div className="confirmation-header">
+          <h2>Order Confirmed!</h2>
+          <div className="checkmark-circle">
+            <div className="checkmark"></div>
+          </div>
+        </div>
         
-        <div className="order-details">
-          <p>We've received your order and will begin preparing it shortly.</p>
-          <p>You will receive updates about your order via email.</p>
+        <div className="receipt">
+          <div className="receipt-header">
+            <h3>FeastFlow Receipt</h3>
+            <p className="receipt-id">#{receiptNumber}</p>
+          </div>
+          
+          <div className="receipt-details">
+            <div className="receipt-row">
+              <span>Order ID:</span>
+              <span>{orderId}</span>
+            </div>
+            <div className="receipt-row">
+              <span>Date:</span>
+              <span>{currentDate}</span>
+            </div>
+            <div className="receipt-row">
+              <span>Payment Method:</span>
+              <span>{paymentMethod}</span>
+            </div>
+            <div className="receipt-row">
+              <span>Payment Reference:</span>
+              <span>{paymentReference}</span>
+            </div>
+            <div className="receipt-row total">
+              <span>Total Amount:</span>
+              <span>₹{amount}</span>
+            </div>
+          </div>
+          
+          <div className="receipt-message">
+            <p>Thank you for your order! Your food is being prepared and will be ready shortly.</p>
+          </div>
         </div>
         
         <div className="confirmation-actions">
-          <button onClick={() => navigate('/menu')} className="back-to-menu">
-            Back to Menu
+          <button className="secondary-button" onClick={handlePrint}>
+            Print Receipt
+          </button>
+          <button className="primary-button" onClick={goToMenu}>
+            Return to Menu
           </button>
         </div>
       </div>

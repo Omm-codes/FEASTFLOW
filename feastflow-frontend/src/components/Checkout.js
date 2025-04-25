@@ -50,13 +50,7 @@ const Checkout = () => {
       const calculatedTotalAmount = cart.reduce((total, item) => 
         total + (item.price * item.quantity), 0);
       
-      console.log("Cart data:", JSON.stringify(cart)); // Debug log
-      console.log("Calculated total amount:", calculatedTotalAmount); // Debug log
-      
-      // Debug cart items to ensure they have proper IDs
-      cart.forEach(item => {
-        console.log(`Item ${item.name}: id=${item.id}, menu_item_id=${item.menu_item_id}`);
-      });
+      console.log("Calculated total amount:", calculatedTotalAmount);
       
       // Prepare order data with explicit values
       const orderData = {
@@ -67,14 +61,12 @@ const Checkout = () => {
           address: formData.address || "Not provided"
         },
         items: cart.map(item => ({
-          // Use appropriate ID with fallbacks
-          menu_item_id: item.id || null,
+          menu_item_id: item.id,
           quantity: item.quantity || 1,
           price: parseFloat(item.price) || 0
         })),
         total_amount: calculatedTotalAmount || 0,
-        payment_method: formData.paymentMethod || "cash",
-        status: 'pending'
+        payment_method: formData.paymentMethod || "cash"
       };
       
       console.log("Sending order data:", JSON.stringify(orderData));
@@ -90,29 +82,26 @@ const Checkout = () => {
         body: JSON.stringify(orderData)
       });
       
-      const responseText = await response.text();
-      console.log("Raw API response:", responseText); // Debug raw response
-      
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (e) {
-        throw new Error(`Invalid JSON response: ${responseText}`);
-      }
-      
       if (!response.ok) {
-        console.error('Order API error:', responseData);
-        throw new Error(responseData.error || responseData.details || 'Failed to place order');
+        const errorText = await response.text();
+        let errorData;
+        
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          console.error("Failed to parse error response:", errorText);
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        throw new Error(errorData.error || errorData.details || 'Failed to place order');
       }
       
-      console.log('Order success:', responseData);
-      
-      // Clear cart and redirect to confirmation page
-      clearCart();
-      navigate('/order-confirmation', { 
-        state: { orderId: responseData.id || Date.now() }
-      });
-      
+      const result = await response.json();
+      console.log('Order success, result:', result);
+
+      // Redirect to payment page with order ID and amount
+      window.location.href = `/payment?orderId=${result.id || ''}&amount=${calculatedTotalAmount}`;
+
     } catch (error) {
       console.error('Error placing order:', error);
       setError(error.message || 'Failed to place order. Please try again.');
@@ -121,7 +110,7 @@ const Checkout = () => {
     }
   };
   
-  // Redirect if cart is empty
+  // Redirect if cart is empty cart is empty
   useEffect(() => {
     if (cart.length === 0) {
       navigate('/menu');
@@ -135,7 +124,7 @@ const Checkout = () => {
       {error && (
         <div className="error-message">{error}</div>
       )}
-      
+          
       <div className="order-summary">
         <h3>Order Summary</h3>
         <div className="cart-items">
@@ -168,7 +157,7 @@ const Checkout = () => {
               required
             />
           </div>
-          
+              
           <div className="form-group">
             <label htmlFor="email">Email*</label>
             <input

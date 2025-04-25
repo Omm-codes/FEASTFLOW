@@ -23,6 +23,7 @@ yarn-error.log*
 
 # Ignore lock files (optional)
 package-lock.json
+package.json
 
 
 # Ignore OS files

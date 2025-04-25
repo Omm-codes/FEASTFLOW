@@ -1,14 +1,22 @@
 import express from 'express';
-import { authenticateToken, optionalAuthToken } from '../middleware/auth.js';
-import { createOrder, getOrdersByUser } from '../controllers/orderController.js';
+import { authenticate } from '../middleware/authenticate.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { createOrder, getOrdersByUser, getOrderById } from '../controllers/orderController.js';
 
 const router = express.Router();
 
-// Allow both guest checkout and authenticated users
-router.post('/', optionalAuthToken, createOrder);
+// Create new order
+router.post('/', authenticateToken, createOrder);
 
-// These routes require authentication
+// Get user's orders - ENSURE THIS ROUTE EXISTS
 router.get('/me', authenticateToken, getOrdersByUser);
-router.get('/user', authenticateToken, getOrdersByUser);
+
+// Get order by ID
+router.get('/api/orders/:id', authenticate, getOrderById);
+
+// Test endpoint - no auth required
+router.get('/test', (req, res) => {
+  res.json({ message: 'Order API is working', timestamp: new Date() });
+});
 
 export default router;

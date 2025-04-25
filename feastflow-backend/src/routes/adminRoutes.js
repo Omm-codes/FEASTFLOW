@@ -5,6 +5,8 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { pool } from '../config/db.js';
+import { authenticate } from '../middleware/authenticate.js';
+import { getOrderById } from '../controllers/orderController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -87,5 +89,8 @@ router.delete('/menu/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete menu item' });
   }
 });
+
+// Get order by ID
+router.get('/api/orders/:id', authenticate, getOrderById);
 
 export default router;

@@ -64,6 +64,43 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Service is running' });
 });
 
+// Add this after initializing your app but before your routes:
+
+// Debug routes
+app._router?.stack.forEach((middleware) => {
+  if (middleware.route) {
+    // routes registered directly on the app
+    console.log(`Route: ${Object.keys(middleware.route.methods)} ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    // router middleware
+    middleware.handle.stack.forEach((handler) => {
+      if (handler.route) {
+        const path = handler.route.path;
+        const methods = Object.keys(handler.route.methods);
+        console.log(`Router Route: ${methods.join(',')} ${path}`);
+      }
+    });
+  }
+});
+
+// Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`REQUEST: ${req.method} ${req.url}`);
+  next();
+});
+
+// Add this before your routes:
+
+// Request logger middleware
+app.use((req, res, next) => {
+  console.log(`----- API Request: ${req.method} ${req.url} -----`);
+  console.log('Headers:', req.headers);
+  console.log('Query:', req.query);
+  console.log('Body:', req.body);
+  console.log('---------------------------------');
+  next();
+});
+
 // Routes that require database connection
 const setupRoutes = () => {
     app.use('/api/menu', menuRoutes);
