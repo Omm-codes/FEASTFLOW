@@ -1,0 +1,73 @@
+.navigation-menu {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.navigation-menu li {
+  margin: 0px 20px;
+}
+.navigation-menu li a {
+  text-decoration: none;
+  color: white;
+}
+
+/* Active state */
+.active {
+  color: goldenrod !important;
+  font-weight: bold !important;
+}
+
+/* Mobile view */
+.mobile-navigation {
+  list-style: none;
+}
+.mobile-navigation li {
+  margin-top: 15px; /* Reduced margin for better spacing */
+}
+.mobile-navigation li a {
+  text-decoration: none;
+  font-size: 1.4rem;
+  color: black;
+}
+
+/* Navigation link styles */
+.navigation-link {
+  text-decoration: none;
+  color: #333;
+  font-size: 1.1rem;
+  margin-left: 20px;
+  transition: color 0.3s ease-in-out;
+  font-weight: 500;
+}
+
+.navigation-link:hover {
+  color: goldenrod;
+}
+
+.navigation-link.active {
+  color: goldenrod;
+  border-bottom: 2px solid goldenrod;
+  padding-bottom: 5px;
+  border-radius: 2px; /* Slight rounding for smoother effect */
+}
+
+/* Drawer styles */
+.MuiDrawer-paper {
+  background-color: white !important;
+  color: #333 !important;
+}
+
+.MuiListItemButton-root {
+  color: #333 !important;
+  padding: 10px 16px !important; /* Improved padding for better tap targets */
+}
+
+.MuiListItemButton-root:hover {
+  color: goldenrod !important;
+  background-color: rgba(218, 165, 32, 0.1) !important;
+}
+
+.MuiListItemIcon-root {
+  color: goldenrod !important;
+}

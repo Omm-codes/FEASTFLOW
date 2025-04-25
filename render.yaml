@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: feastflow-backend
+    env: node
+    buildCommand: cd feastflow-backend && npm install
+    startCommand: cd feastflow-backend && npm start
+    envVars:
+      - key: DB_HOST
+        value: shortline.proxy.rlwy.net
+      - key: DB_USER
+        value: root
+      - key: DB_PASSWORD
+        value: GqjLaCysGnqMnaPgNwDsaWKOcakVVOXD
+      - key: DB_NAME
+        value: railway
+      - key: DB_PORT
+        value: 40482
+      - key: JWT_SECRET
+        value: szcf03LwGt6l02xHcM45Qc69RcivjUjZFPLIa06V7OM=

@@ -1,0 +1,567 @@
+// src/pages/admin/Dashboard.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  Button,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  IconButton,
+  Grid
+} from '@mui/material';
+import { Add, Edit, Delete, CloudUpload } from '@mui/icons-material';
+
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [newItem, setNewItem] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    image_url: ''
+  });
+
+  useEffect(() => {
+    const isAdmin = localStorage.getItem('isAdmin');
+    if (!isAdmin) {
+      navigate('/admin/login');
+    } else {
+      fetchMenuItems();
+    }
+  }, [navigate]);
+
+  const fetchMenuItems = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/menu');
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu items');
+      }
+      const data = await response.json();
+      setMenuItems(data);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Error: ${error.message}`,
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAdmin');
+    navigate('/');
+  };
+
+  const handleAddItem = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      const response = await fetch('http://localhost:5001/api/admin/menu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newItem)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add menu item');
+      }
+      
+      setOpenAddDialog(false);
+      setSnackbar({
+        open: true,
+        message: 'Menu item added successfully!',
+        severity: 'success'
+      });
+      
+      // Reset form and refresh menu items
+      setNewItem({
+        name: '',
+        description: '',
+        price: '',
+        category: '',
+        image_url: ''
+      });
+      fetchMenuItems();
+      
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Error: ${error.message}`,
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleEditItem = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      const response = await fetch(`http://localhost:5001/api/admin/menu/${currentItem.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(currentItem)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update menu item');
+      }
+      
+      setOpenEditDialog(false);
+      setSnackbar({
+        open: true,
+        message: 'Menu item updated successfully!',
+        severity: 'success'
+      });
+      fetchMenuItems();
+      
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Error: ${error.message}`,
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleDeleteItem = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      const response = await fetch(`http://localhost:5001/api/admin/menu/${currentItem.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete menu item');
+      }
+      
+      setOpenDeleteDialog(false);
+      setSnackbar({
+        open: true,
+        message: 'Menu item deleted successfully!',
+        severity: 'success'
+      });
+      fetchMenuItems();
+      
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Error: ${error.message}`,
+        severity: 'error'
+      });
+    }
+  };
+
+  // Dialog handlers
+  const openAddItemDialog = () => setOpenAddDialog(true);
+  
+  const openEditItemDialog = (item) => {
+    setCurrentItem({ ...item });
+    setOpenEditDialog(true);
+  };
+  
+  const openDeleteItemDialog = (item) => {
+    setCurrentItem(item);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseAllDialogs = () => {
+    setOpenAddDialog(false);
+    setOpenEditDialog(false);
+    setOpenDeleteDialog(false);
+  };
+
+  return (
+    <Container maxWidth="lg">
+      <Box mt={5} mb={4}>
+        <Grid container justifyContent="space-between" alignItems="center" mb={4}>
+          <Grid item>
+            <Typography variant="h4" fontWeight="bold">
+              Admin Dashboard
+            </Typography>
+            <Typography variant="body1" mt={1}>
+              Welcome, Admin!
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button variant="outlined" color="error" onClick={handleLogout} sx={{ mr: 2 }}>
+              Logout
+            </Button>
+          </Grid>
+        </Grid>
+
+        <Box mb={4}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h5">Menu Management</Typography>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<Add />}
+              onClick={openAddItemDialog}
+            >
+              Add New Item
+            </Button>
+          </Box>
+
+          {loading ? (
+            <Box display="flex" justifyContent="center" my={4}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {menuItems.length > 0 ? (
+                    menuItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.id}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.description}</TableCell>
+                        <TableCell>₹{item.price}</TableCell>
+                        <TableCell>{item.category}</TableCell>
+                        <TableCell>
+                          <IconButton color="primary" onClick={() => openEditItemDialog(item)}>
+                            <Edit />
+                          </IconButton>
+                          <IconButton color="error" onClick={() => openDeleteItemDialog(item)}>
+                            <Delete />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">
+                        No menu items found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Box>
+      </Box>
+
+      {/* Add Menu Item Dialog */}
+      <Dialog open={openAddDialog} onClose={handleCloseAllDialogs} fullWidth>
+        <DialogTitle>Add New Menu Item</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Name"
+            fullWidth
+            value={newItem.name}
+            onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+            required
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            fullWidth
+            multiline
+            rows={3}
+            value={newItem.description}
+            onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Price"
+            type="number"
+            fullWidth
+            value={newItem.price}
+            onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+            required
+          />
+          <TextField
+            margin="dense"
+            label="Category"
+            fullWidth
+            value={newItem.category}
+            onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+            required
+          />
+          <TextField
+            margin="dense"
+            label="Image URL"
+            fullWidth
+            value={newItem.image_url}
+            onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
+            helperText="Example: /images/dosa.jpg"
+          />
+          <Box mt={2}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUpload />}
+              sx={{ mb: 2 }}
+            >
+              Upload Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={async (e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const formData = new FormData();
+                    formData.append('image', e.target.files[0]);
+                    
+                    try {
+                      const token = localStorage.getItem('adminToken');
+                      const response = await fetch('http://localhost:5001/api/upload', {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                      });
+                      
+                      if (!response.ok) throw new Error('Upload failed');
+                      
+                      const data = await response.json();
+                      setNewItem({...newItem, image_url: data.imagePath});
+                      
+                      setSnackbar({
+                        open: true,
+                        message: 'Image uploaded successfully!',
+                        severity: 'success'
+                      });
+                    } catch (error) {
+                      setSnackbar({
+                        open: true,
+                        message: `Upload error: ${error.message}`,
+                        severity: 'error'
+                      });
+                    }
+                  }
+                }}
+              />
+            </Button>
+          </Box>
+          <Box mt={2} display="flex" flexDirection="column" alignItems="center">
+            <Typography variant="caption" color="textSecondary" sx={{ mb: 1 }}>
+              Image Preview
+            </Typography>
+            <Box
+              sx={{
+                width: '100%',
+                height: 120,
+                border: '1px dashed #ccc',
+                borderRadius: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              {newItem.image_url ? (
+                <img
+                  src={newItem.image_url.startsWith('http') 
+                    ? newItem.image_url 
+                    : newItem.image_url.startsWith('/') 
+                      ? `http://localhost:5001${newItem.image_url}` 
+                      : `/${newItem.image_url}`}
+                  alt="Preview"
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder-food.jpg';
+                  }}
+                />
+              ) : (
+                <Typography variant="body2" color="textSecondary">
+                  No image URL provided
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAllDialogs}>Cancel</Button>
+          <Button onClick={handleAddItem} color="primary" variant="contained">
+            Add Item
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Menu Item Dialog */}
+      <Dialog open={openEditDialog} onClose={handleCloseAllDialogs} fullWidth>
+        <DialogTitle>Edit Menu Item</DialogTitle>
+        <DialogContent>
+          {currentItem && (
+            <>
+              <TextField
+                margin="dense"
+                label="Name"
+                fullWidth
+                value={currentItem.name}
+                onChange={(e) => setCurrentItem({ ...currentItem, name: e.target.value })}
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Description"
+                fullWidth
+                multiline
+                rows={3}
+                value={currentItem.description}
+                onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
+              />
+              <TextField
+                margin="dense"
+                label="Price"
+                type="number"
+                fullWidth
+                value={currentItem.price}
+                onChange={(e) => setCurrentItem({ ...currentItem, price: e.target.value })}
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Category"
+                fullWidth
+                value={currentItem.category}
+                onChange={(e) => setCurrentItem({ ...currentItem, category: e.target.value })}
+                required
+              />
+              <TextField
+                margin="dense"
+                label="Image URL"
+                fullWidth
+                value={currentItem.image_url || ''}
+                onChange={(e) => setCurrentItem({ ...currentItem, image_url: e.target.value })}
+                helperText="Example: /images/dosa.jpg"
+              />
+              <Box mt={2} display="flex" flexDirection="column" alignItems="center">
+                <Typography variant="caption" color="textSecondary" sx={{ mb: 1 }}>
+                  Image Preview
+                </Typography>
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 120,
+                    border: '1px dashed #ccc',
+                    borderRadius: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  {currentItem.image_url ? (
+                    <img
+                      src={currentItem.image_url.startsWith('http') 
+                        ? currentItem.image_url 
+                        : currentItem.image_url.startsWith('/') 
+                          ? `http://localhost:5001${currentItem.image_url}` 
+                          : `/${currentItem.image_url}`}
+                      alt="Preview"
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/placeholder-food.jpg';
+                      }}
+                    />
+                  ) : (
+                    <Typography variant="body2" color="textSecondary">
+                      No image URL provided
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAllDialogs}>Cancel</Button>
+          <Button onClick={handleEditItem} color="primary" variant="contained">
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={handleCloseAllDialogs}>
+        <DialogTitle>Delete Menu Item</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete "{currentItem?.name}"? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAllDialogs}>Cancel</Button>
+          <Button onClick={handleDeleteItem} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity} 
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Container>
+  );
+};
+
+export default Dashboard;
