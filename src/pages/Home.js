@@ -29,8 +29,9 @@ const bannerImagePath = Banner;
 
 // Function to get unique random items from an array
 const getRandomSpecials = (menu, count) => {
-  const shuffled = [...menu].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, Math.min(count, menu.length));
+  const availableItems = menu.filter(item => item.available !== false);
+  const shuffled = [...availableItems].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, Math.min(count, availableItems.length));
 };
 
 const offers = [
@@ -93,7 +94,7 @@ const headerContainerStyle = {
 
 const Home = () => {
   // Use memoized values to prevent unnecessary recalculations
-  const todaysSpecials = useMemo(() => getRandomSpecials(MenuList, 6), []);
+  const todaysSpecials = useMemo(() => getRandomSpecials(MenuList, 3), []);
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
 
   useEffect(() => {
@@ -362,241 +363,148 @@ const Home = () => {
       </Container>
       
       
-{/* Today's Specials Section */}
+{/* Today's Specials Section - With Updated Theme */}
 <Box sx={{
-    py: 6,
+    py: 5,
     textAlign: "center",
     position: 'relative',
-    background: "linear-gradient(135deg, #f9f7f4 0%, #fff5e6 100%)",
-    borderTop: '1px solid #eaeaea',
+    background: '#f8f9fa',
+    borderTop: '1px solid #e0e0e0',
     overflow: 'hidden'
 }}>
-    {/* Decorative elements */}
-    <Box sx={{
-        position: 'absolute',
-        top: -20,
-        left: -20,
-        width: 120,
-        height: 120,
-        borderRadius: '50%',
-        background: 'rgba(255, 213, 79, 0.15)',
-        zIndex: 0
-    }}/>
-    <Box sx={{
-        position: 'absolute',
-        bottom: 30,
-        right: '10%',
-        width: 80,
-        height: 80,
-        borderRadius: '50%',
-        background: 'rgba(85, 42, 15, 0.08)',
-        zIndex: 0
-    }}/>
-    
     <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 5 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
             <Box sx={{
-                background: '#552a0f',
+                background: '#023047',
                 color: 'white',
                 transform: 'rotate(-2deg)',
-                px: 3,
-                py: 1.5,
-                mb: 3,
+                px: 2.5,
+                py: 1,
+                mb: 2,
                 borderRadius: '4px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                position: 'relative',
-                '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: '-8px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    borderLeft: '8px solid transparent',
-                    borderRight: '8px solid transparent',
-                    borderTop: '8px solid #552a0f'
-                }
+                boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
             }}>
-                <Typography variant="overline" sx={{ fontWeight: 600, letterSpacing: 2 }}>
+                <Typography variant="overline" sx={{ fontWeight: 600, letterSpacing: 1 }}>
                     CHEF'S SELECTION
                 </Typography>
             </Box>
             
             <Typography
-                variant="h3"
+                variant="h4"
                 sx={{
-                    fontWeight: "800",
-                    fontFamily: "'Playfair Display', serif",
-                    color: '#552a0f',
+                    fontWeight: "700",
+                    fontFamily: "'Poppins', sans-serif",
+                    color: '#023047',
                     position: 'relative',
-                    display: 'inline-block',
                     mb: 1,
-                    textShadow: '1px 1px 1px rgba(0,0,0,0.1)'
                 }}
             >
                 Today's Specials
             </Typography>
             
-            <Typography variant="subtitle1" color="text.secondary" sx={{ 
-                maxWidth: '700px',
-                mb: 4
+            <Typography variant="body2" color="text.secondary" sx={{ 
+                maxWidth: '600px',
+                mb: 3
             }}>
-                Handcrafted with fresh ingredients and culinary expertise. 
-                Our chef recommends these delightful dishes for your perfect meal.
+                Fresh, available dishes handpicked by our chef for your perfect meal today
             </Typography>
         </Box>
         
-        {/* Carousel Implementation */}
-        <Slider
-            dots={true}
-            infinite={true}
-            speed={500}
-            slidesToShow={3}
-            slidesToScroll={1}
-            autoplay={true}
-            autoplaySpeed={4000}
-            pauseOnHover={true}
-            className="specials-slider"
-            responsive={[
-                {
-                    breakpoint: 1024,
-                    settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 1,
-                    }
-                },
-                {
-                    breakpoint: 600,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1
-                    }
-                }
-            ]}
-        >
+        {/* Menu Cards - Fixed Layout */}
+        <Grid container spacing={3} justifyContent="center">
             {todaysSpecials.map((item) => (
-                <Box key={item.name} sx={{ px: 2, pb: 3 }}>
+                <Grid item xs={12} sm={6} md={4} key={item.id || item.name}>
                     <Card
                         sx={{
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                            borderRadius: '16px',
+                            boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
+                            borderRadius: '12px',
                             overflow: 'hidden',
-                            transition: 'all 0.4s ease',
-                            transform: 'perspective(1000px)',
+                            transition: 'all 0.3s ease',
                             height: '100%',
-                            position: 'relative',
                             '&:hover': {
-                                transform: 'perspective(1000px) translateY(-10px)',
-                                boxShadow: '0 20px 40px rgba(85, 42, 15, 0.2)'
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 24px rgba(2, 48, 71, 0.15)'
                             },
                             '&:hover .dish-image': {
                                 transform: 'scale(1.05)'
                             }
                         }}
                     >
-                        <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                        <Box sx={{ position: 'relative', overflow: 'hidden', height: 180 }}>
                             <CardMedia
                                 className="dish-image"
                                 component="img"
-                                height="260"
+                                height="180"
                                 image={item.image}
                                 alt={item.name}
                                 loading="lazy"
                                 sx={{
-                                    transition: 'transform 0.7s ease',
+                                    transition: 'transform 0.6s ease',
+                                    height: '100%',
+                                    objectFit: 'cover',
                                 }}
                             />
                             <Box sx={{
                                 position: 'absolute',
-                                top: 16,
-                                right: 16,
+                                top: 12,
+                                right: 12,
                                 backgroundColor: 'rgba(255,255,255,0.9)',
-                                backdropFilter: 'blur(5px)',
                                 borderRadius: '50%',
-                                width: 60,
-                                height: 60,
+                                width: 45,
+                                height: 45,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 flexDirection: 'column',
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                                border: '2px solid #ffd54f'
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                border: '2px solid #ffb703'
                             }}>
-                                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>only</Typography>
-                                <Typography sx={{ fontWeight: 800, color: '#552a0f' }}>₹{item.price}</Typography>
+                                <Typography sx={{ fontWeight: 800, color: '#023047', fontSize: '0.9rem' }}>₹{item.price}</Typography>
                             </Box>
-                            {item.isBestSeller && (
-                                <Box sx={{
-                                    position: 'absolute',
-                                    top: 16,
-                                    left: 0,
-                                    backgroundColor: '#552a0f',
-                                    color: 'white',
-                                    padding: '5px 15px 5px 10px',
-                                    fontWeight: 'bold',
-                                    fontSize: '0.75rem',
-                                    clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0 100%)',
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-                                }}>
-                                    BEST SELLER
-                                </Box>
-                            )}
                         </Box>
                         
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ mb: 2 }}>
-                                <Chip 
-                                    size="small" 
-                                    label={item.category} 
-                                    sx={{ 
-                                        background: 'rgba(85, 42, 15, 0.08)', 
-                                        fontWeight: 500,
-                                        color: '#552a0f',
-                                        mb: 1
-                                    }} 
-                                />
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        fontWeight: 700,
-                                        fontSize: '1.3rem',
-                                        color: '#333',
-                                        fontFamily: "'Playfair Display', serif",
-                                    }}
-                                >
-                                    {item.name}
-                                </Typography>
-                            </Box>
-                            
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
-                                {item.description || "A delicious dish crafted with premium ingredients, bringing authentic flavors to your table."}
+                        <CardContent sx={{ p: 2 }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontWeight: 700,
+                                    fontSize: '1.1rem',
+                                    color: '#023047',
+                                    fontFamily: "'Poppins', sans-serif",
+                                    mb: 0.5,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {item.name}
                             </Typography>
                             
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 0.5 }}>
-                                {[...Array(Math.floor(Math.random() > 0.7 ? 5 : 4))].map((_, i) => (
-                                    <StarIcon key={i} fontSize="small" sx={{ color: '#ffd54f' }} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 0.5 }}>
+                                {[...Array(Math.floor(4.5))].map((_, i) => (
+                                    <StarIcon key={i} fontSize="small" sx={{ color: '#ffb703', fontSize: '0.9rem' }} />
                                 ))}
-                                <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                                    ({Math.floor(Math.random() * 150) + 50})
+                                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                                    ({Math.floor(Math.random() * 50) + 10})
                                 </Typography>
                             </Box>
-                            
-                            <Divider sx={{ mb: 2 }} />
                             
                             <Button
                                 component={Link}
-                                to="/menu"
+                                to={`/menu#${item.id || item.name.replace(/\s+/g, '-').toLowerCase()}`}
                                 variant="contained"
                                 fullWidth
                                 startIcon={<ShoppingBasketIcon />}
                                 sx={{
-                                    mt: 1,
-                                    bgcolor: '#552a0f',
+                                    bgcolor: '#ffb703',
+                                    color: '#000',
                                     fontWeight: 600,
                                     textTransform: 'none',
-                                    py: 1.2,
-                                    borderRadius: '8px',
+                                    py: 1,
+                                    fontSize: '0.85rem',
+                                    borderRadius: '20px',
                                     '&:hover': {
-                                        bgcolor: '#3e1e09',
+                                        bgcolor: '#ffaa00',
                                     }
                                 }}
                             >
@@ -604,32 +512,30 @@ const Home = () => {
                             </Button>
                         </CardContent>
                     </Card>
-                </Box>
+                </Grid>
             ))}
-        </Slider>
+        </Grid>
         
-        <Box sx={{ mt: 5, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
             <Button
                 component={Link}
                 to="/menu"
                 variant="outlined"
                 endIcon={<ArrowForwardIcon />}
                 sx={{
-                    color: "#552a0f",
-                    borderColor: "#552a0f",
+                    color: "#023047",
+                    borderColor: "#023047",
                     borderWidth: 2,
-                    borderRadius: "30px",
+                    borderRadius: "20px",
                     fontWeight: 600,
                     textTransform: "none",
-                    fontSize: "1rem",
-                    py: 1,
-                    px: 4,
-                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "0.9rem",
+                    py: 0.8,
+                    px: 3,
                     '&:hover': {
-                        bgcolor: '#552a0f',
+                        bgcolor: '#023047',
                         color: 'white',
-                        borderColor: "#552a0f",
-                        borderWidth: 2,
+                        borderColor: "#023047",
                     }
                 }}
             >
