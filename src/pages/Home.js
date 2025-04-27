@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "./../components/Layout/Layout";
 import "../styles/HomeStyles.css";
+import Banner from "../images/mm.jpg";
 import { 
     Box, 
     Card, 
@@ -24,7 +25,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const bannerImagePath = "C:\Users\Swapnil\OneDrive\Desktop\FEASTFLOW-main\FEASTFLOW-main\src\images";
+const bannerImagePath = Banner;
 
 // Function to get unique random items from an array
 const getRandomSpecials = (menu, count) => {

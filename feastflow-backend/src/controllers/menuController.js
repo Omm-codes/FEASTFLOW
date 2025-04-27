@@ -2,7 +2,8 @@ import { pool } from '../config/db.js';
 
 export const getAllMenuItems = async (req, res) => {
     try {
-        const [items] = await pool.execute('SELECT * FROM menu_items WHERE available = true');
+        // Modified query to either not filter by available status or default new items to available
+        const [items] = await pool.execute('SELECT * FROM menu_items WHERE available IS NULL OR available = true');
         res.json(items);
     } catch (error) {
         console.error('Error fetching menu items:', error);

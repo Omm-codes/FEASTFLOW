@@ -156,7 +156,8 @@ const Payment = () => {
         },
         body: JSON.stringify({ 
           status: 'paid',
-          paymentReference: paymentReference
+          paymentReference: paymentReference,
+          payment_method: 'online' // Add payment method to update from default 'cash'
         })
       });
 
@@ -191,6 +192,7 @@ const Payment = () => {
             order: {
               ...orderToPass,
               status: 'paid',
+              payment_method: 'online', // Ensure this is reflected in the order object passed to next screen
               paymentReference: paymentReference
             }
           }

@@ -1,11 +1,33 @@
 import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import { authService as api } from '../services/api';
 
+// Check for token in localStorage and verify if it's still valid
+const checkToken = () => {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  
+  try {
+    // Try to extract expiration from token
+    const tokenData = parseJwt(token);
+    // If token has expired or has no expiration, return false
+    if (!tokenData || (tokenData.exp && Date.now() >= tokenData.exp * 1000)) {
+      console.log('Token has expired, removing from localStorage');
+      localStorage.removeItem('token');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Error checking token:', e);
+    return false;
+  }
+};
+
+// Improved initial state - sets isAuthenticated based on token presence and validity
 const initialState = {
-  isAuthenticated: false,
+  isAuthenticated: checkToken(),
   token: localStorage.getItem('token') || null,
   user: null,
-  loading: false,
+  loading: true, // Start with loading true to prevent flashes of unauthenticated content
   error: null,
 };
 
@@ -14,15 +36,17 @@ const parseJwt = (token) => {
   try {
     return JSON.parse(atob(token.split('.')[1]));
   } catch (e) {
+    console.error('Error parsing JWT token:', e);
     return null;
   }
 };
 
-// Update this function
+// Improved function to fetch user data
 const fetchUserData = async (token) => {
   if (!token) return null;
   
   try {
+    console.log('Fetching user profile with token');
     const userData = await api.getUserProfile();
     return userData;
   } catch (error) {
@@ -100,47 +124,70 @@ export const AuthProvider = ({ children }) => {
     console.log('AuthProvider initialized with state:', authState);
   }, []);
 
-  // Load user data when token changes
+  // Load user data when component mounts or token changes
   useEffect(() => {
     const loadUser = async () => {
-      if (authState.token && !authState.user) {
-        dispatch({ type: 'LOGIN_REQUEST' });
-        try {
-          console.log('Attempting to fetch user data with token');
-          // Try to fetch user data from backend
-          const userData = await fetchUserData(authState.token);
+      const token = authState.token;
+      
+      if (!token) {
+        // No token found, ensure we're marked as not authenticated and not loading
+        dispatch({ type: 'LOGIN_FAILURE', payload: null });
+        return;
+      }
+      
+      // We have a token, so start the authentication process
+      dispatch({ type: 'LOGIN_REQUEST' });
+      
+      try {
+        console.log('Attempting to load user data from token');
+        
+        // First try to use the token to get user profile data from API
+        const userData = await fetchUserData(token);
+        
+        if (userData) {
+          console.log('User data successfully fetched from API:', userData);
           
-          if (userData) {
-            console.log('User data successfully fetched:', userData);
-            dispatch({ type: 'USER_LOADED', payload: userData });
+          // Update authentication state with user data from API
+          dispatch({ 
+            type: 'LOGIN_SUCCESS', 
+            payload: { token } 
+          });
+          dispatch({ type: 'USER_LOADED', payload: userData });
+        } else {
+          // API call failed, try to extract basic info from token
+          console.log('API fetch failed, extracting data from JWT token');
+          const tokenData = parseJwt(token);
+          
+          if (tokenData && (!tokenData.exp || Date.now() < tokenData.exp * 1000)) {
+            console.log('JWT token is valid:', tokenData);
+            
+            // Create user object from token data
+            const basicUserData = {
+              id: tokenData.userId || tokenData.id || tokenData.sub,
+              email: tokenData.email,
+              role: tokenData.role,
+              name: tokenData.name || (tokenData.email ? tokenData.email.split('@')[0] : 'User')
+            };
+            
+            // Update authentication state with user data from token
+            dispatch({ 
+              type: 'LOGIN_SUCCESS', 
+              payload: { token } 
+            });
+            dispatch({ type: 'USER_LOADED', payload: basicUserData });
           } else {
-            console.log('No user data returned, trying to parse JWT');
-            // If backend request fails, try to extract basic info from token
-            const tokenData = parseJwt(authState.token);
-            if (tokenData) {
-              console.log('JWT parsed successfully:', tokenData);
-              const basicUserData = {
-                id: tokenData.userId || tokenData.id || tokenData.sub,
-                email: tokenData.email,
-                role: tokenData.role,
-                name: tokenData.name || (tokenData.email ? tokenData.email.split('@')[0] : 'User')
-              };
-              dispatch({ type: 'USER_LOADED', payload: basicUserData });
-            } else {
-              console.warn('Failed to parse JWT, logging out');
-              // If all else fails, logout
-              logout();
-            }
+            console.warn('JWT token invalid or expired, logging out');
+            logout();
           }
-        } catch (error) {
-          console.error('Error loading user:', error);
-          logout();
         }
+      } catch (error) {
+        console.error('Error loading user:', error);
+        logout();
       }
     };
     
     loadUser();
-  }, [authState.token]);
+  }, []);
 
   // Add isAdmin function to check if the current user has admin role
   const isAdmin = () => {

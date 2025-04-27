@@ -11,6 +11,7 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import Layout from '../../components/Layout/Layout';
 
 function AdminLogin() {
@@ -90,60 +91,110 @@ function AdminLogin() {
 
   return (
     <Layout>
-      <Container maxWidth="sm" sx={{ mt: 8, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-          <Typography variant="h4" component="h1" align="center" gutterBottom>
-            Admin Login
-          </Typography>
-          
-          <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-            Enter your credentials to access the admin dashboard
-          </Typography>
-          
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
-          
-          <Box component="form" onSubmit={handleSubmit} noValidate>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Login'}
-            </Button>
-          </Box>
-        </Paper>
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            marginTop: 8,
+            marginBottom: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              padding: 4,
+              borderRadius: 2,
+              width: '100%',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
+              <AdminPanelSettingsIcon sx={{ fontSize: 40, color: '#023047', mr: 1 }} />
+              <Typography component="h1" variant="h5" sx={{ fontWeight: 700, color: '#023047', fontFamily: "'Poppins', sans-serif" }}>
+                Admin Login
+              </Typography>
+            </Box>
+
+            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
+              Enter your credentials to access the admin dashboard
+            </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loading}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#023047',
+                    },
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#023047',
+                  },
+                }}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#023047',
+                    },
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#023047',
+                  },
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor: '#ffb703',
+                  color: '#000',
+                  borderRadius: '20px',
+                  fontWeight: 600,
+                  '&:hover': {
+                    backgroundColor: '#ffaa00',
+                  },
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
       </Container>
     </Layout>
   );

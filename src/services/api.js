@@ -1,5 +1,15 @@
 const API_URL = 'http://localhost:5001/api';
 
+// Function to decode JWT tokens
+const parseJwt = (token) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    console.error('Error parsing JWT token:', e);
+    return null;
+  }
+};
+
 export const authService = {
     login: async (credentials) => {
         try {
@@ -79,7 +89,10 @@ export const authService = {
             if (!token) {
                 throw new Error('No token found');
             }
+            
+            console.log('Fetching user profile with token');
             const response = await fetch(`${API_URL}/users/profile`, {
+                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -88,11 +101,36 @@ export const authService = {
             
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Failed to get profile: ${response.status} ${response.statusText}`);
+                console.error('API service: getUserProfile error response', errorText);
+                
+                // Handle common error cases
+                if (response.status === 401) {
+                    throw new Error('Authentication expired. Please log in again.');
+                } else if (response.status === 404) {
+                    throw new Error('User profile not found');
+                } else {
+                    throw new Error(`Failed to get profile: ${response.status} ${response.statusText}`);
+                }
             }
             
             const data = await response.json();
             console.log('API service: getUserProfile response', data);
+            
+            // If we have a valid response but no proper user data, extract from token
+            if (!data || (!data.id && !data.userId)) {
+                console.log('Profile response missing user ID, using JWT data');
+                const tokenData = parseJwt(token);
+                if (tokenData) {
+                    return {
+                        id: tokenData.userId || tokenData.id || tokenData.sub,
+                        email: tokenData.email,
+                        name: tokenData.name || tokenData.email?.split('@')[0] || 'User',
+                        role: tokenData.role
+                    };
+                }
+                throw new Error('Invalid user data in response');
+            }
+            
             return data;
         } catch (error) {
             console.error('API service: getUserProfile error', error);

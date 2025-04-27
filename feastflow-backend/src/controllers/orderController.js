@@ -248,7 +248,7 @@ export const getOrderById = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
-  let { status, paymentReference, notify } = req.body;
+  let { status, paymentReference, payment_method, notify } = req.body;
   let connection;
 
   try {
@@ -312,14 +312,52 @@ export const updateOrderStatus = async (req, res) => {
     const dbStatus = statusMappings[status.toLowerCase()] || order.current_status;
     console.log(`Using mapped database status: ${dbStatus}`);
     
-    // Update order status and store original frontend status if the column exists
+    // Build an array of SQL updates and parameters
+    let updateSql = '';
+    const updateParams = [];
+    
+    // Start building the SQL update statement
+    updateSql = 'UPDATE orders SET ';
+    
+    // Always update status
+    updateSql += 'status = ?';
+    updateParams.push(dbStatus);
+    
+    // Add original_status if it exists
     if (hasOriginalStatus) {
-      await connection.execute(
-        'UPDATE orders SET status = ?, original_status = ?, updated_at = NOW() WHERE id = ?',
-        [dbStatus, status, id]
-      );
-    } else {
-      // If original_status column doesn't exist, create it
+      updateSql += ', original_status = ?';
+      updateParams.push(status);
+    }
+    
+    // Update payment_method if provided
+    if (payment_method) {
+      console.log(`Updating payment method to: ${payment_method}`);
+      updateSql += ', payment_method = ?';
+      updateParams.push(payment_method);
+    }
+    
+    // Update payment reference if provided
+    if (paymentReference) {
+      console.log(`Setting payment reference: ${paymentReference}`);
+      updateSql += ', payment_reference = ?';
+      updateParams.push(paymentReference);
+    }
+    
+    // Add updated_at timestamp
+    updateSql += ', updated_at = NOW()';
+    
+    // Add WHERE clause
+    updateSql += ' WHERE id = ?';
+    updateParams.push(id);
+    
+    // Execute the update
+    console.log('Executing SQL:', updateSql);
+    console.log('With parameters:', updateParams);
+    
+    await connection.execute(updateSql, updateParams);
+    
+    // Try to create original_status column if it doesn't exist and we need it
+    if (!hasOriginalStatus) {
       try {
         console.log("Attempting to add original_status column to orders table");
         await connection.execute(`
@@ -329,27 +367,15 @@ export const updateOrderStatus = async (req, res) => {
         `);
         console.log("Successfully added original_status column");
         
-        // Now update with both status fields
+        // Set the original status
         await connection.execute(
-          'UPDATE orders SET status = ?, original_status = ?, updated_at = NOW() WHERE id = ?',
-          [dbStatus, status, id]
+          'UPDATE orders SET original_status = ? WHERE id = ?',
+          [status, id]
         );
       } catch (alterError) {
-        // If column already exists or other error, just update the status
+        // If column already exists or other error, just log it
         console.error("Error adding original_status column:", alterError);
-        await connection.execute(
-          'UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?',
-          [dbStatus, id]
-        );
       }
-    }
-    
-    // If payment reference provided, update that separately
-    if (paymentReference) {
-      await connection.execute(
-        'UPDATE orders SET payment_reference = ? WHERE id = ?',
-        [paymentReference, id]
-      );
     }
     
     // If notify flag is set and we have a user email, send notification
@@ -364,7 +390,7 @@ export const updateOrderStatus = async (req, res) => {
     
     // Fetch the updated order to return in response
     const [updatedOrder] = await connection.execute(
-      'SELECT id, status, original_status FROM orders WHERE id = ?',
+      'SELECT id, status, payment_method, original_status, payment_reference FROM orders WHERE id = ?',
       [id]
     );
     

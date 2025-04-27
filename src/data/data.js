@@ -1,10 +1,31 @@
+import Dosa from "../images/dosa.jpg";
+import Chola from "../images/chhola.jpg";
+import Idli from "../images/idli.jpg";
+import MasalaDosa from "../images/masala.jpg";
+import Paneer from "../images/paneer.jpg";
+import Gujrati from "../images/gujrati.jpeg";
+import CoffeeMug from "../images/coffee.jpg";
+import Sandwich from "../images/sandwich.jpg";
+import Samosa from "../images/samosa.jpg";
+import ChickenBiryani from "../images/veg biryani.jpg";
+import VegThali from "../images/veg thali.jpeg";
+import PavBhaji from "../images/pav bhaji.jpg";
+import AlooParatha from "../images/aloo paratha.jpg";
+import FruitSalad from "../images/fruit salad.jpg";
+import Lassi from "../images/lassi.jpg";
+import ChocolateCake from "../images/chocolate cake.jpg";
+import FrenchFries from "../images/fries.jpg";
+import VegBurger from "../images/veg burger.jpg";
+import Masalachai from "../images/masala chai.jpg";
+import Vadasambar from "../images/vada sambar.jpg";
+
 export const MenuList = [
   // South Indian Category - mapping to "Breakfast" and "Lunch"
   {
     name: "Dosa",
     description:
       "A crispy and savory South Indian pancake made from fermented rice and lentil batter.",
-    image: "/images/dosa.jpg", // Ensure paths start with / to reference from public folder
+    image: Dosa,
     price: 60,
     category: "Breakfast",
   },
@@ -12,7 +33,7 @@ export const MenuList = [
     name: "Masala Dosa",
     description:
       "A popular South Indian dish consisting of a crispy dosa filled with a spiced potato mixture.",
-    image: "/images/masala.jpg", // Ensure paths start with / to reference from public folder
+    image: MasalaDosa,
     price: 80,
     category: "Breakfast",
   },
@@ -20,7 +41,7 @@ export const MenuList = [
     name: "Idli Sambhar",
     description:
       "Soft and fluffy steamed rice cakes served with a tangy lentil-based vegetable stew.",
-    image: "/images/idli.jpg", // Ensure paths start with / to reference from public folder
+    image: Idli,
     price: 40,
     category: "Breakfast",
   },
@@ -28,7 +49,7 @@ export const MenuList = [
     name: "Vada Sambhar",
     description:
       "Crispy, savory doughnut-shaped fritters made from lentils, served with sambhar and chutney.",
-    image: "/images/vada sambar.jpg", // Ensure paths start with / to reference from public folder
+    image: Vadasambar, // Replace with actual Vada image
     price: 45,
     category: "Breakfast",
   },
@@ -38,7 +59,7 @@ export const MenuList = [
     name: "Chole Puri",
     description:
       "A flavorful North Indian dish made with spiced chickpeas served with deep-fried puffy bread.",
-    image: "/images/chhola.jpg", // Ensure paths start with / to reference from public folder
+    image: Chola,
     price: 70,
     category: "Lunch",
   },
@@ -46,7 +67,7 @@ export const MenuList = [
     name: "Paneer Butter Masala",
     description:
       "A rich and creamy North Indian dish made with paneer (Indian cottage cheese) in a tomato-based gravy.",
-    image: "/images/paneer.jpg", // Ensure paths start with / to reference from public folder
+    image: Paneer,
     price: 120,
     category: "Lunch",
   },
@@ -54,7 +75,7 @@ export const MenuList = [
     name: "Aloo Paratha",
     description:
       "Whole wheat flatbread stuffed with spiced mashed potatoes, served with yogurt and pickle.",
-    image: "/images/aloo paratha.jpg", // Ensure paths start with / to reference from public folder
+    image: AlooParatha,
     price: 50,
     category: "Breakfast",
   },
@@ -62,7 +83,7 @@ export const MenuList = [
     name: "Pav Bhaji",
     description:
       "A thick vegetable curry served with a soft bread roll, butter, and chopped onions.",
-    image: "/images/pav bhaji.jpg", // Ensure paths start with / to reference from public folder
+    image: PavBhaji,
     price: 70,
     category: "Fastfood",
   },
@@ -72,7 +93,7 @@ export const MenuList = [
     name: "Gujarati Thali",
     description:
       "A traditional Gujarati meal consisting of various dishes like dal, kadhi, shaak, rotis, rice and dessert served on a single platter.",
-    image: "/images/gujrati.jpeg", // Ensure paths start with / to reference from public folder
+    image: Gujrati,
     price: 150,
     category: "Lunch",
   },
@@ -80,7 +101,7 @@ export const MenuList = [
     name: "Veg Executive Thali",
     description:
       "A complete meal with rice, dal, 2 vegetables, 3 rotis, salad, papad, raita, and dessert.",
-    image: "/images/veg thali.jpeg", // Ensure paths start with / to reference from public folder
+    image: VegThali,
     price: 180,
     category: "Lunch",
   },
@@ -90,7 +111,7 @@ export const MenuList = [
     name: "Sandwich",
     description:
       "Fresh vegetable sandwich with cucumber, tomato, onion and cheese between slices of bread spread with chutney and butter.",
-    image: "/images/sandwich.jpg", // Ensure paths start with / to reference from public folder
+    image: Sandwich,
     price: 40,
     category: "Breakfast",
   },
@@ -98,7 +119,7 @@ export const MenuList = [
     name: "Fruit Salad",
     description:
       "A refreshing mix of seasonal fruits like apple, banana, papaya, and grapes with a honey and lime dressing.",
-    image: "/images/fruit salad.jpg", // Ensure paths start with / to reference from public folder
+    image: FruitSalad,
     price: 60,
     category: "Snacks",
   },
@@ -108,7 +129,7 @@ export const MenuList = [
     name: "Samosa",
     description:
       "Deep-fried pastry filled with spiced potatoes and peas, served with mint and tamarind chutney.",
-    image: "/images/samosa.jpg", // Ensure paths start with / to reference from public folder
+    image: Samosa,
     price: 20,
     category: "Snacks",
   },
@@ -116,7 +137,7 @@ export const MenuList = [
     name: "Veg Burger",
     description:
       "A delicious vegetable patty with fresh lettuce, tomato, onion and special sauce in a toasted bun.",
-    image: "/images/veg burger.jpg", // Ensure paths start with / to reference from public folder
+    image: VegBurger,
     price: 60,
     category: "Fastfood",
   },
@@ -124,7 +145,7 @@ export const MenuList = [
     name: "French Fries",
     description:
       "Crispy golden potato fries, lightly salted and perfect for snacking, served with tomato ketchup.",
-    image: "/images/fries.jpg", // Ensure paths start with / to reference from public folder
+    image: FrenchFries,
     price: 50,
     category: "Fastfood",
   },
@@ -134,7 +155,7 @@ export const MenuList = [
     name: "Veg Biryani",
     description:
       "Fragrant basmati rice cooked with mixed vegetables, aromatic herbs and special biryani spices, served with raita.",
-    image: "/images/veg biryani.jpg", // Ensure paths start with / to reference from public folder
+    image: ChickenBiryani,
     price: 120,
     category: "Lunch",
   },
@@ -144,7 +165,7 @@ export const MenuList = [
     name: "Chocolate Cake",
     description:
       "Rich, moist chocolate cake with creamy chocolate frosting, perfect for satisfying your sweet cravings.",
-    image: "/images/chocolate cake.jpg", // Ensure paths start with / to reference from public folder
+    image: ChocolateCake,
     price: 60,
     category: "Desserts",
   },
@@ -154,7 +175,7 @@ export const MenuList = [
     name: "Masala Chai",
     description:
       "Traditional Indian spiced tea with milk, cardamom, cinnamon, and ginger - perfect for any time of day.",
-    image: "/images/masala chai.jpg", // Ensure paths start with / to reference from public folder
+    image: Masalachai, // Replace with actual Chai image
     price: 20,
     category: "Breakfast",
   },
@@ -162,7 +183,7 @@ export const MenuList = [
     name: "Mango Lassi",
     description:
       "A refreshing yogurt-based drink with sweet mango pulp and a hint of cardamom, garnished with mint.",
-    image: "/images/lassi.jpg", // Ensure paths start with / to reference from public folder
+    image: Lassi,
     price: 45,
     category: "Desserts",
   },
@@ -170,7 +191,7 @@ export const MenuList = [
     name: "Filter Coffee",
     description:
       "South Indian style coffee brewed with a metal filter, mixed with hot milk and served frothy.",
-    image: "/images/coffee.jpg", // Ensure paths start with / to reference from public folder
+    image: CoffeeMug,
     price: 30,
     category: "Breakfast",
   }
