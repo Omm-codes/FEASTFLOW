@@ -6,8 +6,20 @@ import authRoutes from './routes/authRoutes.js';
 import menuRoutes from './routes/menuRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import { testConnection } from './config/index.js';
+import { fixOrdersTableSchema } from './utils/dbDebug.js';
 
 const app = express();
+
+// Run database schema fixes during app startup
+(async () => {
+  try {
+    console.log('Running database schema checks...');
+    await fixOrdersTableSchema();
+    console.log('Database schema checks completed');
+  } catch (error) {
+    console.error('Error during database schema checks:', error);
+  }
+})();
 
 // Middleware
 app.use(cors());

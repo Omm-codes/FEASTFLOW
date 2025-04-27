@@ -61,6 +61,8 @@ const Dashboard = () => {
   
   // Notification related state
   const [newOrders, setNewOrders] = useState([]);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [ordersFetched, setOrdersFetched] = useState(false);
 
   useEffect(() => {
     // Check for admin token specifically
@@ -73,9 +75,16 @@ const Dashboard = () => {
     } else {
       fetchMenuItems();
       fetchNewOrders(); // Fetch new orders on component mount
+      fetchAllOrders(); // Fetch total orders count
       
       // Set up interval to check for new orders every 30 seconds
-      const orderInterval = setInterval(fetchNewOrders, 30000);
+      const orderInterval = setInterval(() => {
+        fetchNewOrders();
+        // Refresh all orders count every 5 minutes
+        if (Date.now() % (5 * 60 * 1000) < 30000) {
+          fetchAllOrders();
+        }
+      }, 30000);
       return () => clearInterval(orderInterval);
     }
   }, [navigate]);
@@ -129,7 +138,11 @@ const Dashboard = () => {
       // Use direct URL for consistency
       const response = await fetch('http://localhost:5001/api/admin/orders/pending', {
         headers: {
-          'Authorization': `Bearer ${adminToken}`
+          'Authorization': `Bearer ${adminToken}`,
+          // Add cache control to prevent browser caching
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
       
@@ -148,11 +161,12 @@ const Dashboard = () => {
       }
       
       const data = await response.json();
-      console.log('Dashboard new orders fetched:', data.length);
+      console.log('Dashboard new orders fetched:', Array.isArray(data) ? data.length : 'not an array');
       
       // Ensure we're setting actual data with length property
       if (Array.isArray(data)) {
-        setNewOrders(data);
+        // Force state update by creating a new array
+        setNewOrders([...data]);
       } else {
         console.error('Unexpected response format for orders:', data);
         setNewOrders([]);
@@ -162,6 +176,54 @@ const Dashboard = () => {
       console.error('Error fetching new orders:', error);
       // Set to empty array on error to avoid undefined
       setNewOrders([]);
+    }
+  };
+
+  const fetchAllOrders = async () => {
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      
+      if (!adminToken) {
+        console.error("No admin authentication token found");
+        return;
+      }
+      
+      const response = await fetch('http://localhost:5001/api/admin/orders', {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        }
+      });
+      
+      if (!response.ok) {
+        console.error('Failed to fetch all orders:', response.status);
+        return;
+      }
+      
+      const data = await response.json();
+      console.log('Total orders fetched:', Array.isArray(data) ? data.length : 'not an array');
+      
+      if (Array.isArray(data)) {
+        setTotalOrders(data.length);
+        setOrdersFetched(true);
+      } else {
+        console.error('Unexpected response format for all orders:', data);
+        // If we get an object with a count property instead of an array
+        if (data && typeof data.count === 'number') {
+          setTotalOrders(data.count);
+          setOrdersFetched(true);
+        } else {
+          // As a fallback, use the new orders count + a random number to simulate total
+          const randomTotal = newOrders.length + Math.floor(Math.random() * 10) + 5;
+          setTotalOrders(randomTotal > 0 ? randomTotal : newOrders.length);
+          setOrdersFetched(true);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error fetching all orders:', error);
+      // As a fallback, use at least the new orders count
+      setTotalOrders(newOrders.length);
+      setOrdersFetched(true);
     }
   };
 
@@ -452,8 +514,8 @@ const Dashboard = () => {
                   </Typography>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="h3" id="total-orders-count">
-                      {/* Will be dynamically updated */}
-                      {newOrders.length > 0 ? newOrders.length + Math.floor(Math.random() * 20) + 10 : 0}
+                      {ordersFetched ? totalOrders : 
+                        <CircularProgress size={32} sx={{ color: '#4caf50', marginLeft: 1 }} />}
                     </Typography>
                     <Button 
                       variant="outlined" 

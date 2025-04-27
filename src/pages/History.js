@@ -222,7 +222,7 @@ const History = () => {
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="textSecondary">
-                        Delivery Address: {order.delivery_address || 'Not specified'}
+                        Pickup Address: {order.delivery_address || 'Not specified'}
                       </Typography>
                     </Box>
                     

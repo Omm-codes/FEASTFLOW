@@ -30,7 +30,7 @@ export const createOrder = async (req, res) => {
     }, null, 2));
     
     // Handle guest checkout or authenticated user
-    const userId = req.user?.userId || 1; // Default to user ID 1 for guest orders
+    const userId = req.user?.userId || null; // Use null for guest orders to avoid FK constraint issues
     
     // Improved validation with better error responses
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -61,39 +61,94 @@ export const createOrder = async (req, res) => {
     }
     
     try {
-      console.log('About to execute SQL query with values:', {
-        userId,
-        total_amount: parsedAmount || 0,
-        payment_method,
-        status,
-        address: customer?.address || 'Not provided',
-        phone: customer?.phone || 'Not provided',
-        name: customer?.name || 'Guest',
-        email: customer?.email || 'guest@example.com'
-      });
+      // Extract pickup information from customer data
+      const pickupNotes = customer.pickupTime ? `Pickup Time: ${customer.pickupTime}` : '';
+      const customerNotes = customer.notes ? `Notes: ${customer.notes}` : '';
+      const specialInstructions = [pickupNotes, customerNotes].filter(Boolean).join(' | ');
       
-      // Insert order into orders table with non-null values for required fields
-      const [orderResult] = await connection.execute(
-        'INSERT INTO orders (user_id, total_amount, payment_method, status, delivery_address, contact_number, customer_name, customer_email, customer_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [
-          userId, 
-          parsedAmount || 0,
-          payment_method || 'cash',
-          status || 'pending',
-          customer?.address || 'Not provided', // Non-null default
-          customer?.phone || 'Not provided',   // Non-null default
-          customer?.name || 'Guest',           // Optional field in DB
-          customer?.email || 'guest@example.com', // Optional field in DB
-          customer?.phone || 'Not provided'    // Optional field in DB
-        ]
-      );
+      // Check database to see if columns exist
+      const [columns] = await connection.execute(`
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = 'orders'
+        AND COLUMN_NAME IN ('delivery_address', 'pickup_address', 'customer_phone')
+      `);
+      
+      const columnNames = columns.map(col => col.COLUMN_NAME.toLowerCase());
+      const hasDeliveryAddressColumn = columnNames.includes('delivery_address');
+      const hasPickupAddressColumn = columnNames.includes('pickup_address');
+      const hasCustomerPhoneColumn = columnNames.includes('customer_phone');
+      
+      // Get pickup type from request (restaurant or home)
+      const pickupType = req.body.pickup_type || 'restaurant';
+      const pickupAddress = req.body.pickup_address || 'Restaurant Pickup';
+      
+      console.log('Order type:', pickupType);
+      console.log('Has delivery_address column:', hasDeliveryAddressColumn);
+      console.log('Has pickup_address column:', hasPickupAddressColumn);
+      console.log('Has customer_phone column:', hasCustomerPhoneColumn);
+      
+      let orderResult;
+      
+      // First try to get the contact information
+      const contactNumber = customer?.phone || 'Not provided';
+      const customerName = customer?.name || 'Guest';
+      const customerEmail = customer?.email || 'guest@example.com';
+      
+      // Build up the SQL query and parameters based on what columns exist
+      let sqlFields = 'user_id, total_amount, payment_method, status, contact_number, customer_name, customer_email, special_instructions';
+      let sqlPlaceholders = '?, ?, ?, ?, ?, ?, ?, ?';
+      const sqlParams = [
+        userId, 
+        parsedAmount || 0,
+        payment_method || 'cash',
+        status || 'pending',
+        contactNumber,
+        customerName,
+        customerEmail,
+        specialInstructions || ''
+      ];
+      
+      // Add delivery_address if that column exists
+      if (hasDeliveryAddressColumn) {
+        sqlFields += ', delivery_address';
+        sqlPlaceholders += ', ?';
+        sqlParams.push(req.body.delivery_address || customer?.address || 'Not provided');
+      }
+      
+      // Add pickup_address if that column exists
+      if (hasPickupAddressColumn) {
+        sqlFields += ', pickup_address';
+        sqlPlaceholders += ', ?';
+        sqlParams.push(pickupAddress);
+      }
+      
+      // Add customer_phone if that column exists
+      if (hasCustomerPhoneColumn) {
+        sqlFields += ', customer_phone';
+        sqlPlaceholders += ', ?';
+        sqlParams.push(contactNumber);
+      }
+      
+      // Add pickup_type if that parameter is provided
+      if (pickupType) {
+        sqlFields += ', pickup_type';
+        sqlPlaceholders += ', ?';
+        sqlParams.push(pickupType);
+      }
+      
+      const sqlQuery = `INSERT INTO orders (${sqlFields}) VALUES (${sqlPlaceholders})`;
+      console.log('Executing SQL:', sqlQuery);
+      console.log('With parameters:', sqlParams);
+      
+      [orderResult] = await connection.execute(sqlQuery, sqlParams);
       
       const orderId = orderResult.insertId;
       console.log(`Created order with ID: ${orderId}`);
       
-      // Insert order items
+      // Insert order items - Handle both id and menu_item_id from frontend
       for (const item of items) {
-        // Use item.id instead of item.menu_item_id (which is undefined)
+        // Support both item.id and item.menu_item_id formats from different frontends
         const menuItemId = item.id || item.menu_item_id; 
         
         // Verify we have a valid ID before inserting
@@ -102,7 +157,7 @@ export const createOrder = async (req, res) => {
           throw new Error('All items must have an ID');
         }
         
-        const quantity = item.quantity || 1;
+        const quantity = parseInt(item.quantity) || 1;
         const price = parseFloat(item.price) || 0;
         
         console.log('Inserting item:', {

@@ -69,6 +69,8 @@ export const fixOrdersTableSchema = async () => {
       { name: 'customer_email', definition: 'VARCHAR(100) NULL' },
       { name: 'customer_phone', definition: 'VARCHAR(20) NULL' },
       { name: 'delivery_address', definition: 'TEXT NULL' },
+      { name: 'pickup_address', definition: 'TEXT NULL' },
+      { name: 'pickup_type', definition: 'VARCHAR(50) DEFAULT "restaurant"' },
       { name: 'payment_method', definition: 'VARCHAR(50) DEFAULT "cash"' },
       { name: 'contact_number', definition: 'VARCHAR(20) NULL' }
     ];

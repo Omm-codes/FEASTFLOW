@@ -56,7 +56,7 @@ const OrderSummary = ({ order, fallbackText = 'Order details not available' }) =
           </ListItem>
           
           <ListItem sx={{ py: 1, px: 0 }}>
-            <ListItemText primary="Delivery Fee" />
+            <ListItemText primary="Pickup Fee" />
             <Typography variant="body1">₹{order.deliveryFee || 0}</Typography>
           </ListItem>
           
@@ -68,7 +68,7 @@ const OrderSummary = ({ order, fallbackText = 'Order details not available' }) =
         
         <Box sx={{ mt: 2 }}>
           <Typography variant="body2" gutterBottom>
-            Delivery Address:
+            Pickup Address:
           </Typography>
           <Typography variant="body1">
             {order.deliveryAddress || 'No address provided'}

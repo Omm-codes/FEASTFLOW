@@ -14,7 +14,6 @@ import Dashboard from './pages/admin/Dashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 import OrderManagement from './pages/admin/OrderManagement';
 import MenuManagement from './pages/admin/MenuManagement';
-import AdminSettings from './pages/admin/AdminSettings';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import History from './pages/History';
@@ -58,7 +57,6 @@ function App() {
                   <Route path="/admin/dashboard" element={<AdminProtectedRoute><Dashboard /></AdminProtectedRoute>} />
                   <Route path="/admin/orders" element={<AdminProtectedRoute><OrderManagement /></AdminProtectedRoute>} />
                   <Route path="/admin/menu" element={<AdminProtectedRoute><MenuManagement /></AdminProtectedRoute>} />
-                  <Route path="/admin/settings" element={<AdminProtectedRoute><AdminSettings /></AdminProtectedRoute>} />
                   
                   <Route path="*" element={<Pagenotfound />} />
                 </Routes>
