@@ -35,6 +35,12 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete, CloudUpload, Notifications } from '@mui/icons-material';
 
+// Add these color definitions to match your theme
+const primaryColor = '#6a4e38'; // A slightly lighter, warmer brown
+const secondaryColor = '#a1887f'; // A muted, dusty rose
+const accentColor = '#f5f0e1'; // Off-white, creamy background
+const highlightColor = '#ffd54f'; // A golden yellow for highlights
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState([]);
@@ -53,7 +59,8 @@ const Dashboard = () => {
     description: '',
     price: '',
     category: '',
-    image_url: ''
+    image_url: '',
+    uploading: false
   });
   
   // Notification related state
@@ -92,6 +99,17 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (menuItems.length > 0) {
+      console.log('Fetched menu items:', menuItems);
+      // Check if any items are missing the "available" flag
+      const unavailableItems = menuItems.filter(item => item.available !== true);
+      if (unavailableItems.length > 0) {
+        console.warn('Some items might not show up on Menu page due to missing "available" status:', unavailableItems);
+      }
+    }
+  }, [menuItems]);
   
   // Fetch new orders that need admin attention
   const fetchNewOrders = async () => {
@@ -126,18 +144,47 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('adminToken');
       
+      // Validate required fields
+      if (!newItem.name || !newItem.price) {
+        setSnackbar({
+          open: true,
+          message: "Name and price are required fields",
+          severity: "warning"
+        });
+        return;
+      }
+      
+      // Create a copy of the new item object
+      let processedItem = {...newItem};
+      
+      // Only process local paths, leave external URLs as they are
+      if (processedItem.image_url && 
+          !processedItem.image_url.startsWith('data:') && 
+          !processedItem.image_url.startsWith('http')) {
+        // Ensure the image path starts with '/'
+        processedItem.image_url = processedItem.image_url.startsWith('/') 
+          ? processedItem.image_url 
+          : `/${processedItem.image_url}`;
+      }
+      
+      console.log('Sending new menu item data:', processedItem);
+      
       const response = await fetch('http://localhost:5001/api/admin/menu', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(newItem)
+        body: JSON.stringify(processedItem)
       });
       
       if (!response.ok) {
-        throw new Error('Failed to add menu item');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Failed to add menu item: ${errorData.error || response.statusText}`);
       }
+      
+      const result = await response.json();
+      console.log('Add item response:', result);
       
       setOpenAddDialog(false);
       setSnackbar({
@@ -152,11 +199,13 @@ const Dashboard = () => {
         description: '',
         price: '',
         category: '',
-        image_url: ''
+        image_url: '',
+        uploading: false
       });
       fetchMenuItems();
       
     } catch (error) {
+      console.error('Add item error:', error);
       setSnackbar({
         open: true,
         message: `Error: ${error.message}`,
@@ -169,18 +218,38 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('adminToken');
       
-      const response = await fetch(`http://localhost:5001/api/admin/menu/${currentItem.id}`, {
+      // Create a copy of the item to process
+      let processedItem = {...currentItem};
+      
+      // Important: Check if the image_url is not empty AND not already a data URL or http URL
+      if (processedItem.image_url && 
+          !processedItem.image_url.startsWith('data:') && 
+          !processedItem.image_url.startsWith('http')) {
+        
+        // Ensure the image path starts with '/'
+        processedItem.image_url = processedItem.image_url.startsWith('/') 
+          ? processedItem.image_url 
+          : `/${processedItem.image_url}`;
+      }
+      
+      console.log('Sending data for update:', processedItem); // Debug log
+      
+      const response = await fetch(`http://localhost:5001/api/admin/menu/${processedItem.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(currentItem)
+        body: JSON.stringify(processedItem)
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update menu item');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Failed to update menu item: ${errorData.error || response.statusText}`);
       }
+      
+      const result = await response.json();
+      console.log('Update response:', result); // Debug log
       
       setOpenEditDialog(false);
       setSnackbar({
@@ -191,6 +260,7 @@ const Dashboard = () => {
       fetchMenuItems();
       
     } catch (error) {
+      console.error('Edit item error:', error);
       setSnackbar({
         open: true,
         message: `Error: ${error.message}`,
@@ -381,6 +451,12 @@ const Dashboard = () => {
               color="primary" 
               startIcon={<Add />}
               onClick={openAddItemDialog}
+              sx={{
+                bgcolor: primaryColor,
+                '&:hover': {
+                  bgcolor: '#3e1e09',
+                }
+              }}
             >
               Add New Item
             </Button>
@@ -480,14 +556,22 @@ const Dashboard = () => {
             fullWidth
             value={newItem.image_url}
             onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
-            helperText="Example: /images/dosa.jpg"
+            helperText="Enter a local path (e.g. /images/food.jpg) or a complete URL (https://...)"
           />
           <Box mt={2}>
             <Button
               variant="outlined"
               component="label"
               startIcon={<CloudUpload />}
-              sx={{ mb: 2 }}
+              sx={{ 
+                mb: 2,
+                borderColor: primaryColor,
+                color: primaryColor,
+                '&:hover': {
+                  borderColor: secondaryColor,
+                  backgroundColor: 'rgba(106, 78, 56, 0.04)'
+                }
+              }}
             >
               Upload Image
               <input
@@ -496,10 +580,25 @@ const Dashboard = () => {
                 accept="image/*"
                 onChange={async (e) => {
                   if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
                     const formData = new FormData();
-                    formData.append('image', e.target.files[0]);
+                    formData.append('image', file);
+                    
+                    // Show image preview immediately from local file
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      // Temporarily set the image URL to the local file preview
+                      setNewItem({...newItem, image_url: event.target.result, uploading: true});
+                    };
+                    reader.readAsDataURL(file);
                     
                     try {
+                      setSnackbar({
+                        open: true,
+                        message: 'Uploading image...',
+                        severity: 'info'
+                      });
+                      
                       const token = localStorage.getItem('adminToken');
                       const response = await fetch('http://localhost:5001/api/upload', {
                         method: 'POST',
@@ -509,10 +608,22 @@ const Dashboard = () => {
                         body: formData
                       });
                       
-                      if (!response.ok) throw new Error('Upload failed');
+                      if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Upload failed');
+                      }
                       
                       const data = await response.json();
-                      setNewItem({...newItem, image_url: data.imagePath});
+                      
+                      // Log the server response for debugging
+                      console.log('Upload response:', data);
+                      
+                      // Store the actual server path for the image
+                      setNewItem(prev => ({
+                        ...prev, 
+                        image_url: data.imagePath,
+                        uploading: false
+                      }));
                       
                       setSnackbar({
                         open: true,
@@ -520,6 +631,13 @@ const Dashboard = () => {
                         severity: 'success'
                       });
                     } catch (error) {
+                      console.error('Upload error:', error);
+                      
+                      setNewItem(prev => ({
+                        ...prev,
+                        uploading: false
+                      }));
+                      
                       setSnackbar({
                         open: true,
                         message: `Upload error: ${error.message}`,
@@ -531,43 +649,68 @@ const Dashboard = () => {
               />
             </Button>
           </Box>
+
+          {/* Improved Image Preview */}
           <Box mt={2} display="flex" flexDirection="column" alignItems="center">
             <Typography variant="caption" color="textSecondary" sx={{ mb: 1 }}>
-              Image Preview
+              Image Preview {newItem.uploading && '(Uploading...)'}
             </Typography>
             <Box
               sx={{
                 width: '100%',
-                height: 120,
+                height: 200,
                 border: '1px dashed #ccc',
-                borderRadius: 1,
+                borderRadius: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 overflow: 'hidden',
                 position: 'relative',
+                backgroundColor: '#f5f5f5'
               }}
             >
               {newItem.image_url ? (
-                <img
-                  src={newItem.image_url.startsWith('http') 
-                    ? newItem.image_url 
-                    : newItem.image_url.startsWith('/') 
-                      ? `http://localhost:5001${newItem.image_url}` 
-                      : `/${newItem.image_url}`}
-                  alt="Preview"
-                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/placeholder-food.jpg';
-                  }}
-                />
+                <>
+                  <img
+                    src={newItem.image_url.startsWith('data:') 
+                      ? newItem.image_url // Local file preview
+                      : newItem.image_url.startsWith('http') 
+                        ? newItem.image_url // External URL
+                        : `http://localhost:5001${newItem.image_url.startsWith('/') ? newItem.image_url : `/${newItem.image_url}`}`
+                    }
+                    alt="Preview"
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '100%', 
+                      objectFit: 'contain',
+                      opacity: newItem.uploading ? 0.6 : 1
+                    }}
+                    onError={(e) => {
+                      console.error(`Failed to load preview image: ${newItem.image_url}`);
+                      e.target.onerror = null;
+                      e.target.src = '/placeholder-food.jpg';
+                    }}
+                  />
+                  {newItem.uploading && (
+                    <CircularProgress size={40} sx={{ position: 'absolute', color: primaryColor }} />
+                  )}
+                </>
               ) : (
                 <Typography variant="body2" color="textSecondary">
-                  No image URL provided
+                  No image selected
                 </Typography>
               )}
             </Box>
+            {newItem.image_url && !newItem.uploading && (
+              <Button 
+                size="small"
+                color="error"
+                sx={{ mt: 1 }}
+                onClick={() => setNewItem({...newItem, image_url: ''})}
+              >
+                Remove Image
+              </Button>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -647,12 +790,11 @@ const Dashboard = () => {
                     <img
                       src={currentItem.image_url.startsWith('http') 
                         ? currentItem.image_url 
-                        : currentItem.image_url.startsWith('/') 
-                          ? `http://localhost:5001${currentItem.image_url}` 
-                          : `/${currentItem.image_url}`}
+                        : `http://localhost:5001${currentItem.image_url.startsWith('/') ? currentItem.image_url : `/${currentItem.image_url}`}`}
                       alt="Preview"
                       style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                       onError={(e) => {
+                        console.log(`Failed to load preview image: ${currentItem.image_url}`);
                         e.target.onerror = null;
                         e.target.src = '/placeholder-food.jpg';
                       }}

@@ -49,15 +49,19 @@ export const getAllOrders = async (req, res) => {
 export const updateMenuItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, available } = req.body;
+        const { name, description, price, category, available, image_url } = req.body;
         
         await pool.execute(
-            'UPDATE menu_items SET name = ?, description = ?, price = ?, category = ?, available = ? WHERE id = ?',
-            [name, description, price, category, available, id]
+            'UPDATE menu_items SET name = ?, description = ?, price = ?, category = ?, available = ?, image_url = ? WHERE id = ?',
+            [name, description, price, category, available, image_url, id]
         );
         
-        res.json({ message: 'Menu item updated successfully' });
+        res.json({ 
+            message: 'Menu item updated successfully',
+            updatedFields: { name, description, price, category, available, image_url }
+        });
     } catch (error) {
+        console.error('Error updating menu item:', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -76,16 +80,40 @@ export const addMenuItem = async (req, res) => {
     try {
         const { name, description, price, category, image_url } = req.body;
         
+        // Validate the required fields
+        if (!name || !price) {
+            return res.status(400).json({ error: 'Name and price are required' });
+        }
+        
+        // Handle different image URL formats
+        let finalImageUrl = image_url;
+        
+        // Note: We'll allow external URLs to be saved directly to the database
+        // This will let you use images from external sources
+        
+        console.log('Adding menu item with image URL:', finalImageUrl);
+        
+        // Add the available=true by default
         const [result] = await pool.execute(
-            'INSERT INTO menu_items (name, description, price, category, image_url) VALUES (?, ?, ?, ?, ?)',
-            [name, description, price, category, image_url]
+            'INSERT INTO menu_items (name, description, price, category, image_url, available) VALUES (?, ?, ?, ?, ?, ?)',
+            [name, description, price, category, finalImageUrl, true]
         );
         
         res.status(201).json({
             message: 'Menu item added successfully',
-            id: result.insertId
+            id: result.insertId,
+            item: {
+                id: result.insertId,
+                name,
+                description,
+                price,
+                category,
+                image_url: finalImageUrl,
+                available: true
+            }
         });
     } catch (error) {
+        console.error('Error adding menu item:', error);
         res.status(500).json({ error: error.message });
     }
 };

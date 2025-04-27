@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+
 import {
   AppBar,
   Box,
@@ -18,7 +19,8 @@ import {
   History,
   Dashboard,
   Logout,
-  ShoppingCart
+  ShoppingCart,
+  Home
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -61,6 +63,17 @@ const Header = () => {
 
         {/* Right: Nav Links + User/Login */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Button 
+            component={Link} 
+            to="/" 
+            startIcon={<Home />}
+            sx={{ 
+              color: '#023047', 
+              fontWeight: 500 
+            }}
+          >
+            Home
+          </Button>
           <Button component={Link} to="/menu" sx={{ color: '#023047', fontWeight: 500 }}>
             Menu
           </Button>

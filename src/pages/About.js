@@ -25,25 +25,31 @@ import {
 } from "@mui/icons-material";
 import "../styles/AboutStyles.css";
 
+// Define color variables to maintain consistency
+const primaryColor = '#6a4e38'; // A slightly lighter, warmer brown
+const secondaryColor = '#a1887f'; // A muted, dusty rose
+const accentColor = '#f5f0e1'; // Off-white, creamy background
+const highlightColor = '#ffd54f'; // A golden yellow for highlights
+
 const About = () => {
   const features = [
     {
-      icon: <FastfoodOutlined sx={{ fontSize: 40, color: "#552a0f" }} />,
+      icon: <FastfoodOutlined sx={{ fontSize: 40, color: primaryColor }} />,
       title: "Fresh Food",
       description: "We serve fresh, high-quality meals prepared daily by our expert chefs"
     },
     {
-      icon: <AccessTime sx={{ fontSize: 40, color: "#552a0f" }} />,
+      icon: <AccessTime sx={{ fontSize: 40, color: primaryColor }} />,
       title: "Quick Service",
       description: "Pre-order your meals and skip the queue with our efficient service"
     },
     {
-      icon: <Payment sx={{ fontSize: 40, color: "#552a0f" }} />,
+      icon: <Payment sx={{ fontSize: 40, color: primaryColor }} />,
       title: "Easy Payments",
       description: "Hassle-free digital payments for a seamless dining experience"
     },
     {
-      icon: <People sx={{ fontSize: 40, color: "#552a0f" }} />,
+      icon: <People sx={{ fontSize: 40, color: primaryColor }} />,
       title: "User Friendly",
       description: "Simple and intuitive interface for students and faculty"
     }
@@ -51,22 +57,22 @@ const About = () => {
 
   const values = [
     {
-      icon: <Restaurant />,
+      icon: <Restaurant color="white"/>,
       title: "Quality",
       description: "We never compromise on the quality of ingredients or preparation methods."
     },
     {
-      icon: <CleanHands />,
+      icon: <CleanHands color="white"/>,
       title: "Cleanliness",
       description: "Maintaining the highest standards of hygiene in our food service areas."
     },
     {
-      icon: <EmojiEvents />,
+      icon: <EmojiEvents color="white"/>,
       title: "Excellence",
       description: "Striving to exceed expectations in every aspect of our service."
     },
     {
-      icon: <LocalCafe />,
+      icon: <LocalCafe color="white"/>,
       title: "Community",
       description: "Creating a welcoming environment for everyone on campus."
     }
@@ -84,7 +90,7 @@ const About = () => {
           justifyContent: "center",
           alignItems: "center",
           textAlign: "center",
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/images/banner.jpeg")',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://images.unsplash.com/photo-1542181961-9590d0c79dab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80")',
           backgroundAttachment: "fixed",
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -114,14 +120,14 @@ const About = () => {
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)"
             }}
           >
-            About <span style={{ color: "#ffd54f" }}>FeastFlow</span>
+            About <span style={{ color: highlightColor }}>FeastFlow</span>
           </Typography>
           
           <Divider sx={{ 
             width: 100, 
             mx: "auto", 
             mb: 3, 
-            borderColor: "#ffd54f", 
+            borderColor: highlightColor, 
             borderWidth: 2 
           }} />
           
@@ -145,9 +151,9 @@ const About = () => {
 
       {/* Mission Statement Banner */}
       <Box sx={{ 
-        bgcolor: "#552a0f", 
+        bgcolor: primaryColor, 
         py: 4,
-        borderBottom: "5px solid #ffd54f"
+        borderBottom: "5px solid "+ highlightColor
       }}>
         <Container maxWidth="md">
           <Typography 
@@ -178,7 +184,7 @@ const About = () => {
                 fontFamily: "'Playfair Display', serif",
                 fontWeight: 700,
                 fontSize: { xs: "2rem", md: "2.5rem" },
-                color: "#333",
+                color: primaryColor,
                 position: "relative",
                 mb: 4,
                 "&:after": {
@@ -187,7 +193,7 @@ const About = () => {
                   bottom: "-10px",
                   left: 0,
                   width: "60px",
-                  borderBottom: "3px solid #ffd54f"
+                  borderBottom: "3px solid "+ highlightColor
                 }
               }}
             >
@@ -259,7 +265,7 @@ const About = () => {
           mb: 6,
           py: 6,
           borderRadius: "16px", 
-          backgroundColor: "#f9f7f4",
+          backgroundColor: accentColor,
           boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
         }}>
           <Container>
@@ -276,7 +282,7 @@ const About = () => {
                       variant="h3" 
                       component="div" 
                       sx={{ 
-                        color: "#552a0f", 
+                        color: primaryColor, 
                         fontWeight: 700,
                         fontFamily: "'Playfair Display', serif"
                       }}
@@ -309,7 +315,7 @@ const About = () => {
               fontFamily: "'Playfair Display', serif",
               fontWeight: 700,
               fontSize: { xs: "2rem", md: "2.5rem" },
-              color: "#333",
+              color: primaryColor,
               mb: 5,
               position: "relative",
               "&:after": {
@@ -319,7 +325,7 @@ const About = () => {
                 left: "50%",
                 transform: "translateX(-50%)",
                 width: "80px",
-                borderBottom: "3px solid #ffd54f"
+                borderBottom: "3px solid "+ highlightColor
               }
             }}
           >
@@ -372,7 +378,7 @@ const About = () => {
                         mb: 2,
                         fontFamily: "'Playfair Display', serif",
                         fontWeight: 600,
-                        color: "#333"
+                        color: primaryColor
                       }}
                     >
                       {feature.title}
@@ -402,7 +408,7 @@ const About = () => {
           mt: 8, 
           mb: 6, 
           py: 8,
-          bgcolor: "#552a0f",
+          bgcolor: primaryColor,
           borderRadius: "16px",
           color: "white"
         }}>
@@ -425,7 +431,7 @@ const About = () => {
                   left: "50%",
                   transform: "translateX(-50%)",
                   width: "80px",
-                  borderBottom: "3px solid #ffd54f"
+                  borderBottom: "3px solid "+ highlightColor
                 }
               }}
             >
@@ -441,8 +447,8 @@ const About = () => {
                   }}>
                     <Avatar 
                       sx={{ 
-                        bgcolor: "#ffd54f", 
-                        color: "#552a0f",
+                        bgcolor: highlightColor, 
+                        color: primaryColor,
                         width: 60,
                         height: 60,
                         mx: "auto",
@@ -455,7 +461,7 @@ const About = () => {
                       variant="h6" 
                       sx={{ 
                         mb: 1.5,
-                        color: "#ffd54f",
+                        color: highlightColor,
                         fontFamily: "'Playfair Display', serif",
                       }}
                     >
@@ -497,7 +503,7 @@ const About = () => {
               fontFamily: "'Playfair Display', serif",
               fontWeight: 700,
               mb: 3,
-              color: "#333"
+              color: accentColor
             }}
           >
             Ready to Revolutionize Your Dining Experience?
@@ -509,7 +515,7 @@ const About = () => {
               mb: 4,
               fontFamily: "'Poppins', sans-serif",
               fontSize: "1.1rem",
-              color: "#555"
+              color: accentColor
             }}
           >
             Join thousands of satisfied users who have transformed their campus dining experience with FeastFlow.
@@ -519,7 +525,7 @@ const About = () => {
             component={Link}
             to="/menu"
             sx={{ 
-              bgcolor: "#552a0f",
+              bgcolor: primaryColor,
               color: "white",
               py: 1.5,
               px: 4,
