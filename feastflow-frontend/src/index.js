@@ -1,0 +1,9 @@
+// ...existing code...
+import { CartProvider } from './context/CartContext';
+// ...existing code...
+<React.StrictMode>
+  <CartProvider>
+    {/* ...other providers and your app... */}
+  </CartProvider>
+</React.StrictMode>
+// ...existing code...

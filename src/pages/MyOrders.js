@@ -86,7 +86,7 @@ const MyOrders = () => {
     setQuantities(updatedQuantities);
   };
 
-  // Updated function to handle checkout navigation with auth check
+  // Updated function to handle checkout navigation
   const handleCheckout = () => {
     // Update cart items with quantities
     const updatedCart = cart.map((item, index) => ({
@@ -97,14 +97,9 @@ const MyOrders = () => {
     // Update cart with quantities before navigation
     setCart(updatedCart);
     
-    // Check if user is logged in
-    if (!user) {
-      // If not logged in, navigate to login with return path set to checkout
-      navigate('/login', { state: { returnTo: '/checkout' } });
-    } else {
-      // If logged in, navigate directly to checkout
-      navigate('/checkout');
-    }
+    // Always navigate directly to checkout - allow the protected route logic
+    // to handle redirection to login if needed
+    navigate('/checkout');
   };
 
   return (

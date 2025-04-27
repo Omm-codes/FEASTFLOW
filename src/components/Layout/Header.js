@@ -23,9 +23,13 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
-  const { user, logout } = useAuth();
+  const { authState, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
+  
+  // Extract user from authState
+  const user = authState?.user;
+  const isAuthenticated = authState?.isAuthenticated;
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -74,11 +78,11 @@ const Header = () => {
             Contact
           </Button>
 
-          {user ? (
+          {isAuthenticated ? (
             <>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user.name || 'User'} src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={user?.name || 'User'} src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
               <Menu

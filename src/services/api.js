@@ -1,27 +1,103 @@
 const API_URL = 'http://localhost:5001/api';
 
 export const authService = {
-    login: async (email, password) => {
-        const response = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        localStorage.setItem('token', data.token);
-        return data;
+    login: async (credentials) => {
+        try {
+            console.log('API service: login called with', credentials);
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(credentials)
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API service: login error response', errorText);
+                try {
+                    // Try to parse as JSON
+                    const errorData = JSON.parse(errorText);
+                    throw new Error(errorData.error || 'Login failed');
+                } catch (e) {
+                    // If not JSON, throw with text
+                    if (errorText.includes('<!DOCTYPE')) {
+                        throw new Error('Server error: API returned HTML instead of JSON. Please check server configuration.');
+                    }
+                    throw new Error(`Login failed: ${response.status} ${response.statusText}`);
+                }
+            }
+            
+            const data = await response.json();
+            console.log('API service: login response', data);
+            return data;
+        } catch (error) {
+            console.error('API service: login error', error);
+            throw error;
+        }
     },
 
-    register: async (name, email, password) => {
-        const response = await fetch(`${API_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        return data;
+    register: async (userData) => {
+        try {
+            console.log('API service: register called with', userData);
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API service: register error response', errorText);
+                try {
+                    // Try to parse as JSON
+                    const errorData = JSON.parse(errorText);
+                    throw new Error(errorData.error || 'Registration failed');
+                } catch (e) {
+                    // If not JSON, throw with text
+                    if (errorText.includes('<!DOCTYPE')) {
+                        throw new Error('Server error: API returned HTML instead of JSON. Please check server configuration.');
+                    }
+                    throw new Error(`Registration failed: ${response.status} ${response.statusText}`);
+                }
+            }
+            
+            const data = await response.json();
+            console.log('API service: register response', data);
+            return data;
+        } catch (error) {
+            console.error('API service: register error', error);
+            throw error;
+        }
+    },
+
+    getUserProfile: async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No token found');
+            }
+            const response = await fetch(`${API_URL}/users/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to get profile: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('API service: getUserProfile response', data);
+            return data;
+        } catch (error) {
+            console.error('API service: getUserProfile error', error);
+            throw error;
+        }
     }
 };
 

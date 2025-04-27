@@ -166,16 +166,20 @@ export const getOrdersByUser = async (req, res) => {
     
     console.log(`Fetching orders for user ID: ${userId}`);
     
-    const [orders] = await pool.execute(
-      'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
-      [userId]
-    );
+    // Use the enhanced Order model method instead of direct query
+    const orders = await Order.getByUserId(userId);
     
-    console.log(`Found ${orders.length} orders`);
+    // Ensure correct status display by using display_status
+    const processedOrders = orders.map(order => ({
+      ...order,
+      status: order.display_status || order.status
+    }));
+    
+    console.log(`Found ${processedOrders.length} orders for user ${userId}`);
     
     // Ensure we're sending valid JSON
     res.setHeader('Content-Type', 'application/json');
-    res.json(orders);
+    res.json(processedOrders);
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
@@ -244,8 +248,7 @@ export const getOrderById = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
-  // Convert status from const to let to allow modification
-  let { status, paymentReference } = req.body;
+  let { status, paymentReference, notify } = req.body;
   let connection;
 
   try {
@@ -260,14 +263,27 @@ export const updateOrderStatus = async (req, res) => {
     // Get connection from pool
     connection = await pool.getConnection();
     
-    // Log update attempt
-    console.log(`Updating order ${id} status to ${status}`);
+    // Check if original_status column exists
+    const [columns] = await connection.execute(`
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_NAME = 'orders'
+      AND COLUMN_NAME = 'original_status'
+    `);
     
-    // Check if order exists
-    const [orderCheck] = await connection.execute(
-      'SELECT id, user_id FROM orders WHERE id = ?',
-      [id]
-    );
+    const hasOriginalStatus = columns.length > 0;
+    
+    // Log update attempt
+    console.log(`Updating order ${id} status to ${status}. Notify: ${notify}`);
+    
+    // Check if order exists and get related user information
+    let selectQuery = `
+      SELECT o.id, o.user_id, o.status AS current_status, o.customer_email, u.email, u.name
+      ${hasOriginalStatus ? ', o.original_status' : ''}
+      FROM orders o LEFT JOIN users u ON o.user_id = u.id WHERE o.id = ?
+    `;
+    
+    const [orderCheck] = await connection.execute(selectQuery, [id]);
     
     if (orderCheck.length === 0) {
       return res.status(404).json({
@@ -275,39 +291,90 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
     
-    // Define allowed status values - check database schema for actual allowed values
-    // Note: Modified to match database ENUM constraints
-    const allowedStatuses = ['pending', 'processing', 'completed', 'cancelled'];
+    const order = orderCheck[0];
+    console.log('Current order status:', order.current_status);
+    console.log('New status to apply:', status);
     
-    // Map 'paid' status to 'processing' since 'paid' isn't in the ENUM 
-    if (status === 'paid') {
-      console.log("Status 'paid' received, mapping to 'processing' to match database schema");
-      status = 'processing'; // Convert to a valid status that's in the database ENUM
-    }
+    // Define status mappings that works with your database
+    // This ensures consistent status representation between frontend and backend
+    const statusMappings = {
+      'pending': 'pending',
+      'paid': 'processing',      // Map 'paid' to 'processing'
+      'preparing': 'processing', // Map 'preparing' to 'processing'  
+      'processing': 'processing',
+      'ready': 'completed',      // Map 'ready' to 'completed'
+      'completed': 'completed',
+      'delivered': 'completed',  // Map 'delivered' to 'completed'
+      'cancelled': 'cancelled'
+    };
     
-    if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({
-        error: 'Invalid status value',
-        details: `Status must be one of: ${allowedStatuses.join(', ')}, or 'paid' (which will be converted to 'processing')`
-      });
-    }
+    // Use mapped status for database but keep original status for frontend
+    const dbStatus = statusMappings[status.toLowerCase()] || order.current_status;
+    console.log(`Using mapped database status: ${dbStatus}`);
     
-    // Update order status (and payment reference if provided)
-    if (paymentReference) {
+    // Update order status and store original frontend status if the column exists
+    if (hasOriginalStatus) {
       await connection.execute(
-        'UPDATE orders SET status = ?, payment_reference = ?, updated_at = NOW() WHERE id = ?',
-        [status, paymentReference, id]
+        'UPDATE orders SET status = ?, original_status = ?, updated_at = NOW() WHERE id = ?',
+        [dbStatus, status, id]
       );
     } else {
+      // If original_status column doesn't exist, create it
+      try {
+        console.log("Attempting to add original_status column to orders table");
+        await connection.execute(`
+          ALTER TABLE orders 
+          ADD COLUMN original_status VARCHAR(50) DEFAULT NULL
+          AFTER status
+        `);
+        console.log("Successfully added original_status column");
+        
+        // Now update with both status fields
+        await connection.execute(
+          'UPDATE orders SET status = ?, original_status = ?, updated_at = NOW() WHERE id = ?',
+          [dbStatus, status, id]
+        );
+      } catch (alterError) {
+        // If column already exists or other error, just update the status
+        console.error("Error adding original_status column:", alterError);
+        await connection.execute(
+          'UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?',
+          [dbStatus, id]
+        );
+      }
+    }
+    
+    // If payment reference provided, update that separately
+    if (paymentReference) {
       await connection.execute(
-        'UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?',
-        [status, id]
+        'UPDATE orders SET payment_reference = ? WHERE id = ?',
+        [paymentReference, id]
       );
     }
+    
+    // If notify flag is set and we have a user email, send notification
+    if (notify && order.user_id) {
+      const userEmail = order.email || order.customer_email;
+      const userName = order.name || 'Customer';
+      
+      console.log(`📧 Sending notification to ${userName} (${userEmail}) about order #${order.id} status: ${status}`);
+      
+      // In a real implementation, you would call your notification service here
+    }
+    
+    // Fetch the updated order to return in response
+    const [updatedOrder] = await connection.execute(
+      'SELECT id, status, original_status FROM orders WHERE id = ?',
+      [id]
+    );
     
     res.status(200).json({
       success: true,
-      message: 'Order status updated successfully'
+      message: 'Order status updated successfully',
+      status: status,
+      dbStatus: dbStatus,
+      orderId: id,
+      order: updatedOrder[0]
     });
     
   } catch (error) {
@@ -318,6 +385,5 @@ export const updateOrderStatus = async (req, res) => {
     });
   } finally {
     if (connection) connection.release();
-    console.log('Database connection released after status update');
   }
 };

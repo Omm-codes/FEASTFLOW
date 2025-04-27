@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout/Layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -9,28 +9,77 @@ import {
   Typography,
   TextField,
   Button,
-  Box
+  Box,
+  Alert,
+  CircularProgress
 } from '@mui/material';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { authState, login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Get the return path from location state, default to home page
-  const returnTo = location.state?.returnTo || '/';
+  // Get the return path from location state, query params, or session storage
+  const returnTo = 
+    location.state?.returnTo || 
+    new URLSearchParams(location.search).get('returnTo') || 
+    sessionStorage.getItem('redirectAfterLogin') || 
+    '/';
+
+  useEffect(() => {
+    // If user is already logged in, redirect them
+    if (authState.isAuthenticated) {
+      // Clear any stored redirect paths
+      sessionStorage.removeItem('redirectAfterLogin');
+      navigate(returnTo);
+    }
+    
+    // Display auth errors from context if any
+    if (authState.error) {
+      setError(authState.error);
+    }
+  }, [authState.isAuthenticated, authState.error, navigate, returnTo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+    
     try {
-      await login(email, password);
-      // Navigate to the return path after successful login
-      navigate(returnTo, { replace: true });
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      // Basic validation
+      if (!email.trim()) {
+        setError('Email is required');
+        setLoading(false);
+        return;
+      }
+      
+      if (!password) {
+        setError('Password is required');
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Attempting login with email:', email);
+      const success = await login({ email, password });
+      
+      if (success) {
+        console.log('Login successful, redirecting to:', returnTo);
+        
+        // Clear the stored redirect path
+        sessionStorage.removeItem('redirectAfterLogin');
+        
+        // Navigate to the return path
+        navigate(returnTo);
+      }
+    } catch (error) {
+      setError(error.message || 'An unexpected error occurred');
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,13 +122,21 @@ const Login = () => {
             </Typography>
 
             {error && (
-              <Typography
-                color="error"
-                align="center"
-                sx={{ mb: 2, fontWeight: 500 }}
+              <Alert
+                severity="error"
+                sx={{ mb: 2 }}
               >
                 {error}
-              </Typography>
+              </Alert>
+            )}
+
+            {location.state?.message && (
+              <Alert
+                severity="info"
+                sx={{ mb: 2 }}
+              >
+                {location.state.message}
+              </Alert>
             )}
 
             <Box component="form" onSubmit={handleSubmit}>
@@ -92,6 +149,7 @@ const Login = () => {
                 variant="outlined"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
               <TextField
                 label="Password"
@@ -102,12 +160,14 @@ const Login = () => {
                 variant="outlined"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
 
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
+                disabled={loading}
                 sx={{
                   mt: 3,
                   mb: 2,
@@ -120,10 +180,13 @@ const Login = () => {
                   },
                 }}
               >
-                Sign In
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  'Sign In'
+                )}
               </Button>
 
-              {/* Optional: Add Signup link */}
               <Typography align="center" variant="body2" sx={{ mt: 1 }}>
                 Don't have an account?{' '}
                 <Box

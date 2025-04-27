@@ -28,71 +28,92 @@ import { useNavigate } from 'react-router-dom';
 import API_URL, { buildApiUrl } from '../services/apiConfig';
 
 const History = () => {
-  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { authState } = useAuth();
+  const { isAuthenticated, token, user } = authState;
 
   useEffect(() => {
     const fetchOrders = async () => {
+      // If not authenticated, save current path and redirect to login
+      if (!isAuthenticated || !token) {
+        console.log("User not authenticated, redirecting to login");
+        // Store the current path to redirect back after login
+        sessionStorage.setItem('redirectAfterLogin', '/history');
+        navigate('/login', { 
+          state: { 
+            returnTo: '/history',
+            message: 'Please login to view your order history'
+          } 
+        });
+        return;
+      }
+
+      setLoading(true);
       try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        
-        // Use the correct endpoint /api/orders/me which works for any authenticated user
-        const response = await fetch(buildApiUrl('/orders/me'), {
+        // Use direct URL for consistency and to avoid any path issues
+        console.log("Fetching orders with token:", token.substring(0, 15) + "...");
+        const response = await fetch('http://localhost:5001/api/orders/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
+        // Log response status for debugging
+        console.log('Orders API response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('Failed to fetch orders');
+          const errorText = await response.text();
+          console.error("Error response from orders/me endpoint:", errorText);
+          throw new Error(`Failed to fetch orders: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
         console.log('Orders fetched:', data);
         
-        // Fetch details for each order to get the items
-        const ordersWithDetails = await Promise.all(data.map(async (order) => {
-          try {
-            const detailsResponse = await fetch(buildApiUrl(`/orders/${order.id}`), {
-              headers: {
-                'Authorization': `Bearer ${token}`
+        // If we have orders, fetch details for each one
+        if (data && Array.isArray(data) && data.length > 0) {
+          const ordersWithDetails = await Promise.all(data.map(async (order) => {
+            try {
+              // Use direct URL for consistency
+              const detailsResponse = await fetch(`http://localhost:5001/api/orders/${order.id}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              
+              if (!detailsResponse.ok) {
+                console.warn(`Could not fetch details for order ${order.id}: ${detailsResponse.status}`);
+                return order;
               }
-            });
-            
-            if (!detailsResponse.ok) {
-              return order; // Return order without details if fetch fails
+              
+              const orderDetails = await detailsResponse.json();
+              return { ...order, items: orderDetails.items || [] };
+            } catch (err) {
+              console.error(`Error fetching details for order ${order.id}:`, err);
+              return order;
             }
-            
-            const orderDetails = await detailsResponse.json();
-            return { ...order, items: orderDetails.items || [] };
-          } catch (err) {
-            console.error(`Error fetching details for order ${order.id}:`, err);
-            return order;
-          }
-        }));
+          }));
+          
+          setOrders(ordersWithDetails);
+        } else {
+          setOrders([]);
+        }
         
-        setOrders(ordersWithDetails);
         setError(null);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-        setError('Error fetching orders: ' + error.message);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setError(`Failed to load orders: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
-    if (user) {
-      fetchOrders();
-    } else {
-      navigate('/login');
-    }
-  }, [user, navigate]);
+    fetchOrders();
+  }, [isAuthenticated, token, navigate, user]);
 
-  // Function to get appropriate chip color based on order status
   const getStatusColor = (status) => {
     switch(status?.toLowerCase()) {
       case 'paid':
@@ -110,7 +131,6 @@ const History = () => {
     }
   };
   
-  // Function to generate receipt number
   const generateReceiptNumber = (orderId, timestamp) => {
     const date = new Date(timestamp);
     const dateString = date.toISOString().slice(0, 10).replace(/-/g, '');

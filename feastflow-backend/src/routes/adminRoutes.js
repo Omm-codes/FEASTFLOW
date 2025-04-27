@@ -8,6 +8,7 @@ import {
     addMenuItem,
     getAllOrders
 } from '../controllers/adminController.js';
+import { updateOrderStatus, getOrderById } from '../controllers/orderController.js'; // Import order controller functions
 
 const router = express.Router();
 
@@ -25,5 +26,7 @@ router.delete('/menu/:id', deleteMenuItem);
 
 // Order management routes
 router.get('/orders', getAllOrders);
+router.get('/orders/:id', getOrderById); // Add endpoint to get a specific order
+router.put('/orders/:id/status', updateOrderStatus); // Add endpoint for updating order status
 
 export default router;

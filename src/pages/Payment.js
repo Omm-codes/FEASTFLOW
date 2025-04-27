@@ -1,54 +1,153 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Paper, Divider, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, Button, Paper, Divider, CircularProgress, Alert, Container } from '@mui/material';
 import Layout from '../components/Layout/Layout';
 import API_URL, { buildApiUrl } from '../services/apiConfig';
+import { useAuth } from '../hooks/useAuth';
 
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const params = new URLSearchParams(location.search);
-  const orderId = params.get('orderId');
-  const amount = params.get('amount');
-  const [order, setOrder] = useState(null);
+  
+  // Get URL parameters more reliably
+  const searchParams = new URLSearchParams(location.search);
+  const orderId = searchParams.get('orderId');
+  const amount = searchParams.get('amount');
+  
+  // Get order from location state if available
+  const stateOrder = location.state?.order;
+  
+  // Initialize state
+  const [order, setOrder] = useState(stateOrder || null);
   const [isPaid, setIsPaid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const { authState } = useAuth();
+
+  // Enhanced fetchOrder function with better error handling
+  const fetchOrder = async (id) => {
+    try {
+      if (!id) {
+        throw new Error("Invalid order ID");
+      }
+      
+      setIsLoading(true);
+      
+      if (!authState.isAuthenticated || !authState.token) {
+        console.error("User not authenticated");
+        throw new Error("You must be logged in to view order details");
+      }
+      
+      console.log(`Fetching order details for ID: ${id}`);
+      
+      // Use buildApiUrl to ensure consistent URL format
+      const response = await fetch(buildApiUrl(`/orders/${id}`), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${authState.token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      
+      // Log the response status to debug
+      console.log(`Order fetch response status: ${response.status}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response text:", errorText);
+        
+        if (response.status === 401) {
+          console.error("Unauthorized access - token may be invalid or expired");
+          throw new Error(`Error 401: Authentication required. Please log in again.`);
+        } else if (response.status === 500) {
+          throw new Error(`Server error (500): The server encountered an internal error.`);
+        } else {
+          throw new Error(`Error ${response.status}: ${response.statusText || 'Unknown error'}`);
+        }
+      }
+      
+      const data = await response.json();
+      console.log('Order data fetched successfully:', data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      setError(error.message || 'Unknown error occurred');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRetry = () => {
+    setRetryCount(retryCount + 1);
+    setError(null);
+  };
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(buildApiUrl(`/orders/${orderId}`), {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) {
-          setOrder(null);
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-        const data = await response.json();
-        setOrder(data);
-      } catch (err) {
-        console.error('Error fetching order:', err);
-        setError(`Failed to load order: ${err.message}`);
-        setOrder(null);
-      } finally {
-        setLoading(false);
+    const getOrderDetails = async () => {
+      if (!authState.isAuthenticated) {
+        console.log("User not authenticated, redirecting to login");
+        sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+        navigate('/login');
+        return;
+      }
+      
+      // Check if we have orderId directly from URL parameters
+      let orderIdToFetch = orderId;
+      
+      // If no orderId in URL, check location state
+      if (!orderIdToFetch && location.state?.orderId) {
+        orderIdToFetch = location.state.orderId;
+      }
+      
+      // If we already have the order from state, use it
+      if (stateOrder) {
+        setOrder(stateOrder);
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!orderIdToFetch) {
+        setError("No order ID found in the URL.");
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log(`Fetching order details for ID: ${orderIdToFetch}`);
+      const orderData = await fetchOrder(orderIdToFetch);
+      
+      if (orderData) {
+        setOrder(orderData);
       }
     };
     
-    if (orderId) fetchOrder();
-  }, [orderId]);
+    getOrderDetails();
+  }, [authState.isAuthenticated, authState.token, navigate, retryCount, location.state, orderId, stateOrder]);
 
   const handlePaid = async () => {
     try {
+      if (!orderId) {
+        throw new Error("Order ID is required to process payment");
+      }
+      
       setIsPaid(true);
       setProcessing(true);
       setError(null);
       
-      // Update the order status to 'paid' in the backend
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || authState.token;
+      
+      if (!token) {
+        throw new Error("Authentication token is missing");
+      }
+      
+      console.log(`Updating order ${orderId} status to paid`);
+      
+      const paymentReference = `PAY-${orderId}-${Date.now().toString().slice(-6)}`;
+      
+      // Use buildApiUrl for consistent API URL formatting
       const response = await fetch(buildApiUrl(`/orders/${orderId}/status`), {
         method: 'PUT',
         headers: {
@@ -57,149 +156,182 @@ const Payment = () => {
         },
         body: JSON.stringify({ 
           status: 'paid',
-          paymentReference: `PAY-${orderId}-${Date.now().toString().slice(-6)}`
+          paymentReference: paymentReference
         })
       });
 
+      console.log('Payment status update response:', response.status);
+      
+      let errorMessage;
       if (!response.ok) {
-        const errorData = await response.text();
-        let errorMessage;
-        try {
-          const parsedError = JSON.parse(errorData);
-          errorMessage = parsedError.error || parsedError.message || 'Failed to update payment status';
-        } catch (e) {
-          errorMessage = errorData || 'Failed to update payment status';
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorData.details || 'Failed to update payment status';
+        } else {
+          const errorText = await response.text();
+          errorMessage = errorText || 'Failed to update payment status';
         }
         throw new Error(errorMessage);
       }
+      
+      const data = await response.json();
+      console.log('Payment status update successful:', data);
 
-      // After successful payment, navigate to order confirmation
+      // Make sure we have complete order data before navigating
+      let orderToPass = order;
+      if (!orderToPass || !orderToPass.items) {
+        console.log("Fetching complete order data before navigation");
+        orderToPass = await fetchOrder(orderId);
+      }
+
       setTimeout(() => {
         navigate('/order-confirmation', {
           state: { 
             order: {
-              ...order,
-              status: 'paid' 
+              ...orderToPass,
+              status: 'paid',
+              paymentReference: paymentReference
             }
           }
         });
       }, 1500);
     } catch (err) {
       console.error('Payment error:', err);
-      const errorMsg = err.message || 'Failed to update payment status';
-      setError(errorMsg);
+      setError(`Payment failed: ${err.message || 'Unknown error'}`);
       setIsPaid(false);
       setProcessing(false);
-      
-      // Navigate to order confirmation page with failure status and error message
-      setTimeout(() => {
-        navigate(`/order-confirmation?status=failed&error=${encodeURIComponent(errorMsg)}`, {
-          state: { 
-            order: order,
-            paymentFailed: true
-          }
-        });
-      }, 1000);
     }
   };
 
-  if (loading) return (
-    <Layout>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-        <CircularProgress />
-      </Box>
-    </Layout>
-  );
-
-  if (error && !processing) return (
-    <Layout>
-      <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
-        <Alert severity="error">{error}</Alert>
+  const renderErrorState = () => (
+    <Box sx={{ 
+      p: 4, 
+      textAlign: 'center', 
+      border: '1px solid #f0f0f0',
+      borderRadius: 2,
+      backgroundColor: '#fff8f8',
+      mb: 4
+    }}>
+      <Typography variant="h6" color="error" gutterBottom>
+        Unable to load order details
+      </Typography>
+      <Typography variant="body1" sx={{ mb: 3 }}>
+        {error}
+      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+        {error?.includes('Authentication required') ? (
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={() => navigate('/login')}
+          >
+            Go to Login
+          </Button>
+        ) : (
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleRetry}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Try Again'}
+          </Button>
+        )}
         <Button 
-          variant="contained"
-          sx={{ mt: 2 }}
+          variant="outlined" 
           onClick={() => navigate('/myorders')}
         >
-          Return to Cart
+          Go to My Orders
         </Button>
       </Box>
-    </Layout>
-  );
-
-  if (order === null) return (
-    <Layout>
-      <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
-        <Alert severity="warning">Order not found.</Alert>
-        <Button 
-          variant="contained"
-          sx={{ mt: 2 }}
-          onClick={() => navigate('/menu')}
-        >
-          Return to Menu
-        </Button>
-      </Box>
-    </Layout>
+    </Box>
   );
 
   return (
     <Layout>
-      <Box sx={{ maxWidth: 420, mx: 'auto', mt: 6, p: 3 }}>
-        <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h5" gutterBottom>Scan to Pay</Typography>
-          <Box sx={{ fontSize: 64, my: 2 }}>📱</Box>
-          <Typography variant="body2" sx={{ mt: 2, mb: 2, color: '#666' }}>
-            Scan this QR code with any UPI app to pay
-          </Typography>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="h6" gutterBottom>Order Details</Typography>
-          <Box sx={{ textAlign: 'left', mb: 2 }}>
-            {order.items && order.items.map((item, idx) => (
-              <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <span>{item.name} x {item.quantity}</span>
-                <span>₹{item.price * item.quantity}</span>
-              </Box>
-            ))}
-            <Divider sx={{ my: 1 }} />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
-              <span>Total</span>
-              <span>₹{order.total_amount}</span>
-            </Box>
+      <Container sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Payment
+        </Typography>
+        
+        {isLoading && (
+          <Box display="flex" justifyContent="center" my={4}>
+            <CircularProgress />
           </Box>
-          
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          
-          <Button
-            variant="contained"
-            color="success"
-            size="large"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={handlePaid}
-            disabled={isPaid && !error}
-          >
-            {isPaid && !error ? (
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <CircularProgress size={24} sx={{ color: 'white', mr: 1 }} />
-                Processing...
+        )}
+        
+        {error && !isLoading && renderErrorState()}
+        
+        {!isLoading && !error && order && (
+          <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, p: 3 }}>
+            <Paper sx={{ p: 3, borderRadius: 2 }}>
+              <Typography variant="h5" gutterBottom align="center">
+                Payment Details
+              </Typography>
+              
+              <Box sx={{ my: 3 }}>
+                <Typography variant="body1" gutterBottom>
+                  Order ID: #{orderId || order.id}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Total Amount: ₹{amount || order.total_amount}
+                </Typography>
+                {order && (
+                  <Typography variant="body1" gutterBottom>
+                    Delivery Address: {order.delivery_address}
+                  </Typography>
+                )}
               </Box>
-            ) : "I've Paid"}
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="medium"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={() => navigate('/myorders')}
-          >
-            Cancel Payment
-          </Button>
-        </Paper>
-      </Box>
+              
+              <Divider sx={{ my: 2 }} />
+              
+              {!isPaid ? (
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    Payment Options:
+                  </Typography>
+                  
+                  <Box sx={{ mt: 2 }}>
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      fullWidth 
+                      onClick={handlePaid}
+                      disabled={processing}
+                      sx={{ mb: 2 }}
+                    >
+                      Pay Now (UPI/Card)
+                    </Button>
+                    
+                    <Button 
+                      variant="outlined"
+                      fullWidth
+                      onClick={() => navigate('/myorders')}
+                      disabled={processing}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </Box>
+              ) : (
+                <Box sx={{ textAlign: 'center' }}>
+                  {processing ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <CircularProgress sx={{ mb: 2 }} />
+                      <Typography>Processing payment...</Typography>
+                    </Box>
+                  ) : (
+                    <Alert severity="success">
+                      Payment successful! Redirecting to confirmation...
+                    </Alert>
+                  )}
+                </Box>
+              )}
+            </Paper>
+          </Box>
+        )}
+      </Container>
     </Layout>
   );
 };

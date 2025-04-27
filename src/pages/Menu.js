@@ -23,6 +23,8 @@ const Menu = () => {
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  const fallbackImage = '/images/default-food.jpg';
+
   useEffect(() => {
     console.log('Menu component mounted'); // Debug log
     const fetchMenuItems = async () => {
@@ -88,57 +90,51 @@ const Menu = () => {
     });
   };
 
+  const renderMenuItem = (item) => (
+    <Grid item xs={12} sm={6} md={4} key={item.id}>
+      <Card elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <CardMedia
+          component="img"
+          height="200"
+          image={item.image || fallbackImage}
+          alt={item.name}
+          onError={(e) => {
+            console.log(`Falling back to default image for ${item.name}`);
+            e.target.onerror = null; // Prevent infinite loop
+            e.target.src = fallbackImage;
+          }}
+          sx={{ objectFit: 'cover' }}
+        />
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" gutterBottom>
+            {item.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {item.description}
+          </Typography>
+          <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
+            ₹{item.price}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Button
+            variant="contained"
+            startIcon={<AddShoppingCart />}
+            onClick={() => handleAddToCart(item)}
+            fullWidth
+          >
+            Add to Cart
+          </Button>
+        </CardActions>
+      </Card>
+    </Grid>
+  );
+
   return (
     <Layout>
       <Container sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
-          {menuItems.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
-              <Card elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={
-                    item.image_url 
-                      ? (item.image_url.startsWith('http') 
-                          ? item.image_url 
-                          : item.image_url.startsWith('/') 
-                              ? `http://localhost:5001${item.image_url}` 
-                              : `/${item.image_url}`)
-                      : '/placeholder-food.jpg'
-                  }
-                  alt={item.name}
-                  onError={(e) => {
-                    console.log(`Failed to load image: ${item.image_url}`);
-                    e.target.src = '/placeholder-food.jpg';
-                    e.target.onerror = null;
-                  }}
-                  sx={{ objectFit: 'cover' }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {item.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.description}
-                  </Typography>
-                  <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
-                    ₹{item.price}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddShoppingCart />}
-                    onClick={() => handleAddToCart(item)}
-                    fullWidth
-                  >
-                    Add to Cart
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
+          {menuItems.map((item) => renderMenuItem(item))}
         </Grid>
 
         <Snackbar

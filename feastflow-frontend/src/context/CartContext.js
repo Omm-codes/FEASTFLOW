@@ -44,12 +44,41 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Rest of your CartContext functions remain the same...
+  // Add quantity manipulation and remove functions
+  const increaseQuantity = (id) => {
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === id ? { ...item, quantity: (item.quantity || 1) + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (id) => {
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, (item.quantity || 1) - 1) }
+          : item
+      )
+    );
+  };
+
+  const removeFromCart = (id) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
+    <CartContext.Provider value={{
+      cart,
       addToCart,
+      increaseQuantity,
+      decreaseQuantity,
+      removeFromCart,
+      clearCart
       // other functions...
     }}>
       {children}

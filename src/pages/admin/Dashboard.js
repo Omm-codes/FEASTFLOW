@@ -34,6 +34,7 @@ import {
   CardContent
 } from '@mui/material';
 import { Add, Edit, Delete, CloudUpload, Notifications } from '@mui/icons-material';
+import API_URL, { buildApiUrl } from '../../services/apiConfig';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -61,8 +62,12 @@ const Dashboard = () => {
   const [notificationAnchor, setNotificationAnchor] = useState(null);
 
   useEffect(() => {
+    // Check for admin token specifically
+    const adminToken = localStorage.getItem('adminToken');
     const isAdmin = localStorage.getItem('isAdmin');
-    if (!isAdmin) {
+    
+    if (!adminToken || !isAdmin) {
+      console.log('Admin authentication required, redirecting to login');
       navigate('/admin/login');
     } else {
       fetchMenuItems();
@@ -96,30 +101,63 @@ const Dashboard = () => {
   // Fetch new orders that need admin attention
   const fetchNewOrders = async () => {
     try {
-      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+      // Always use adminToken for admin endpoints
+      const adminToken = localStorage.getItem('adminToken');
       
-      const response = await fetch('http://localhost:5001/api/admin/orders?status=paid', {
+      if (!adminToken) {
+        console.error("No admin authentication token found");
+        setSnackbar({
+          open: true,
+          message: "Admin authentication required",
+          severity: "error"
+        });
+        return;
+      }
+      
+      // Use direct URL for consistency
+      const response = await fetch('http://localhost:5001/api/admin/orders/pending', {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${adminToken}`
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch new orders');
+        console.error('Failed to fetch new orders:', response.status);
+        
+        if (response.status === 403) {
+          setSnackbar({
+            open: true,
+            message: "You don't have admin privileges",
+            severity: "error"
+          });
+        }
+        
+        return;
       }
       
       const data = await response.json();
-      setNewOrders(data);
+      console.log('Dashboard new orders fetched:', data.length);
+      
+      // Ensure we're setting actual data with length property
+      if (Array.isArray(data)) {
+        setNewOrders(data);
+      } else {
+        console.error('Unexpected response format for orders:', data);
+        setNewOrders([]);
+      }
       
     } catch (error) {
       console.error('Error fetching new orders:', error);
-      // Don't show error in UI to avoid disrupting main dashboard functionality
+      // Set to empty array on error to avoid undefined
+      setNewOrders([]);
     }
   };
 
   const handleLogout = () => {
+    // Clear admin-specific tokens and state
+    localStorage.removeItem('adminToken');
     localStorage.removeItem('isAdmin');
-    navigate('/');
+    navigate('/admin/login');
   };
 
   const handleAddItem = async () => {
@@ -260,6 +298,24 @@ const Dashboard = () => {
   };
   
   const handleViewOrders = () => {
+    // Check for authentication tokens before navigating
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+    if (!token) {
+      console.error("No authentication token found");
+      setSnackbar({
+        open: true,
+        message: "Authentication required. Please log in again.",
+        severity: "error"
+      });
+      return;
+    }
+    
+    // Close notification popover if open
+    if (notificationAnchor) {
+      handleNotificationClose();
+    }
+    
+    // Navigate to orders page with proper token
     navigate('/admin/orders');
   };
   
