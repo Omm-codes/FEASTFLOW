@@ -2,8 +2,6 @@ import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
 import { getMenuItemById } from '../controllers/menuController.js';
 import { pool } from '../config/db.js'; // Updated import path
-import { authenticate } from '../middleware/authenticate.js';
-import { getOrderById } from '../controllers/orderController.js';
 
 const router = express.Router();
 
@@ -25,7 +23,5 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', getMenuItemById);
-
-router.get('/api/orders/:id', authenticate, getOrderById);
 
 export default router;

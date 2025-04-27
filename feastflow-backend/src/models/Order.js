@@ -50,20 +50,36 @@ const Order = {
   },
   
   getOrderWithItems: async (orderId) => {
-    const [orders] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
-    if (orders.length === 0) return null;
-    
-    const order = orders[0];
-    
-    const [items] = await pool.query(
-      `SELECT oi.*, mi.name, mi.description, mi.category, mi.image 
-       FROM order_items oi 
-       JOIN menu_items mi ON oi.menu_item_id = mi.id 
-       WHERE oi.order_id = ?`,
-      [orderId]
-    );
-    
-    return { ...order, items };
+    try {
+      console.log(`Fetching order details for order ID: ${orderId}`);
+      
+      // First get the order
+      const [orders] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+      
+      if (orders.length === 0) {
+        console.log(`No order found with ID: ${orderId}`);
+        return null;
+      }
+      
+      const order = orders[0];
+      console.log(`Found order: ${order.id}`);
+      
+      // Then get the order items with menu item details
+      const [items] = await pool.query(
+        `SELECT oi.*, mi.name, mi.description, mi.category, mi.image_url as image 
+         FROM order_items oi 
+         JOIN menu_items mi ON oi.menu_item_id = mi.id 
+         WHERE oi.order_id = ?`,
+        [orderId]
+      );
+      
+      console.log(`Found ${items.length} items for order ${orderId}`);
+      
+      return { ...order, items };
+    } catch (error) {
+      console.error('Error in getOrderWithItems:', error);
+      throw error;
+    }
   },
   
   updateStatus: async (id, status) => {

@@ -215,12 +215,109 @@ export const updateOrderPayment = async (req, res) => {
 export const getOrderById = async (req, res) => {
   const orderId = req.params.id;
   try {
+    console.log(`Attempting to fetch order with ID: ${orderId}`);
+    
+    if (!orderId || isNaN(parseInt(orderId))) {
+      return res.status(400).json({ 
+        message: 'Invalid order ID',
+        details: 'Order ID must be a valid number'
+      });
+    }
+    
     const order = await Order.getOrderWithItems(orderId);
+    
     if (!order) {
+      console.log(`Order not found with ID: ${orderId}`);
       return res.status(404).json({ message: 'Order not found' });
     }
+    
+    console.log(`Successfully fetched order ${orderId} with ${order.items?.length || 0} items`);
     res.json(order);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching order by ID:', err);
+    res.status(500).json({ 
+      message: 'Server error', 
+      details: err.message 
+    });
+  }
+};
+
+export const updateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  // Convert status from const to let to allow modification
+  let { status, paymentReference } = req.body;
+  let connection;
+
+  try {
+    // Validate required parameters
+    if (!id || !status) {
+      return res.status(400).json({ 
+        error: 'Missing required parameters',
+        details: 'Both order ID and status are required'
+      });
+    }
+
+    // Get connection from pool
+    connection = await pool.getConnection();
+    
+    // Log update attempt
+    console.log(`Updating order ${id} status to ${status}`);
+    
+    // Check if order exists
+    const [orderCheck] = await connection.execute(
+      'SELECT id, user_id FROM orders WHERE id = ?',
+      [id]
+    );
+    
+    if (orderCheck.length === 0) {
+      return res.status(404).json({
+        error: 'Order not found'
+      });
+    }
+    
+    // Define allowed status values - check database schema for actual allowed values
+    // Note: Modified to match database ENUM constraints
+    const allowedStatuses = ['pending', 'processing', 'completed', 'cancelled'];
+    
+    // Map 'paid' status to 'processing' since 'paid' isn't in the ENUM 
+    if (status === 'paid') {
+      console.log("Status 'paid' received, mapping to 'processing' to match database schema");
+      status = 'processing'; // Convert to a valid status that's in the database ENUM
+    }
+    
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid status value',
+        details: `Status must be one of: ${allowedStatuses.join(', ')}, or 'paid' (which will be converted to 'processing')`
+      });
+    }
+    
+    // Update order status (and payment reference if provided)
+    if (paymentReference) {
+      await connection.execute(
+        'UPDATE orders SET status = ?, payment_reference = ?, updated_at = NOW() WHERE id = ?',
+        [status, paymentReference, id]
+      );
+    } else {
+      await connection.execute(
+        'UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?',
+        [status, id]
+      );
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Order status updated successfully'
+    });
+    
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ 
+      error: 'Failed to update order status',
+      details: error.message
+    });
+  } finally {
+    if (connection) connection.release();
+    console.log('Database connection released after status update');
   }
 };

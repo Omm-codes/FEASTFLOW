@@ -23,9 +23,17 @@ import {
   Snackbar,
   Alert,
   IconButton,
-  Grid
+  Grid,
+  Badge,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Card,
+  CardContent
 } from '@mui/material';
-import { Add, Edit, Delete, CloudUpload } from '@mui/icons-material';
+import { Add, Edit, Delete, CloudUpload, Notifications } from '@mui/icons-material';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -47,6 +55,10 @@ const Dashboard = () => {
     category: '',
     image_url: ''
   });
+  
+  // Notification related state
+  const [newOrders, setNewOrders] = useState([]);
+  const [notificationAnchor, setNotificationAnchor] = useState(null);
 
   useEffect(() => {
     const isAdmin = localStorage.getItem('isAdmin');
@@ -54,6 +66,11 @@ const Dashboard = () => {
       navigate('/admin/login');
     } else {
       fetchMenuItems();
+      fetchNewOrders(); // Fetch new orders on component mount
+      
+      // Set up interval to check for new orders every 30 seconds
+      const orderInterval = setInterval(fetchNewOrders, 30000);
+      return () => clearInterval(orderInterval);
     }
   }, [navigate]);
 
@@ -73,6 +90,30 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+  
+  // Fetch new orders that need admin attention
+  const fetchNewOrders = async () => {
+    try {
+      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+      
+      const response = await fetch('http://localhost:5001/api/admin/orders?status=paid', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch new orders');
+      }
+      
+      const data = await response.json();
+      setNewOrders(data);
+      
+    } catch (error) {
+      console.error('Error fetching new orders:', error);
+      // Don't show error in UI to avoid disrupting main dashboard functionality
     }
   };
 
@@ -208,6 +249,21 @@ const Dashboard = () => {
     setOpenEditDialog(false);
     setOpenDeleteDialog(false);
   };
+  
+  // Notification handlers
+  const handleNotificationOpen = (event) => {
+    setNotificationAnchor(event.currentTarget);
+  };
+  
+  const handleNotificationClose = () => {
+    setNotificationAnchor(null);
+  };
+  
+  const handleViewOrders = () => {
+    navigate('/admin/orders');
+  };
+  
+  const notificationsOpen = Boolean(notificationAnchor);
 
   return (
     <Container maxWidth="lg">
@@ -222,11 +278,100 @@ const Dashboard = () => {
             </Typography>
           </Grid>
           <Grid item>
-            <Button variant="outlined" color="error" onClick={handleLogout} sx={{ mr: 2 }}>
-              Logout
-            </Button>
+            <Box display="flex" alignItems="center">
+              {/* Notification Bell with Badge */}
+              <IconButton 
+                color="primary" 
+                onClick={handleNotificationOpen}
+                sx={{ mr: 2 }}
+              >
+                <Badge badgeContent={newOrders.length} color="error">
+                  <Notifications />
+                </Badge>
+              </IconButton>
+              
+              {/* Notification Popover */}
+              <Popover
+                open={notificationsOpen}
+                anchorEl={notificationAnchor}
+                onClose={handleNotificationClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                <Box sx={{ width: 320, maxHeight: 400, overflow: 'auto' }}>
+                  <List sx={{ p: 0 }}>
+                    <ListItem sx={{ bgcolor: '#f5f5f5' }}>
+                      <ListItemText 
+                        primary="New Orders" 
+                        secondary={`You have ${newOrders.length} new orders to process`}
+                      />
+                    </ListItem>
+                    <Divider />
+                    
+                    {newOrders.length === 0 ? (
+                      <ListItem>
+                        <ListItemText primary="No new orders" />
+                      </ListItem>
+                    ) : (
+                      newOrders.map((order) => (
+                        <ListItem key={order.id} button onClick={handleViewOrders}>
+                          <ListItemText 
+                            primary={`Order #${order.id} - ₹${order.total_amount}`} 
+                            secondary={`${new Date(order.created_at).toLocaleString()}`} 
+                          />
+                        </ListItem>
+                      ))
+                    )}
+                    
+                    <Divider />
+                    <ListItem button onClick={handleViewOrders}>
+                      <ListItemText 
+                        primary="Manage All Orders" 
+                        sx={{ textAlign: 'center', color: 'primary.main' }}
+                      />
+                    </ListItem>
+                  </List>
+                </Box>
+              </Popover>
+              
+              <Button variant="outlined" color="error" onClick={handleLogout}>
+                Logout
+              </Button>
+            </Box>
           </Grid>
         </Grid>
+
+        {/* Orders Quick Summary */}
+        <Box mb={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={4}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    New Orders
+                  </Typography>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="h3">{newOrders.length}</Typography>
+                    <Button 
+                      variant="contained" 
+                      color="primary"
+                      onClick={handleViewOrders}
+                      disabled={newOrders.length === 0}
+                    >
+                      View Orders
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
 
         <Box mb={4}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>

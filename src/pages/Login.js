@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout/Layout';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import {
   Container,
@@ -14,16 +14,21 @@ import {
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  // Get the return path from location state, default to home page
+  const returnTo = location.state?.returnTo || '/';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate('/');
+      // Navigate to the return path after successful login
+      navigate(returnTo, { replace: true });
     } catch (err) {
       setError('Invalid email or password. Please try again.');
     }
@@ -120,7 +125,7 @@ const Login = () => {
 
               {/* Optional: Add Signup link */}
               <Typography align="center" variant="body2" sx={{ mt: 1 }}>
-                Don’t have an account?{' '}
+                Don't have an account?{' '}
                 <Box
                   component="span"
                   sx={{ color: '#219ebc', cursor: 'pointer' }}

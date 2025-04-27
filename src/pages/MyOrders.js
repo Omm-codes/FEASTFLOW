@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
-import { CartContext } from "../context/cartContext";
+import { useCart } from "../context/cartContext";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import {
   Typography, Box, Container, Grid, Card, CardContent,
   Table, TableBody, TableCell, TableContainer, TableHead, 
@@ -55,8 +56,10 @@ const OrderButton = styled(Button)(({ theme }) => ({
 }));
 
 const MyOrders = () => {
-  const { cart, setCart } = useContext(CartContext);
+  const { cart, setCart } = useCart();
   const [quantities, setQuantities] = useState(() => cart.map(() => 1));
+  const navigate = useNavigate(); // Use navigate for programmatic navigation
+  const { user } = useAuth(); // Get authentication status
 
   const calculateItemTotal = (price, index) => {
     return (price * quantities[index]).toFixed(2);
@@ -81,6 +84,27 @@ const MyOrders = () => {
     updatedQuantities.splice(index, 1);
     setCart(updatedCart);
     setQuantities(updatedQuantities);
+  };
+
+  // Updated function to handle checkout navigation with auth check
+  const handleCheckout = () => {
+    // Update cart items with quantities
+    const updatedCart = cart.map((item, index) => ({
+      ...item, 
+      quantity: quantities[index]
+    }));
+    
+    // Update cart with quantities before navigation
+    setCart(updatedCart);
+    
+    // Check if user is logged in
+    if (!user) {
+      // If not logged in, navigate to login with return path set to checkout
+      navigate('/login', { state: { returnTo: '/checkout' } });
+    } else {
+      // If logged in, navigate directly to checkout
+      navigate('/checkout');
+    }
   };
 
   return (
@@ -174,8 +198,7 @@ const MyOrders = () => {
                     fullWidth
                     variant="contained"
                     color="primary"
-                    component={Link}
-                    to="/checkout"
+                    onClick={handleCheckout}
                   >
                     Proceed to Checkout
                   </Button>

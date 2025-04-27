@@ -54,17 +54,21 @@ export const optionalAuthToken = (req, res, next) => {
   next();
 };
 
-// Add the missing isAdmin middleware
+// Fixed isAdmin middleware to check the correct property
 export const isAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   
-  if (!req.user.isAdmin) {
+  console.log('Checking admin permissions for user:', req.user);
+  
+  // Check for role property instead of isAdmin
+  if (req.user.role !== 'admin') {
+    console.log('Admin access denied. User role:', req.user.role);
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  console.log(`Admin access granted to user: ${req.user.id}`);
+  console.log(`Admin access granted to user: ${req.user.userId}`);
   
   next();
 };

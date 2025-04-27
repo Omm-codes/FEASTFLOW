@@ -12,6 +12,40 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
+// Get all orders for admin with optional status filter
+export const getAllOrders = async (req, res) => {
+    try {
+        // Get status filter if provided
+        const { status } = req.query;
+        
+        let query = `
+            SELECT o.*, 
+                   u.name as customer_name, 
+                   u.email as customer_email 
+            FROM orders o
+            LEFT JOIN users u ON o.user_id = u.id
+        `;
+        
+        const queryParams = [];
+        
+        // Add status filter if provided
+        if (status) {
+            query += ` WHERE o.status = ?`;
+            queryParams.push(status);
+        }
+        
+        // Add order by newest first
+        query += ` ORDER BY o.created_at DESC`;
+        
+        const [orders] = await pool.execute(query, queryParams);
+        
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching admin orders:', error);
+        res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+};
+
 export const updateMenuItem = async (req, res) => {
     try {
         const { id } = req.params;

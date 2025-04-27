@@ -6,7 +6,8 @@ export const ProtectedRoute = ({ children, adminOnly = false }) => {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+    // Redirect to login but save the current location they were trying to access
+    return <Navigate to="/login" state={{ returnTo: location.pathname }} replace />;
   }
 
   if (adminOnly && user?.role !== 'admin') {
