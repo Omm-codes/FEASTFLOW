@@ -15,8 +15,88 @@ import {
   Alert, 
   CircularProgress, 
   Tabs,
-  Tab
+  Tab,
+  Card,
+  CardContent,
+  Avatar
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { 
+  ShoppingBag, 
+  LocationOn, 
+  RestaurantMenu, 
+  AccessTime, 
+  LocalShipping, 
+  Person, 
+  Email, 
+  Phone, 
+  Note 
+} from '@mui/icons-material';
+
+// Styled components to match theme
+const StyledTabs = styled(Tabs)(({ theme }) => ({
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#ffb703',
+    height: 3,
+  },
+  '& .MuiTab-root': {
+    fontWeight: 600,
+    textTransform: 'none',
+    fontFamily: "'Poppins', sans-serif",
+    '&.Mui-selected': {
+      color: '#023047',
+    },
+  },
+}));
+
+const StyledTab = styled(Tab)(({ theme }) => ({
+  '&.Mui-selected': {
+    color: '#023047',
+  },
+  '&:hover': {
+    color: '#023047',
+    opacity: 0.8,
+  },
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    '&.Mui-focused fieldset': {
+      borderColor: '#023047',
+    },
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+    color: '#023047',
+  },
+}));
+
+const OrderButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#ffb703',
+  color: '#000',
+  borderRadius: '30px',
+  padding: '12px 25px',
+  fontSize: '1rem',
+  fontWeight: 600,
+  fontFamily: "'Poppins', sans-serif",
+  textTransform: 'none',
+  boxShadow: '0 4px 12px rgba(255, 183, 3, 0.3)',
+  '&:hover': {
+    backgroundColor: '#ffaa00',
+    boxShadow: '0 6px 15px rgba(255, 183, 3, 0.4)',
+  },
+  '&.Mui-disabled': {
+    backgroundColor: '#f5f5f5',
+    color: '#9e9e9e',
+  }
+}));
+
+const LoginButton = styled(Button)(({ theme }) => ({
+  color: '#023047',
+  fontWeight: 600,
+  '&:hover': {
+    backgroundColor: 'rgba(2, 48, 71, 0.08)',
+  },
+}));
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -47,8 +127,6 @@ const Checkout = () => {
         return; // Wait for auth state to be determined
       }
       
-      console.log("Auth state in Checkout:", authState);
-      
       if (authState.isAuthenticated && authState.user) {
         setIsLoadingUserData(true);
         setGuestCheckout(false);
@@ -63,13 +141,12 @@ const Checkout = () => {
           
           if (response.ok) {
             const userData = await response.json();
-            console.log('User profile data loaded:', userData);
             
             // Pre-fill the form with user data - ensure correct field mapping
             setFormData({
               name: userData.name || authState.user.name || '',
               email: userData.email || authState.user.email || '',
-              phone: userData.phone || '', // Properly set phone separately from email
+              phone: userData.phone || '',
               address: userData.address || '',
               city: userData.city || '',
               postalCode: userData.postalCode || '',
@@ -78,12 +155,11 @@ const Checkout = () => {
               notes: ''
             });
           } else {
-            console.error('Failed to fetch user profile data');
             // Still use the basic data from auth state
             setFormData({
               name: authState.user.name || '',
               email: authState.user.email || '',
-              phone: '', // Clear phone to avoid using email as phone
+              phone: '',
               pickupAddress: '',
               pickupTime: '',
               address: '',
@@ -198,8 +274,6 @@ const Checkout = () => {
         return;
       }
       
-      console.log('Submitting order data:', orderData);
-      
       const response = await fetch('http://localhost:5001/api/orders', {
         method: 'POST',
         headers,
@@ -211,10 +285,6 @@ const Checkout = () => {
         let errorMessage = 'Failed to create order';
         try {
           const errorData = await response.json();
-          console.error('Order creation failed:', errorData);
-          // Log the full error object for debugging
-          console.log('Error response details:', JSON.stringify(errorData, null, 2));
-          
           // More detailed error extraction
           if (typeof errorData === 'object') {
             errorMessage = errorData.error || errorData.message || errorData.details || 
@@ -226,10 +296,8 @@ const Checkout = () => {
           // If response isn't valid JSON, try to get the text
           try {
             const errorText = await response.text();
-            console.error('Error response text:', errorText);
             errorMessage = errorText || `Server error (${response.status}): ${response.statusText}`;
           } catch (textErr) {
-            console.error('Could not parse error response:', e, 'Status:', response.status, 'Status Text:', response.statusText);
             errorMessage = `Server error (${response.status}): ${response.statusText}`;
           }
         }
@@ -239,7 +307,6 @@ const Checkout = () => {
       }
       
       const data = await response.json();
-      console.log('Order created successfully:', data);
       clearCart();
       
       // Use navigate with state to ensure order ID is available even after page refresh
@@ -256,55 +323,123 @@ const Checkout = () => {
 
   return (
     <Layout>
-      <Container sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Checkout
-        </Typography>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Box sx={{ mb: 5, display: 'flex', alignItems: 'center' }}>
+          <ShoppingBag sx={{ fontSize: 32, color: '#023047', mr: 2 }} />
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 700, 
+              color: '#023047',
+              fontFamily: "'Poppins', sans-serif" 
+            }}
+          >
+            Checkout
+          </Typography>
+        </Box>
         
         {isLoadingUserData ? (
           <Box display="flex" justifyContent="center" my={4}>
-            <CircularProgress />
+            <CircularProgress sx={{ color: '#023047' }} />
           </Box>
         ) : (
           <>
             {guestCheckout ? (
-              <Alert severity="info" sx={{ mb: 3 }}>
-                Checking out as a guest. 
-                You can checkout as a guest, but your order won't be saved to any account. 
-                <Button 
-                  color="primary" 
-                  size="small" 
-                  onClick={() => navigate('/login', { state: { returnTo: '/checkout' } })}
-                  sx={{ ml: 1 }}
-                >
-                  Log in
-                </Button>
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  mb: 4, 
+                  borderRadius: 2,
+                  '& .MuiAlert-icon': { color: '#023047' }
+                }}
+                icon={<Person />}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      Checking out as a guest
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      You can checkout as a guest, but your order won't be saved to any account.
+                    </Typography>
+                  </Box>
+                  <LoginButton 
+                    variant="outlined"
+                    size="medium" 
+                    onClick={() => navigate('/login', { state: { returnTo: '/checkout' } })}
+                    sx={{ mt: { xs: 2, sm: 0 } }}
+                  >
+                    Log in
+                  </LoginButton>
+                </Box>
               </Alert>
             ) : (
-              <Alert severity="success" sx={{ mb: 3 }}>
-                Logged in as {authState.user?.name || authState.user?.email || 'User'}
+              <Alert 
+                severity="success" 
+                sx={{ 
+                  mb: 4, 
+                  borderRadius: 2,
+                  '& .MuiAlert-icon': { color: '#023047' }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar sx={{ mr: 2, bgcolor: '#023047', width: 32, height: 32 }}>
+                    {authState.user?.name?.charAt(0) || 'U'}
+                  </Avatar>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Logged in as {authState.user?.name || authState.user?.email || 'User'}
+                  </Typography>
+                </Box>
               </Alert>
             )}
             
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
               <Grid item xs={12} md={8}>
-                <Paper sx={{ p: 3 }}>
+                <Paper 
+                  elevation={1} 
+                  sx={{ 
+                    p: 4, 
+                    borderRadius: 3,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+                  }}
+                >
                   <form onSubmit={handleSubmit}>
-                    <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
-                      <Tab label="Pickup at Restaurant" />
-                      <Tab label="Home Pickup" />
-                    </Tabs>
+                    <StyledTabs value={activeTab} onChange={handleTabChange} sx={{ mb: 4 }}>
+                      <StyledTab 
+                        label="Pickup at Restaurant" 
+                        icon={<RestaurantMenu />} 
+                        iconPosition="start"
+                      />
+                      <StyledTab 
+                        label="Home Pickup" 
+                        icon={<LocalShipping />} 
+                        iconPosition="start"
+                      />
+                    </StyledTabs>
                     
                     {activeTab === 0 ? (
                       // Restaurant pickup form
                       <Grid container spacing={3}>
                         <Grid item xs={12}>
-                          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <AccessTime sx={{ color: '#023047', mr: 1.5 }} />
+                            <Typography 
+                              variant="subtitle1" 
+                              sx={{ 
+                                fontWeight: 600, 
+                                color: '#023047',
+                                fontFamily: "'Poppins', sans-serif"
+                              }}
+                            >
+                              Restaurant Pickup Details
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2, ml: 0.5 }}>
                             Please provide your details for restaurant pickup
                           </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                          <TextField
+                          <StyledTextField
                             required
                             fullWidth
                             label="Preferred Pickup Time"
@@ -312,43 +447,60 @@ const Checkout = () => {
                             type="time"
                             InputLabelProps={{ shrink: true }}
                             onChange={(e) => setFormData({...formData, pickupTime: e.target.value})}
+                            sx={{ mb: 1 }}
+                            InputProps={{
+                              startAdornment: <AccessTime sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
                           />
                         </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            required
-                            fullWidth
-                            label="Phone Number"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
+                        <Grid item xs={12} sm={6}>
+                          <StyledTextField
                             required
                             fullWidth
                             label="Name"
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Person sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <StyledTextField
+                            required
+                            fullWidth
+                            label="Phone Number"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Phone sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
                           />
                         </Grid>
                         <Grid item xs={12}>
-                          <TextField
+                          <StyledTextField
                             required
                             fullWidth
                             label="Email"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Email sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
                           />
                         </Grid>
                         <Grid item xs={12}>
-                          <TextField
+                          <StyledTextField
                             fullWidth
                             label="Additional Notes"
                             multiline
-                            rows={2}
+                            rows={3}
                             value={formData.notes}
                             onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Note sx={{ color: 'text.secondary', mr: 1, alignSelf: 'flex-start', mt: 1 }} />,
+                            }}
+                            placeholder="Any special requests or dietary requirements?"
                           />
                         </Grid>
                       </Grid>
@@ -356,12 +508,25 @@ const Checkout = () => {
                       // Home pickup form
                       <Grid container spacing={3}>
                         <Grid item xs={12}>
-                          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                            Please provide your address for home pickup
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <LocationOn sx={{ color: '#023047', mr: 1.5 }} />
+                            <Typography 
+                              variant="subtitle1" 
+                              sx={{ 
+                                fontWeight: 600, 
+                                color: '#023047',
+                                fontFamily: "'Poppins', sans-serif"
+                              }}
+                            >
+                              Home Pickup Details
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2, ml: 0.5 }}>
+                            Please provide your complete address for home pickup
                           </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                          <TextField
+                          <StyledTextField
                             required
                             fullWidth
                             label="Pickup Address"
@@ -369,10 +534,14 @@ const Checkout = () => {
                             rows={3}
                             value={formData.address}
                             onChange={(e) => setFormData({...formData, address: e.target.value})}
+                            InputProps={{
+                              startAdornment: <LocationOn sx={{ color: 'text.secondary', mr: 1, alignSelf: 'flex-start', mt: 1 }} />,
+                            }}
+                            placeholder="Enter your complete address"
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <TextField
+                          <StyledTextField
                             fullWidth
                             label="City"
                             value={formData.city}
@@ -380,48 +549,61 @@ const Checkout = () => {
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <TextField
+                          <StyledTextField
                             fullWidth
                             label="Postal Code"
                             value={formData.postalCode}
                             onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                           />
                         </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            required
-                            fullWidth
-                            label="Phone Number"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
+                        <Grid item xs={12} sm={6}>
+                          <StyledTextField
                             required
                             fullWidth
                             label="Name"
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Person sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <StyledTextField
+                            required
+                            fullWidth
+                            label="Phone Number"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Phone sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
                           />
                         </Grid>
                         <Grid item xs={12}>
-                          <TextField
+                          <StyledTextField
                             required
                             fullWidth
                             label="Email"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Email sx={{ color: 'text.secondary', mr: 1 }} />,
+                            }}
                           />
                         </Grid>
                         <Grid item xs={12}>
-                          <TextField
+                          <StyledTextField
                             fullWidth
                             label="Additional Notes"
                             multiline
                             rows={2}
                             value={formData.notes}
                             onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                            InputProps={{
+                              startAdornment: <Note sx={{ color: 'text.secondary', mr: 1, alignSelf: 'flex-start', mt: 1 }} />,
+                            }}
+                            placeholder="Any special requests or dietary requirements?"
                           />
                         </Grid>
                       </Grid>
@@ -431,40 +613,141 @@ const Checkout = () => {
               </Grid>
               
               <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom>Order Summary</Typography>
-                  <Box sx={{ mb: 2 }}>
-                    {cart.map((item) => (
-                      <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2">{item.name} x {item.quantity || 1}</Typography>
-                        <Typography variant="body2">₹{item.price * (item.quantity || 1)}</Typography>
+                <Card 
+                  sx={{ 
+                    borderRadius: 3, 
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                  }}
+                >
+                  <Box sx={{ bgcolor: '#023047', py: 2, px: 3 }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: 'white',
+                        fontWeight: 600,
+                        fontFamily: "'Poppins', sans-serif"
+                      }}
+                    >
+                      Order Summary
+                    </Typography>
+                  </Box>
+                  
+                  <CardContent sx={{ p: 3 }}>
+                    <Box sx={{ mb: 3 }}>
+                      {cart.map((item) => (
+                        <Box 
+                          key={item.id} 
+                          sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            mb: 2,
+                            pb: 1.5,
+                            borderBottom: '1px dashed #e0e0e0',
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {item.image_url && (
+                              <Box
+                                component="img"
+                                src={`http://localhost:5001${item.image_url}`}
+                                sx={{ 
+                                  width: 45, 
+                                  height: 45, 
+                                  borderRadius: 1.5, 
+                                  mr: 2,
+                                  objectFit: 'cover'
+                                }}
+                                alt={item.name}
+                              />
+                            )}
+                            <Box>
+                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                {item.name}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Qty: {item.quantity || 1}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#023047' }}>
+                            ₹{item.price * (item.quantity || 1)}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                    
+                    <Divider sx={{ my: 2 }} />
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                      <Typography variant="body2">₹{total}</Typography>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">Delivery</Typography>
+                      <Typography variant="body2">Free</Typography>
+                    </Box>
+                    
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        mt: 3,
+                        pt: 2,
+                        borderTop: '1px solid #e0e0e0' 
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#023047' }}>
+                        Total
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#023047' }}>
+                        ₹{total}
+                      </Typography>
+                    </Box>
+                    
+                    {error && (
+                      <Alert 
+                        severity="error" 
+                        sx={{ 
+                          mt: 3, 
+                          borderRadius: 2,
+                        }}
+                      >
+                        {error}
+                      </Alert>
+                    )}
+                    
+                    <OrderButton
+                      fullWidth
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      sx={{ mt: 3 }}
+                      startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+                    >
+                      {isSubmitting ? 'Processing...' : 'Place Order'}
+                    </OrderButton>
+                  </CardContent>
+                </Card>
+                
+                <Card 
+                  sx={{ 
+                    borderRadius: 3, 
+                    mt: 3, 
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)', 
+                    border: '1px solid #e0e0e0' 
+                  }}
+                >
+                  <CardContent sx={{ p: 2.5 }}>
+                    <Typography variant="body2" align="center" color="text.secondary">
+                      By placing an order, you agree to our
+                      <Box component="span" sx={{ fontWeight: 500, display: 'block', color: '#023047', mt: 0.5 }}>
+                        Terms & Conditions
                       </Box>
-                    ))}
-                  </Box>
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography variant="h6">Total</Typography>
-                    <Typography variant="h6">₹{total}</Typography>
-                  </Box>
-                  
-                  {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                      {error}
-                    </Alert>
-                  )}
-                  
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
-                  >
-                    {isSubmitting ? 'Processing...' : 'Place Order'}
-                  </Button>
-                </Paper>
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Grid>
             </Grid>
           </>
@@ -475,4 +758,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

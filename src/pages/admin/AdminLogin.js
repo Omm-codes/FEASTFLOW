@@ -21,26 +21,44 @@ function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
-  const { authState, isAdmin } = useAuth();
+  const { authState } = useAuth();
 
-  // Check if the user is already authenticated as an admin
+  // Fix the infinite redirect loop by adding proper checks
   useEffect(() => {
-    const checkAdminStatus = () => {
-      // If we have an admin token or the user is already authenticated as admin
-      if (localStorage.getItem('adminToken') || 
-          (authState.isAuthenticated && authState.user?.role === 'admin') || 
-          localStorage.getItem('isAdmin') === 'true') {
+    const checkAdminStatus = async () => {
+      try {
+        // Check if admin token exists
+        const adminToken = localStorage.getItem('adminToken');
         
-        console.log('User already authenticated as admin, redirecting to dashboard');
-        navigate('/admin/dashboard');
-        return;
+        if (adminToken) {
+          // Verify the token is valid by making a test request
+          const response = await fetch('http://localhost:5001/api/admin/orders', {
+            headers: {
+              'Authorization': `Bearer ${adminToken}`
+            }
+          });
+          
+          if (response.ok) {
+            // Token is valid, navigate to dashboard
+            navigate('/admin/dashboard');
+            return;
+          } else {
+            // Token is invalid, clear it
+            console.log('Admin token invalid, clearing...');
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('isAdmin');
+          }
+        }
+        
+        setCheckingAuth(false);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setCheckingAuth(false);
       }
-      
-      setCheckingAuth(false);
     };
     
     checkAdminStatus();
-  }, [navigate, authState]);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,7 +87,8 @@ function AdminLogin() {
       if (data.role === 'admin') {
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('token', data.token); // Also store in regular token for consistency
+        localStorage.setItem('adminName', data.name || 'Admin User');
+        localStorage.setItem('adminEmail', data.email);
         navigate('/admin/dashboard');
       } else {
         setError('You are not authorized as an admin');

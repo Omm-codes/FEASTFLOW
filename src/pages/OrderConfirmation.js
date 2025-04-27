@@ -9,13 +9,66 @@ import {
   CircularProgress, 
   Alert,
   AlertTitle,
-  Container
+  Container,
+  Card,
+  CardContent,
+  Grid,
+  Chip
 } from '@mui/material';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { 
+  ErrorOutline,
+  CheckCircleOutline,
+  RestartAlt,
+  Receipt,
+  ArrowBack,
+  ShoppingBag,
+  List,
+  Home,
+  AccessTime,
+  LocationOn
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 import { buildApiUrl } from '../services/apiConfig';
 import Layout from '../components/Layout/Layout';
 import { useAuth } from '../hooks/useAuth';
+
+// Styled components to match theme
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#ffb703',
+  color: '#000',
+  borderRadius: '30px',
+  padding: '10px 24px',
+  fontSize: '0.95rem',
+  fontWeight: 600,
+  fontFamily: "'Poppins', sans-serif",
+  textTransform: 'none',
+  boxShadow: '0 4px 12px rgba(255, 183, 3, 0.3)',
+  '&:hover': {
+    backgroundColor: '#ffaa00',
+    boxShadow: '0 6px 15px rgba(255, 183, 3, 0.4)',
+  }
+}));
+
+const OutlinedButton = styled(Button)(({ theme }) => ({
+  borderRadius: '30px',
+  padding: '9px 24px',
+  fontSize: '0.95rem',
+  fontWeight: 600,
+  textTransform: 'none',
+  fontFamily: "'Poppins', sans-serif",
+  border: '2px solid #e0e0e0',
+  color: '#666',
+  '&:hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    borderColor: '#ccc',
+  },
+}));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  borderRadius: 16,
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  overflow: 'hidden',
+}));
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -112,13 +165,31 @@ const OrderConfirmation = () => {
     }
   };
 
+  const formatOrderTime = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   if (loading) {
     return (
       <Layout>
-        <Container maxWidth="md">
-          <Box sx={{ maxWidth: 420, mx: 'auto', mt: 6, p: 3, textAlign: 'center' }}>
-            <CircularProgress />
-            <Typography sx={{ mt: 2 }}>Loading your receipt...</Typography>
+        <Container maxWidth="md" sx={{ py: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', my: 8 }}>
+            <CircularProgress sx={{ color: '#023047', mb: 3 }} />
+            <Typography variant="h6" sx={{ fontFamily: "'Poppins', sans-serif", color: '#023047' }}>
+              Loading your order details...
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              This will just take a moment
+            </Typography>
           </Box>
         </Container>
       </Layout>
@@ -128,40 +199,89 @@ const OrderConfirmation = () => {
   if (paymentStatus === 'failed') {
     return (
       <Layout>
-        <Container maxWidth="md">
-          <Box sx={{ maxWidth: 420, mx: 'auto', mt: 6, p: 3 }}>
-            <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-              <ErrorOutlineIcon sx={{ fontSize: 60, color: 'error.main', mb: 2 }} />
-              <Typography variant="h5" gutterBottom color="error">
+        <Container maxWidth="md" sx={{ py: 6 }}>
+          <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                fontWeight: 700, 
+                color: '#023047',
+                fontFamily: "'Poppins', sans-serif",
+                textAlign: 'center'
+              }}
+            >
+              Payment Status
+            </Typography>
+          </Box>
+          
+          <StyledCard sx={{ maxWidth: 600, mx: 'auto' }}>
+            <Box sx={{ bgcolor: '#f44336', py: 3, px: 3, textAlign: 'center' }}>
+              <ErrorOutline sx={{ fontSize: 60, color: 'white', mb: 1 }} />
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  color: 'white',
+                  fontWeight: 600,
+                  fontFamily: "'Poppins', sans-serif"
+                }}
+              >
                 Payment Failed
               </Typography>
-              
-              <Alert severity="error" sx={{ my: 2, textAlign: 'left' }}>
-                <AlertTitle>Error</AlertTitle>
+            </Box>
+            
+            <CardContent sx={{ p: 4, textAlign: 'center' }}>
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  my: 3, 
+                  textAlign: 'left',
+                  borderRadius: 2,
+                  '& .MuiAlert-message': { width: '100%' }
+                }}
+              >
+                <AlertTitle sx={{ fontWeight: 600 }}>Error</AlertTitle>
                 {error || 'Failed to update payment status'}
               </Alert>
               
-              <Typography variant="body1" sx={{ mt: 2, mb: 3 }}>
+              <Typography variant="body1" sx={{ mt: 2, mb: 4, color: '#555' }}>
                 Your payment could not be processed. Please try again or choose a different payment method.
               </Typography>
               
               <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, gap: 2, justifyContent: 'center' }}>
-                <Button
-                  variant="contained"
-                  color="primary"
+                <StyledButton
+                  startIcon={<RestartAlt />}
                   onClick={handleRetryPayment}
+                  sx={{ minWidth: 150 }}
                 >
                   Retry Payment
-                </Button>
-                <Button
-                  variant="outlined"
+                </StyledButton>
+                <OutlinedButton
+                  startIcon={<ShoppingBag />}
                   onClick={() => navigate('/myorders')}
+                  sx={{ minWidth: 150 }}
                 >
-                  Back to Orders
-                </Button>
+                  My Orders
+                </OutlinedButton>
               </Box>
-            </Paper>
-          </Box>
+              
+              <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid #eee' }}>
+                <Typography variant="body2" color="textSecondary">
+                  Need help with your payment? 
+                  <Button 
+                    sx={{ 
+                      color: '#023047', 
+                      textTransform: 'none', 
+                      fontWeight: 600, 
+                      ml: 0.5 
+                    }}
+                    onClick={() => navigate('/contact')}
+                  >
+                    Contact Support
+                  </Button>
+                </Typography>
+              </Box>
+            </CardContent>
+          </StyledCard>
         </Container>
       </Layout>
     );
@@ -170,24 +290,46 @@ const OrderConfirmation = () => {
   if (!order) {
     return (
       <Layout>
-        <Container maxWidth="md">
-          <Box sx={{ maxWidth: 420, mx: 'auto', mt: 6, p: 3 }}>
-            <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="h6">Order not found.</Typography>
-              <Typography variant="body2" sx={{ mt: 2, mb: 3 }}>
-                We couldn't find the order details. This might be because the order doesn't exist 
-                or you don't have permission to view it.
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3 }}
+        <Container maxWidth="md" sx={{ py: 6 }}>
+          <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                fontWeight: 700, 
+                color: '#023047',
+                fontFamily: "'Poppins', sans-serif",
+                textAlign: 'center'
+              }}
+            >
+              Order Not Found
+            </Typography>
+          </Box>
+          
+          <StyledCard sx={{ maxWidth: 500, mx: 'auto', textAlign: 'center', p: 4 }}>
+            <ErrorOutline sx={{ fontSize: 60, color: '#023047', opacity: 0.4, mb: 2 }} />
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#023047', mb: 2 }}>
+              We couldn't find your order
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
+              This might be because the order doesn't exist or you don't have permission to view it.
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, gap: 2, justifyContent: 'center' }}>
+              <StyledButton
+                startIcon={<ShoppingBag />}
                 onClick={() => navigate('/menu')}
+                sx={{ minWidth: 140 }}
               >
                 Browse Menu
-              </Button>
-            </Paper>
-          </Box>
+              </StyledButton>
+              <OutlinedButton
+                startIcon={<Home />}
+                onClick={() => navigate('/')}
+                sx={{ minWidth: 140 }}
+              >
+                Go to Home
+              </OutlinedButton>
+            </Box>
+          </StyledCard>
         </Container>
       </Layout>
     );
@@ -195,48 +337,203 @@ const OrderConfirmation = () => {
 
   return (
     <Layout>
-      <Container maxWidth="md">
-        <Box sx={{ maxWidth: 420, mx: 'auto', mt: 6, p: 3 }}>
-          <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-            <CheckCircleOutlineIcon sx={{ fontSize: 60, color: 'success.main', mb: 1 }} />
-            <Typography variant="h5" gutterBottom>
-              🎉 Payment Successful!
-            </Typography>
-            <Typography variant="body1" sx={{ mt: 2 }}>
-              Thank you for your order.
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="h6" gutterBottom>Receipt</Typography>
-            <Box sx={{ textAlign: 'left', mb: 2 }}>
-              {order.items && order.items.length > 0 ? (
-                order.items.map((item, idx) => (
-                  <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <span>{item.name} x {item.quantity}</span>
-                    <span>₹{item.price * item.quantity}</span>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2" color="textSecondary">
-                  Item details not available
-                </Typography>
-              )}
-              <Divider sx={{ my: 1 }} />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
-                <span>Total</span>
-                <span>₹{order.total_amount || order.amount}</span>
-              </Box>
-            </Box>
-            <Typography variant="body2" sx={{ mb: 2, color: '#888' }}>
-              Order ID: {order.id || urlOrderId}
-            </Typography>
-            <Button
-              variant="contained"
-              sx={{ mt: 3 }}
-              onClick={() => navigate('/history')}
+      <Container maxWidth="md" sx={{ py: 6 }}>
+        <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 700, 
+              color: '#023047',
+              fontFamily: "'Poppins', sans-serif",
+              textAlign: 'center'
+            }}
+          >
+            Order Confirmation
+          </Typography>
+        </Box>
+        
+        <StyledCard sx={{ maxWidth: 650, mx: 'auto', overflow: 'hidden' }}>
+          <Box sx={{ bgcolor: '#4caf50', py: 3, px: 3, textAlign: 'center' }}>
+            <CheckCircleOutline sx={{ fontSize: 60, color: 'white', mb: 1 }} />
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                color: 'white',
+                fontWeight: 600,
+                fontFamily: "'Poppins', sans-serif"
+              }}
             >
-              View Order History
-            </Button>
-          </Paper>
+              Payment Successful!
+            </Typography>
+          </Box>
+          
+          <CardContent sx={{ p: 4 }}>
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Typography variant="body1" sx={{ mb: 2, color: '#555' }}>
+                Thank you for your order with FeastFlow. Your payment has been processed successfully.
+              </Typography>
+              <Chip 
+                label={`Order ID: ${order.id || urlOrderId}`} 
+                sx={{ 
+                  bgcolor: '#e8f5e9', 
+                  color: '#2e7d32',
+                  fontWeight: 600, 
+                  px: 1,
+                  my: 1
+                }} 
+              />
+            </Box>
+            
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Receipt sx={{ color: '#023047', mr: 1.5, fontSize: 20 }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#023047' }}>
+                      Order Summary
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ mb: 2 }} />
+                  
+                  {order.items && order.items.length > 0 ? (
+                    <Box sx={{ maxHeight: 200, overflowY: 'auto', pr: 1 }}>
+                      {order.items.map((item, idx) => (
+                        <Box 
+                          key={idx} 
+                          sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            mb: 1.5,
+                            pb: idx < order.items.length - 1 ? 1 : 0,
+                            borderBottom: idx < order.items.length - 1 ? '1px dashed #e0e0e0' : 'none'
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                              {item.name || item.item_name} 
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary" sx={{ ml: 1 }}>
+                              x{item.quantity}
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            ₹{item.price * item.quantity}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="textSecondary">
+                      Item details not available
+                    </Typography>
+                  )}
+                  
+                  <Divider sx={{ my: 2 }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+                    <Typography variant="subtitle2" sx={{ color: '#023047' }}>Total</Typography>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#023047' }}>
+                      ₹{order.total_amount || order.amount}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <AccessTime sx={{ color: '#023047', mr: 1.5, fontSize: 20 }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#023047' }}>
+                      Order Details
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ mb: 2 }} />
+                  
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Order Date
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {formatOrderTime(order.created_at)}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Pickup Type
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, textTransform: 'capitalize' }}>
+                      {order.pickup_type === 'restaurant' ? 'Restaurant Pickup' : 'Home Delivery'}
+                    </Typography>
+                  </Box>
+                  
+                  {(order.delivery_address || order.pickup_address) && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="textSecondary">
+                        {order.pickup_type === 'restaurant' ? 'Pickup Location' : 'Delivery Address'}
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: 0.5 }}>
+                        <LocationOn sx={{ fontSize: 18, color: '#666', mr: 1, mt: 0.25 }} />
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {order.delivery_address || order.pickup_address || 'Not specified'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+                  
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Payment Method
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, textTransform: 'capitalize' }}>
+                      {order.payment_method || 'Online Payment'}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Payment Status
+                    </Typography>
+                    <Chip 
+                      label="Paid" 
+                      size="small"
+                      sx={{ 
+                        bgcolor: '#e8f5e9', 
+                        color: '#2e7d32',
+                        fontWeight: 600,
+                        mt: 0.5
+                      }} 
+                    />
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+            
+            <Divider sx={{ my: 3 }} />
+            
+            <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, gap: 2, justifyContent: 'center' }}>
+              <StyledButton
+                startIcon={<List />}
+                onClick={() => navigate('/history')}
+              >
+                View Order History
+              </StyledButton>
+              <OutlinedButton
+                startIcon={<Home />}
+                onClick={() => navigate('/')}
+              >
+                Back to Home
+              </OutlinedButton>
+            </Box>
+          </CardContent>
+        </StyledCard>
+        
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Typography variant="body2" color="textSecondary">
+            A confirmation email has been sent to your registered email address.
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1, color: '#023047', fontWeight: 500 }}>
+            Thank you for choosing FeastFlow!
+          </Typography>
         </Box>
       </Container>
     </Layout>

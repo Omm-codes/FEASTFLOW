@@ -32,7 +32,8 @@ function App() {
         <CartProvider>
           <AuthProvider>
             <ErrorBoundary>
-              <BrowserRouter basename="/">
+              {/* Remove the basename property if you're running locally */}
+              <BrowserRouter>
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
