@@ -43,8 +43,9 @@ const Payment = () => {
       
       console.log(`Fetching order details for ID: ${id}`);
       
-      // Use buildApiUrl to ensure consistent URL format
-      const response = await fetch(buildApiUrl(`/orders/${id}`), {
+      // Fix: Ensure we're using the correct endpoint path with proper prefixing
+      // The API routes in the backend are mounted at /api/orders/...
+      const response = await fetch(`http://localhost:5001/api/orders/${id}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authState.token}`,
@@ -147,8 +148,8 @@ const Payment = () => {
       
       const paymentReference = `PAY-${orderId}-${Date.now().toString().slice(-6)}`;
       
-      // Use buildApiUrl for consistent API URL formatting
-      const response = await fetch(buildApiUrl(`/orders/${orderId}/status`), {
+      // Use consistent direct URL format like we did with fetchOrder
+      const response = await fetch(`http://localhost:5001/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
