@@ -15,7 +15,9 @@ import {
     CircularProgress,
     Box,
     Chip,
-    Divider
+    Divider,
+    Tab,
+    Tabs
 } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
@@ -24,11 +26,25 @@ const primaryColor = '#6a4e38'; // A slightly lighter, warmer brown
 const secondaryColor = '#a1887f'; // A muted, dusty rose
 const accentColor = '#f5f0e1'; // Off-white, creamy background
 
+const groupItemsByCategory = (items) => {
+    const grouped = items.reduce((acc, item) => {
+        const category = item.category || 'Other';
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+        acc[category].push(item);
+        return acc;
+    }, {});
+    return grouped;
+};
+
 const Menu = () => {
     const { addToCart } = useCart();
     const [menuItems, setMenuItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [categories, setCategories] = useState([]);
 
     // Fallback image for when menu item images fail to load
     const fallbackImage = '/placeholder-food.jpg';
@@ -49,6 +65,9 @@ const Menu = () => {
                 console.log('Fetched menu items:', data);
                 if (Array.isArray(data)) {
                     setMenuItems(data);
+                    // Extract unique categories
+                    const uniqueCategories = ['all', ...new Set(data.map(item => item.category).filter(Boolean))];
+                    setCategories(uniqueCategories);
                 } else {
                     console.error('Data is not an array:', data);
                     setSnackbar({
@@ -101,6 +120,14 @@ const Menu = () => {
         });
     };
 
+    const handleCategoryChange = (event, newValue) => {
+        setSelectedCategory(newValue);
+    };
+
+    const filteredItems = selectedCategory === 'all' 
+        ? menuItems 
+        : menuItems.filter(item => item.category === selectedCategory);
+
     return (
         <Layout>
             <Container sx={{ mt: 3, mb: 3 }}>
@@ -117,8 +144,39 @@ const Menu = () => {
                 >
                     Our Menu
                 </Typography>
+
+                {/* Add Category Tabs */}
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+                    <Tabs 
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        sx={{
+                            '& .MuiTab-root': {
+                                color: secondaryColor,
+                                '&.Mui-selected': {
+                                    color: primaryColor,
+                                },
+                            },
+                        }}
+                    >
+                        {categories.map((category) => (
+                            <Tab 
+                                key={category}
+                                label={category.charAt(0).toUpperCase() + category.slice(1)}
+                                value={category}
+                                sx={{
+                                    textTransform: 'capitalize',
+                                    fontWeight: 600,
+                                }}
+                            />
+                        ))}
+                    </Tabs>
+                </Box>
+
                 <Grid container spacing={2}>
-                    {menuItems.map((item) => (
+                    {filteredItems.map((item) => (
                         <Grid item xs={12} sm={6} md={3} key={item.id}>
                             <Card
                                 elevation={2}
