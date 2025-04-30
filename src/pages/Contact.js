@@ -28,6 +28,12 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
 
+// Define color variables to match site theme
+const primaryColor = '#023047'; // Blue from header
+const secondaryColor = '#219ebc'; // Lighter blue accent
+const accentColor = '#f8f9fa'; // Light background
+const highlightColor = '#ffb703'; // Yellow accent from header
+
 // Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -38,7 +44,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   height: '100%',
   "&:hover": {
     transform: "translateY(-5px)",
-    boxShadow: '0 10px 25px rgba(0,0,0,0.12)',
+    boxShadow: '0 10px 25px rgba(2, 48, 71, 0.12)',
   },
 }));
 
@@ -46,11 +52,11 @@ const FormTextField = styled(TextField)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   '& .MuiOutlinedInput-root': {
     '&.Mui-focused fieldset': {
-      borderColor: '#552a0f',
+      borderColor: primaryColor,
     },
   },
   '& .MuiFormLabel-root.Mui-focused': {
-    color: '#552a0f',
+    color: primaryColor,
   },
 }));
 
@@ -66,7 +72,7 @@ const InfoRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const IconContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: 'rgba(85, 42, 15, 0.08)',
+  backgroundColor: 'rgba(2, 48, 71, 0.08)',
   borderRadius: '50%',
   width: 46,
   height: 46,
@@ -138,7 +144,7 @@ const Contact = () => {
             variant="h3"
             align="center" 
             sx={{ 
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Poppins', sans-serif",
               fontWeight: 700,
               mb: 2
             }}
@@ -173,9 +179,9 @@ const Contact = () => {
                 variant="h5" 
                 gutterBottom
                 sx={{
-                  fontFamily: "'Playfair Display', serif",
+                  fontFamily: "'Poppins', sans-serif",
                   fontWeight: 600,
-                  color: '#333',
+                  color: primaryColor,
                   position: 'relative',
                   pb: 2,
                   mb: 3,
@@ -185,7 +191,7 @@ const Contact = () => {
                     bottom: 0,
                     left: 0,
                     width: "60px",
-                    borderBottom: "3px solid #ffd54f"
+                    borderBottom: `3px solid ${highlightColor}`
                   }
                 }}
               >
@@ -211,7 +217,7 @@ const Contact = () => {
                     <InfoRow>
                       <TableCell width="60px">
                         <IconContainer>
-                          <LocationOn sx={{ color: "#552a0f" }} />
+                          <LocationOn sx={{ color: primaryColor }} />
                         </IconContainer>
                       </TableCell>
                       <TableCell>
@@ -243,7 +249,7 @@ const Contact = () => {
                     <InfoRow>
                       <TableCell>
                         <IconContainer>
-                          <Call sx={{ color: "#552a0f" }} />
+                          <Call sx={{ color: primaryColor }} />
                         </IconContainer>
                       </TableCell>
                       <TableCell>
@@ -273,7 +279,7 @@ const Contact = () => {
                     <InfoRow>
                       <TableCell>
                         <IconContainer>
-                          <Mail sx={{ color: "#552a0f" }} />
+                          <Mail sx={{ color: primaryColor }} />
                         </IconContainer>
                       </TableCell>
                       <TableCell>
@@ -303,7 +309,7 @@ const Contact = () => {
                     <InfoRow>
                       <TableCell>
                         <IconContainer>
-                          <AccessTime sx={{ color: "#552a0f" }} />
+                          <AccessTime sx={{ color: primaryColor }} />
                         </IconContainer>
                       </TableCell>
                       <TableCell>
@@ -339,13 +345,13 @@ const Contact = () => {
                 mt: 4, 
                 p: 2, 
                 borderRadius: 2, 
-                bgcolor: 'rgba(85, 42, 15, 0.04)',
-                border: '1px dashed rgba(85, 42, 15, 0.2)'
+                bgcolor: 'rgba(2, 48, 71, 0.04)',
+                border: `1px dashed rgba(2, 48, 71, 0.2)`
               }}>
                 <Typography 
                   variant="body2" 
                   sx={{ 
-                    color: '#552a0f',
+                    color: primaryColor,
                     fontFamily: "'Poppins', sans-serif",
                     fontStyle: 'italic'
                   }}
@@ -364,9 +370,9 @@ const Contact = () => {
                 variant="h5" 
                 gutterBottom
                 sx={{
-                  fontFamily: "'Playfair Display', serif",
+                  fontFamily: "'Poppins', sans-serif",
                   fontWeight: 600,
-                  color: '#333',
+                  color: primaryColor,
                   position: 'relative',
                   pb: 2,
                   mb: 3,
@@ -376,7 +382,7 @@ const Contact = () => {
                     bottom: 0,
                     left: 0,
                     width: "60px",
-                    borderBottom: "3px solid #ffd54f"
+                    borderBottom: `3px solid ${highlightColor}`
                   }
                 }}
               >
@@ -455,19 +461,19 @@ const Contact = () => {
                       disabled={loading}
                       endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
                       sx={{
-                        backgroundColor: '#552a0f',
-                        color: 'white',
+                        backgroundColor: highlightColor,
+                        color: '#000',
                         py: 1.5,
                         px: 4,
-                        borderRadius: '30px',
+                        borderRadius: '20px',
                         fontSize: '1rem',
                         textTransform: 'none',
                         fontFamily: "'Poppins', sans-serif",
-                        fontWeight: 500,
-                        boxShadow: '0 4px 15px rgba(85, 42, 15, 0.3)',
+                        fontWeight: 600,
+                        boxShadow: '0 4px 15px rgba(255, 183, 3, 0.3)',
                         '&:hover': {
-                          backgroundColor: '#3e1e09',
-                          boxShadow: '0 6px 20px rgba(85, 42, 15, 0.4)',
+                          backgroundColor: '#ffaa00',
+                          boxShadow: '0 6px 20px rgba(255, 183, 3, 0.4)',
                         }
                       }}
                     >
@@ -485,11 +491,22 @@ const Contact = () => {
           <Typography 
             variant="h5" 
             sx={{
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Poppins', sans-serif",
               fontWeight: 600,
-              color: '#333',
+              color: primaryColor,
               mb: 3,
-              textAlign: 'center'
+              textAlign: 'center',
+              position: 'relative',
+              pb: 2,
+              "&:after": {
+                content: '""',
+                position: "absolute",
+                bottom: 0,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "80px",
+                borderBottom: `3px solid ${highlightColor}`
+              }
             }}
           >
             Find Us
@@ -522,7 +539,7 @@ const Contact = () => {
             mt: 8,
             p: 4, 
             borderRadius: 3, 
-            bgcolor: '#f9f7f4',
+            bgcolor: accentColor,
             border: '1px solid #f0f0f0',
             boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
           }}
@@ -531,9 +548,9 @@ const Contact = () => {
             variant="h5" 
             align="center"
             sx={{
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Poppins', sans-serif",
               fontWeight: 600,
-              color: '#333',
+              color: primaryColor,
               mb: 4,
               position: "relative",
               pb: 2,
@@ -544,7 +561,7 @@ const Contact = () => {
                 left: "50%",
                 transform: "translateX(-50%)",
                 width: "80px",
-                borderBottom: "3px solid #ffd54f"
+                borderBottom: `3px solid ${highlightColor}`
               }
             }}
           >
@@ -577,7 +594,7 @@ const Contact = () => {
                     sx={{ 
                       fontWeight: 600,
                       mb: 1,
-                      color: '#552a0f', 
+                      color: primaryColor, 
                       fontFamily: "'Poppins', sans-serif"
                     }}
                   >
@@ -603,12 +620,12 @@ const Contact = () => {
               variant="text"
               endIcon={<ArrowForward />}
               sx={{
-                color: '#552a0f',
+                color: primaryColor,
                 fontFamily: "'Poppins', sans-serif",
                 textTransform: 'none',
                 fontWeight: 500,
                 '&:hover': {
-                  backgroundColor: 'rgba(85, 42, 15, 0.05)',
+                  backgroundColor: 'rgba(2, 48, 71, 0.05)',
                 }
               }}
             >
@@ -627,7 +644,13 @@ const Contact = () => {
         <Alert 
           onClose={handleSnackbarClose} 
           severity={snackbar.severity} 
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            fontFamily: "'Poppins', sans-serif",
+            '& .MuiAlert-icon': {
+              color: snackbar.severity === 'success' ? highlightColor : undefined
+            }
+          }}
         >
           {snackbar.message}
         </Alert>

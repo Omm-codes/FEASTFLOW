@@ -41,6 +41,12 @@ import {
 } from '@mui/icons-material';
 import AdminLayout from '../../components/Layout/AdminLayout';
 
+// Define color variables to match site theme
+const primaryColor = '#023047'; // Blue from header
+const secondaryColor = '#219ebc'; // Lighter blue accent
+const accentColor = '#f8f9fa'; // Light background
+const highlightColor = '#ffb703'; // Yellow accent from header
+
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -230,7 +236,14 @@ const OrderManagement = () => {
     <AdminLayout>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4">
+          <Typography 
+            variant="h4" 
+            sx={{
+              color: primaryColor,
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 700
+            }}
+          >
             Order Management 
             {newOrders > 0 && (
               <Badge 
@@ -238,7 +251,14 @@ const OrderManagement = () => {
                 color="error" 
                 sx={{ ml: 2 }}
               >
-                <Typography variant="h6" component="span">
+                <Typography 
+                  variant="h6" 
+                  component="span"
+                  sx={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }}
+                >
                   New Orders
                 </Typography>
               </Badge>
@@ -247,8 +267,28 @@ const OrderManagement = () => {
         </Box>
 
         {/* Order Status Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={selectedTab} onChange={handleTabChange}>
+        <Box sx={{ 
+          borderBottom: 1, 
+          borderColor: 'divider', 
+          mb: 3
+        }}>
+          <Tabs 
+            value={selectedTab} 
+            onChange={handleTabChange}
+            sx={{
+              '& .MuiTabs-indicator': {
+                backgroundColor: highlightColor,
+              },
+              '& .MuiTab-root': {
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 600,
+                color: secondaryColor,
+                '&.Mui-selected': {
+                  color: primaryColor,
+                }
+              }
+            }}
+          >
             <Tab label="All Orders" value="all" />
             <Tab 
               label={
@@ -273,50 +313,114 @@ const OrderManagement = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <SearchIcon sx={{ color: secondaryColor }} />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
-                  <Button startIcon={<FilterIcon />}>
+                  <Button 
+                    startIcon={<FilterIcon />}
+                    sx={{
+                      color: primaryColor,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontWeight: 600,
+                      textTransform: 'none',
+                    }}
+                  >
                     Filter
                   </Button>
                 </InputAdornment>
-              )
+              ),
+              sx: { 
+                fontFamily: "'Poppins', sans-serif" 
+              }
             }}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ bgcolor: 'white' }}
+            sx={{ 
+              bgcolor: 'white',
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: primaryColor,
+                },
+              },
+            }}
           />
         </Box>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 3,
+              fontFamily: "'Poppins', sans-serif"
+            }}
+          >
             {error}
           </Alert>
         )}
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-            <CircularProgress />
+            <CircularProgress sx={{ color: highlightColor }} />
           </Box>
         ) : (
-          <TableContainer component={Paper} sx={{ mb: 4 }}>
+          <TableContainer 
+            component={Paper} 
+            sx={{ 
+              mb: 4,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+            }}
+          >
             <Table>
-              <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+              <TableHead sx={{ bgcolor: primaryColor }}>
                 <TableRow>
-                  <TableCell>Order ID</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Customer</TableCell>
-                  <TableCell>Items</TableCell>
-                  <TableCell align="right">Total</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="center">Actions</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }}>Order ID</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }}>Date</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }}>Customer</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }}>Items</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }} align="right">Total</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }}>Status</TableCell>
+                  <TableCell sx={{ 
+                    color: 'white', 
+                    fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 600
+                  }} align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center">
+                    <TableCell 
+                      colSpan={7} 
+                      align="center"
+                      sx={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
                       No orders found
                     </TableCell>
                   </TableRow>
@@ -330,24 +434,34 @@ const OrderManagement = () => {
                       (order.contact_number && order.contact_number.includes(searchTerm))
                     )
                     .map(order => (
-                      <TableRow key={order.id} hover>
-                        <TableCell>#{order.id}</TableCell>
-                        <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
-                        <TableCell>
+                      <TableRow 
+                        key={order.id} 
+                        hover
+                        sx={{ 
+                          '&:hover': { bgcolor: 'rgba(2, 48, 71, 0.04)' }
+                        }}
+                      >
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>#{order.id}</TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>{new Date(order.created_at).toLocaleString()}</TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>
                           {order.customer_name || 'Guest'}
                           {order.contact_number && <div>{order.contact_number}</div>}
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>
                           {order.items && Array.isArray(order.items) ? 
                             `${order.items.length} items` : 
                             'Items info not available'}
                         </TableCell>
-                        <TableCell align="right">₹{order.total_amount}</TableCell>
+                        <TableCell sx={{ 
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600
+                        }} align="right">₹{order.total_amount}</TableCell>
                         <TableCell>
                           <Chip 
                             label={order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Pending'} 
                             color={getStatusColor(order.status)}
                             size="small"
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
                           />
                         </TableCell>
                         <TableCell align="center">
@@ -356,6 +470,17 @@ const OrderManagement = () => {
                             size="small"
                             startIcon={<ViewIcon />}
                             onClick={() => handleViewOrderDetails(order)}
+                            sx={{ 
+                              color: secondaryColor,
+                              borderColor: secondaryColor,
+                              fontFamily: "'Poppins', sans-serif",
+                              textTransform: 'none',
+                              borderRadius: '20px',
+                              '&:hover': {
+                                bgcolor: 'rgba(33, 158, 188, 0.04)',
+                                borderColor: secondaryColor,
+                              }
+                            }}
                           >
                             Details
                           </Button>
@@ -374,14 +499,40 @@ const OrderManagement = () => {
           onClose={() => setOrderDetailsOpen(false)}
           fullWidth
           maxWidth="md"
+          PaperProps={{
+            sx: {
+              borderRadius: '12px',
+            }
+          }}
         >
-          <DialogTitle sx={{ bgcolor: '#f5f5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <DialogTitle 
+            sx={{ 
+              bgcolor: accentColor, 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              borderBottom: `1px solid #eee`
+            }}
+          >
             <Box>
-              <Typography variant="h6">
+              <Typography 
+                variant="h6"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 600,
+                  color: primaryColor
+                }}
+              >
                 Order #{selectedOrder?.id}
               </Typography>
               {selectedOrder && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary"
+                  sx={{
+                    fontFamily: "'Poppins', sans-serif"
+                  }}
+                >
                   Placed on {new Date(selectedOrder.created_at).toLocaleString()}
                 </Typography>
               )}
@@ -390,6 +541,7 @@ const OrderManagement = () => {
               <Chip 
                 label={selectedOrder.status ? selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1) : 'Pending'} 
                 color={getStatusColor(selectedOrder.status)}
+                sx={{ fontFamily: "'Poppins', sans-serif" }}
               />
             )}
           </DialogTitle>
@@ -397,60 +549,164 @@ const OrderManagement = () => {
             {selectedOrder && (
               <Box>
                 {/* Customer Information Section */}
-                <Paper elevation={0} variant="outlined" sx={{ p: 2, mb: 3 }}>
-                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                <Paper 
+                  elevation={0} 
+                  variant="outlined" 
+                  sx={{ 
+                    p: 2, 
+                    mb: 3,
+                    borderRadius: '8px',
+                    borderColor: '#eee'
+                  }}
+                >
+                  <Typography 
+                    variant="subtitle1" 
+                    fontWeight="bold" 
+                    gutterBottom
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primaryColor
+                    }}
+                  >
                     Customer Information
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Name</Typography>
-                      <Typography variant="body1">{selectedOrder.customer_name || 'Guest User'}</Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Name
+                      </Typography>
+                      <Typography 
+                        variant="body1"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {selectedOrder.customer_name || 'Guest User'}
+                      </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Email</Typography>
-                      <Typography variant="body1">{selectedOrder.customer_email || selectedOrder.email || 'Not provided'}</Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Email
+                      </Typography>
+                      <Typography 
+                        variant="body1"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {selectedOrder.customer_email || selectedOrder.email || 'Not provided'}
+                      </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Phone</Typography>
-                      <Typography variant="body1">{selectedOrder.contact_number || selectedOrder.customer_phone || 'Not provided'}</Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Phone
+                      </Typography>
+                      <Typography 
+                        variant="body1"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {selectedOrder.contact_number || selectedOrder.customer_phone || 'Not provided'}
+                      </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="body2" color="text.secondary">Delivery Address</Typography>
-                      <Typography variant="body1">{selectedOrder.delivery_address || 'Not provided'}</Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Delivery Address
+                      </Typography>
+                      <Typography 
+                        variant="body1"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {selectedOrder.delivery_address || 'Not provided'}
+                      </Typography>
                     </Grid>
                   </Grid>
                 </Paper>
 
                 {/* Order Status Management */}
-                <Paper elevation={0} variant="outlined" sx={{ p: 2, mb: 3 }}>
-                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                <Paper 
+                  elevation={0} 
+                  variant="outlined" 
+                  sx={{ 
+                    p: 2, 
+                    mb: 3,
+                    borderRadius: '8px',
+                    borderColor: '#eee'
+                  }}
+                >
+                  <Typography 
+                    variant="subtitle1" 
+                    fontWeight="bold" 
+                    gutterBottom
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primaryColor
+                    }}
+                  >
                     Order Management
                   </Typography>
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
                         Receipt Number
                       </Typography>
-                      <Typography variant="body1">
+                      <Typography 
+                        variant="body1"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
                         {`RCPT-${new Date(selectedOrder.created_at).toISOString().slice(0, 10).replace(/-/g, '')}-${selectedOrder.id}`}
                       </Typography>
                       {selectedOrder.payment_reference && (
                         <>
-                          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          <Typography 
+                            variant="body2" 
+                            color="text.secondary" 
+                            sx={{ 
+                              mt: 1,
+                              fontFamily: "'Poppins', sans-serif" 
+                            }}
+                          >
                             Payment Reference
                           </Typography>
-                          <Typography variant="body1">
+                          <Typography 
+                            variant="body1"
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
                             {selectedOrder.payment_reference}
                           </Typography>
                         </>
                       )}
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary" 
+                        gutterBottom
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
                         Status
                       </Typography>
                       <FormControl fullWidth variant="outlined" size="small">
-                        <InputLabel>Update Status</InputLabel>
+                        <InputLabel 
+                          sx={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                          Update Status
+                        </InputLabel>
                         <Select
                           label="Update Status"
                           value={selectedOrder.status || 'pending'}
@@ -463,13 +719,52 @@ const OrderManagement = () => {
                                 });
                               });
                           }}
+                          sx={{ 
+                            fontFamily: "'Poppins', sans-serif",
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(0, 0, 0, 0.23)',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: primaryColor,
+                            },
+                          }}
                         >
-                          <MenuItem value="pending">Pending</MenuItem>
-                          <MenuItem value="paid">Paid</MenuItem>
-                          <MenuItem value="preparing">Preparing</MenuItem>
-                          <MenuItem value="ready">Ready for Pickup/Delivery</MenuItem>
-                          <MenuItem value="delivered">Delivered/Completed</MenuItem>
-                          <MenuItem value="cancelled">Cancelled</MenuItem>
+                          <MenuItem 
+                            value="pending" 
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            Pending
+                          </MenuItem>
+                          <MenuItem 
+                            value="paid" 
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            Paid
+                          </MenuItem>
+                          <MenuItem 
+                            value="preparing" 
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            Preparing
+                          </MenuItem>
+                          <MenuItem 
+                            value="ready" 
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            Ready for Pickup/Delivery
+                          </MenuItem>
+                          <MenuItem 
+                            value="delivered" 
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            Delivered/Completed
+                          </MenuItem>
+                          <MenuItem 
+                            value="cancelled" 
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            Cancelled
+                          </MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -477,20 +772,58 @@ const OrderManagement = () => {
                 </Paper>
 
                 {/* Payment Information */}
-                <Paper elevation={0} variant="outlined" sx={{ p: 2, mb: 3 }}>
-                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                <Paper 
+                  elevation={0} 
+                  variant="outlined" 
+                  sx={{ 
+                    p: 2, 
+                    mb: 3,
+                    borderRadius: '8px',
+                    borderColor: '#eee'
+                  }}
+                >
+                  <Typography 
+                    variant="subtitle1" 
+                    fontWeight="bold" 
+                    gutterBottom
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primaryColor
+                    }}
+                  >
                     Payment Information
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
-                      <Typography variant="body2" color="text.secondary">Payment Method</Typography>
-                      <Typography variant="body1" sx={{ textTransform: 'capitalize' }}>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Payment Method
+                      </Typography>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          textTransform: 'capitalize',
+                          fontFamily: "'Poppins', sans-serif" 
+                        }}
+                      >
                         {selectedOrder.payment_method || 'Not specified'}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                      <Typography variant="body2" color="text.secondary">Payment Status</Typography>
-                      <Typography variant="body1">
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Payment Status
+                      </Typography>
+                      <Typography 
+                        variant="body1"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
                         {selectedOrder.status === 'paid' || 
                          selectedOrder.status === 'preparing' || 
                          selectedOrder.status === 'ready' || 
@@ -498,27 +831,59 @@ const OrderManagement = () => {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                      <Typography variant="body2" color="text.secondary">Total Amount</Typography>
-                      <Typography variant="body1" fontWeight="bold">₹{parseFloat(selectedOrder.total_amount).toFixed(2)}</Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Total Amount
+                      </Typography>
+                      <Typography 
+                        variant="body1" 
+                        fontWeight="bold"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          color: primaryColor
+                        }}
+                      >
+                        ₹{parseFloat(selectedOrder.total_amount).toFixed(2)}
+                      </Typography>
                     </Grid>
                   </Grid>
                 </Paper>
 
                 {/* Order Items Table */}
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                <Typography 
+                  variant="subtitle1" 
+                  fontWeight="bold" 
+                  gutterBottom
+                  sx={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: primaryColor
+                  }}
+                >
                   Order Items
                 </Typography>
                 
                 {selectedOrder.items && selectedOrder.items.length > 0 ? (
-                  <TableContainer component={Paper} variant="outlined" sx={{ mb: 2 }}>
+                  <TableContainer 
+                    component={Paper} 
+                    variant="outlined" 
+                    sx={{ 
+                      mb: 2,
+                      borderRadius: '8px',
+                      borderColor: '#eee',
+                      overflow: 'hidden'
+                    }}
+                  >
                     <Table size="small">
-                      <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                      <TableHead sx={{ bgcolor: accentColor }}>
                         <TableRow>
-                          <TableCell>Item</TableCell>
-                          <TableCell>Category</TableCell>
-                          <TableCell align="right">Quantity</TableCell>
-                          <TableCell align="right">Price</TableCell>
-                          <TableCell align="right">Total</TableCell>
+                          <TableCell sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Item</TableCell>
+                          <TableCell sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Category</TableCell>
+                          <TableCell sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }} align="right">Quantity</TableCell>
+                          <TableCell sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }} align="right">Price</TableCell>
+                          <TableCell sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }} align="right">Total</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -545,45 +910,62 @@ const OrderManagement = () => {
                                   />
                                 )}
                                 <Box>
-                                  <Typography variant="body2" fontWeight="medium">{item.name}</Typography>
+                                  <Typography 
+                                    variant="body2" 
+                                    fontWeight="medium"
+                                    sx={{ fontFamily: "'Poppins', sans-serif" }}
+                                  >
+                                    {item.name}
+                                  </Typography>
                                   {item.description && (
-                                    <Typography variant="caption" color="text.secondary" sx={{
-                                      display: '-webkit-box',
-                                      WebkitLineClamp: 1,
-                                      WebkitBoxOrient: 'vertical',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                      maxWidth: '200px'
-                                    }}>
+                                    <Typography 
+                                      variant="caption" 
+                                      color="text.secondary" 
+                                      sx={{
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 1,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        maxWidth: '200px',
+                                        fontFamily: "'Poppins', sans-serif"
+                                      }}
+                                    >
                                       {item.description}
                                     </Typography>
                                   )}
                                 </Box>
                               </Box>
                             </TableCell>
-                            <TableCell>{item.category || 'Uncategorized'}</TableCell>
-                            <TableCell align="right">{item.quantity}</TableCell>
-                            <TableCell align="right">₹{parseFloat(item.price).toFixed(2)}</TableCell>
-                            <TableCell align="right">₹{(parseFloat(item.price) * item.quantity).toFixed(2)}</TableCell>
+                            <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>{item.category || 'Uncategorized'}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif" }}>{item.quantity}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif" }}>₹{parseFloat(item.price).toFixed(2)}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif" }}>₹{(parseFloat(item.price) * item.quantity).toFixed(2)}</TableCell>
                           </TableRow>
                         ))}
                         <TableRow sx={{ bgcolor: '#fafafa' }}>
-                          <TableCell colSpan={4} align="right"><strong>Subtotal:</strong></TableCell>
-                          <TableCell align="right"><strong>₹{parseFloat(selectedOrder.total_amount).toFixed(2)}</strong></TableCell>
+                          <TableCell colSpan={4} align="right" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Subtotal:</TableCell>
+                          <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>₹{parseFloat(selectedOrder.total_amount).toFixed(2)}</TableCell>
                         </TableRow>
                         <TableRow sx={{ bgcolor: '#fafafa' }}>
-                          <TableCell colSpan={4} align="right"><strong>Delivery Fee:</strong></TableCell>
-                          <TableCell align="right">₹0.00</TableCell>
+                          <TableCell colSpan={4} align="right" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Delivery Fee:</TableCell>
+                          <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif" }}>₹0.00</TableCell>
                         </TableRow>
-                        <TableRow sx={{ bgcolor: '#f5f5f5' }}>
-                          <TableCell colSpan={4} align="right"><strong>Total Amount:</strong></TableCell>
-                          <TableCell align="right"><strong>₹{parseFloat(selectedOrder.total_amount).toFixed(2)}</strong></TableCell>
+                        <TableRow sx={{ bgcolor: accentColor }}>
+                          <TableCell colSpan={4} align="right" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600, color: primaryColor }}>Total Amount:</TableCell>
+                          <TableCell align="right" sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, color: primaryColor }}>₹{parseFloat(selectedOrder.total_amount).toFixed(2)}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
                   </TableContainer>
                 ) : (
-                  <Typography variant="body2" color="text.secondary">No item details available</Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    No item details available
+                  </Typography>
                 )}
                 
                 {/* Order Timeline/History - Could be added in future enhancements */}
@@ -591,7 +973,33 @@ const OrderManagement = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOrderDetailsOpen(false)}>Close</Button>
+            <Button 
+              onClick={() => setOrderDetailsOpen(false)}
+              sx={{ 
+                color: 'text.secondary',
+                fontFamily: "'Poppins', sans-serif",
+                textTransform: 'none',
+              }}
+            >
+              Close
+            </Button>
+            <Button 
+              variant="contained"
+              onClick={() => setOrderDetailsOpen(false)}
+              sx={{
+                bgcolor: highlightColor,
+                color: '#000',
+                fontWeight: 600,
+                borderRadius: '20px',
+                textTransform: 'none',
+                fontFamily: "'Poppins', sans-serif",
+                '&:hover': {
+                  bgcolor: '#ffaa00',
+                }
+              }}
+            >
+              Done
+            </Button>
           </DialogActions>
         </Dialog>
 
@@ -607,7 +1015,13 @@ const OrderManagement = () => {
         <Alert 
           onClose={() => setSnackbar({ ...snackbar, open: false })} 
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            fontFamily: "'Poppins', sans-serif",
+            '& .MuiAlert-icon': {
+              color: snackbar.severity === 'success' ? highlightColor : undefined
+            }
+          }}
         >
           {snackbar.message}
         </Alert>

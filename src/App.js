@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -14,6 +14,7 @@ import Dashboard from './pages/admin/Dashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 import OrderManagement from './pages/admin/OrderManagement';
 import MenuManagement from './pages/admin/MenuManagement';
+import AdminSettings from './pages/admin/AdminSettings'; // Add this import
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import History from './pages/History';
@@ -33,10 +34,11 @@ function App() {
           <AuthProvider>
             <ErrorBoundary>
               {/* Remove the basename property if you're running locally */}
-              <BrowserRouter>
+              <BrowserRouter basename={process.env.PUBLIC_URL}>
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
+                  <Route path="/index.html" element={<Navigate to="/" replace />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/menu" element={<Menu />} />
@@ -58,6 +60,7 @@ function App() {
                   <Route path="/admin/dashboard" element={<AdminProtectedRoute><Dashboard /></AdminProtectedRoute>} />
                   <Route path="/admin/orders" element={<AdminProtectedRoute><OrderManagement /></AdminProtectedRoute>} />
                   <Route path="/admin/menu" element={<AdminProtectedRoute><MenuManagement /></AdminProtectedRoute>} />
+                  <Route path="/admin/settings" element={<AdminProtectedRoute><AdminSettings /></AdminProtectedRoute>} /> {/* Add this line */}
                   
                   <Route path="*" element={<Pagenotfound />} />
                 </Routes>

@@ -56,7 +56,6 @@
 
 .headerContainer button:hover {
   background-color: #b8860b;
-  transition: 0.3s ease-in-out;
   cursor: pointer;
 }
 
@@ -76,16 +75,19 @@
     flex-direction: column;
     background-color: #121619;
     color: white;
+    padding: 15px 10px;
   }
   .home .headerContainer h1 {
-    font-size: 40px;
+    font-size: 32px;
     height: 30px;
-    margin: 30px 0px;
+    margin: 20px 0;
+    line-height: 1.2;
     color: white;
   }
   .home .headerContainer p {
-    font-size: 30px;
+    font-size: 22px;
     color: white;
+    line-height: 1.4;
   }
   .headerContainer button {
     background-color: white;
@@ -115,6 +117,7 @@
 .offers-scroll-content p {
   font-size: 16px;
   margin: 0;
+  letter-spacing: 0.2px;
 }
 
 @keyframes fadeInOut {
@@ -151,7 +154,7 @@
 
 .category-card:hover {
   transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
 }
 
 .category-card:hover::before {
@@ -295,6 +298,113 @@
 .stars {
   color: #ffc107;
   margin-bottom: 15px;
+}
+
+/* Mobile Responsiveness Adjustments - Enhanced */
+@media only screen and (max-width: 600px) {
+  .offers-scroll-content p {
+    font-size: 14px;
+  }
+  
+  .category-card {
+    height: 150px; /* Increased from 120px for better visibility */
+    margin-bottom: 15px;
+  }
+  
+  .category-card h3 {
+    font-size: 16px;
+    padding: 10px;
+    line-height: 1.3;
+  }
+  
+  /* Improved mobile hero section */
+  .headerContainer {
+    padding: 15px 10px;
+  }
+
+  .home .headerContainer h1 {
+    font-size: 32px;
+    margin: 20px 0;
+    line-height: 1.2;
+  }
+
+  .home .headerContainer p {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+  
+  /* Better spacing for testimonials on mobile */
+  .testimonial-card {
+    padding: 20px 15px;
+    margin-bottom: 15px;
+  }
+}
+
+/* Tablet Responsiveness */
+@media only screen and (min-width: 601px) and (max-width: 960px) {
+  .how-it-works-step {
+    margin-bottom: 30px;
+    padding: 15px 20px;
+  }
+  
+  .category-card {
+    height: 160px;
+  }
+  
+  .home {
+    height: 45vh;
+  }
+  
+  .headerContainer {
+    max-width: 450px;
+  }
+}
+
+/* Enhanced animations */
+@keyframes floatUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.category-section .row,
+.how-it-works-section .row {
+  animation: floatUp 0.8s ease-out forwards;
+}
+
+/* Accessibility improvement - better contrast */
+.offers-scroll-container {
+  background-color: #291010;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.offers-scroll-content p {
+  letter-spacing: 0.2px;
+}
+
+/* Add smooth scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Print styles for better printing */
+@media print {
+  .offers-scroll-container,
+  .headerContainer button,
+  .view-all-btn {
+    display: none !important;
+  }
+  
+  .home {
+    height: auto;
+    background-image: none !important;
+  }
+  
+  .headerContainer {
+    background-color: transparent;
+    margin-left: 0;
+    padding: 0;
+  }
 }
 
 /* Mobile Responsiveness Adjustments */

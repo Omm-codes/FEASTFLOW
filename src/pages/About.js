@@ -25,11 +25,11 @@ import {
 } from "@mui/icons-material";
 import "../styles/AboutStyles.css";
 
-// Define color variables to maintain consistency
-const primaryColor = '#6a4e38'; // A slightly lighter, warmer brown
-const secondaryColor = '#a1887f'; // A muted, dusty rose
-const accentColor = '#f5f0e1'; // Off-white, creamy background
-const highlightColor = '#ffd54f'; // A golden yellow for highlights
+// Define color variables to match site theme
+const primaryColor = '#023047'; // Blue from header
+const secondaryColor = '#219ebc'; // Lighter blue accent
+const accentColor = '#f8f9fa'; // Light background
+const highlightColor = '#ffb703'; // Yellow accent from header
 
 const About = () => {
   const features = [
@@ -114,7 +114,7 @@ const About = () => {
               fontWeight: "bold",
               color: "white",
               mb: 2,
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "2.5rem", md: "3.5rem" },
               letterSpacing: "0.02em",
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)"
@@ -161,7 +161,7 @@ const About = () => {
             align="center" 
             sx={{ 
               color: "white",
-              fontFamily: "'Playfair Display', serif", 
+              fontFamily: "'Poppins', sans-serif", 
               fontWeight: 600,
               fontStyle: "italic",
               lineHeight: 1.6
@@ -181,7 +181,7 @@ const About = () => {
               variant="h4" 
               gutterBottom
               sx={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: "'Poppins', sans-serif",
                 fontWeight: 700,
                 fontSize: { xs: "2rem", md: "2.5rem" },
                 color: primaryColor,
@@ -284,7 +284,7 @@ const About = () => {
                       sx={{ 
                         color: primaryColor, 
                         fontWeight: 700,
-                        fontFamily: "'Playfair Display', serif"
+                        fontFamily: "'Poppins', sans-serif"
                       }}
                     >
                       {stat.number}
@@ -312,7 +312,7 @@ const About = () => {
             align="center" 
             gutterBottom
             sx={{
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Poppins', sans-serif",
               fontWeight: 700,
               fontSize: { xs: "2rem", md: "2.5rem" },
               color: primaryColor,
@@ -345,7 +345,7 @@ const About = () => {
                     border: "1px solid #eaeaea",
                     "&:hover": {
                       transform: "translateY(-5px)",
-                      boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
+                      boxShadow: "0 10px 25px rgba(2, 48, 71, 0.15)"
                     }
                   }}
                 >
@@ -359,7 +359,7 @@ const About = () => {
                     <Box 
                       sx={{ 
                         mb: 2,
-                        backgroundColor: "rgba(85, 42, 15, 0.08)",
+                        backgroundColor: "rgba(2, 48, 71, 0.08)",
                         borderRadius: "50%",
                         width: "80px",
                         height: "80px",
@@ -376,7 +376,7 @@ const About = () => {
                       variant="h6" 
                       sx={{ 
                         mb: 2,
-                        fontFamily: "'Playfair Display', serif",
+                        fontFamily: "'Poppins', sans-serif",
                         fontWeight: 600,
                         color: primaryColor
                       }}
@@ -418,7 +418,7 @@ const About = () => {
               align="center" 
               gutterBottom
               sx={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: "'Poppins', sans-serif",
                 fontWeight: 700,
                 fontSize: { xs: "2rem", md: "2.5rem" },
                 color: "white",
@@ -462,7 +462,7 @@ const About = () => {
                       sx={{ 
                         mb: 1.5,
                         color: highlightColor,
-                        fontFamily: "'Playfair Display', serif",
+                        fontFamily: "'Poppins', sans-serif",
                       }}
                     >
                       {value.title}
@@ -500,7 +500,7 @@ const About = () => {
           <Typography 
             variant="h4"
             sx={{
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Poppins', sans-serif",
               fontWeight: 700,
               mb: 3,
               color: accentColor
@@ -525,19 +525,19 @@ const About = () => {
             component={Link}
             to="/menu"
             sx={{ 
-              bgcolor: primaryColor,
-              color: "white",
+              bgcolor: highlightColor,
+              color: "#000",
               py: 1.5,
               px: 4,
-              borderRadius: "30px",
+              borderRadius: "20px",
               fontSize: "1rem",
               textTransform: "none",
               fontFamily: "'Poppins', sans-serif",
-              fontWeight: 500,
-              boxShadow: "0 4px 15px rgba(85, 42, 15, 0.3)",
+              fontWeight: 600,
+              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.15)",
               "&:hover": {
-                bgcolor: "#3e1e09",
-                boxShadow: "0 6px 20px rgba(85, 42, 15, 0.4)",
+                bgcolor: "#ffaa00",
+                boxShadow: "0 6px 20px rgba(0, 0, 0, 0.2)",
               }
             }}
           >

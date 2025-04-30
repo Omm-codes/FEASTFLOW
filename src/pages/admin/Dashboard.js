@@ -1,4 +1,3 @@
-// src/pages/admin/Dashboard.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -31,11 +30,11 @@ import {
 import { Add, Edit, Delete, CloudUpload, Notifications } from '@mui/icons-material';
 import API_URL, { buildApiUrl } from '../../services/apiConfig';
 
-// Add these color definitions to match your theme
-const primaryColor = '#6a4e38'; // A slightly lighter, warmer brown
-const secondaryColor = '#a1887f'; // A muted, dusty rose
-const accentColor = '#f5f0e1'; // Off-white, creamy background
-const highlightColor = '#ffd54f'; // A golden yellow for highlights
+// Update these color definitions to match your site theme
+const primaryColor = '#023047'; // Blue from header/profile
+const secondaryColor = '#219ebc'; // Lighter blue accent
+const accentColor = '#f8f9fa'; // Light background
+const highlightColor = '#ffb703'; // Yellow accent from header
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -436,36 +435,81 @@ const Dashboard = () => {
       <Box mt={5} mb={4}>
         <Grid container justifyContent="space-between" alignItems="center" mb={4}>
           <Grid item>
-            <Typography variant="h4" fontWeight="bold">
+            <Typography 
+              variant="h4" 
+              fontWeight="bold" 
+              sx={{ 
+                color: primaryColor,
+                fontFamily: "'Poppins', sans-serif" 
+              }}
+            >
               Admin Dashboard
             </Typography>
-            <Typography variant="body1" mt={1}>
+            <Typography 
+              variant="body1" 
+              mt={1}
+              sx={{ 
+                color: secondaryColor,
+                fontFamily: "'Poppins', sans-serif" 
+              }}
+            >
               Welcome, Admin!
             </Typography>
           </Grid>
           <Grid item>
             <Box display="flex" alignItems="center">
-              {/* Replaced notification bell with a direct Manage Orders button */}
               <Button 
-                variant="contained" 
-                color="primary" 
+                variant="contained"
                 onClick={handleViewOrders}
                 startIcon={<Notifications />}
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  bgcolor: highlightColor,
+                  color: '#000',
+                  fontWeight: 600,
+                  borderRadius: '20px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  fontFamily: "'Poppins', sans-serif",
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: '#ffaa00',
+                  }
+                }}
               >
                 Manage All Orders {newOrders.length > 0 && `(${newOrders.length})`}
               </Button>
               
               <Button 
-                variant="outlined" 
-                color="primary" 
+                variant="outlined"
                 onClick={() => navigate('/admin/settings')}
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  color: primaryColor,
+                  borderColor: primaryColor,
+                  borderRadius: '20px',
+                  fontWeight: 600, 
+                  textTransform: 'none',
+                  fontFamily: "'Poppins', sans-serif",
+                  '&:hover': {
+                    bgcolor: 'rgba(2, 48, 71, 0.04)',
+                    borderColor: primaryColor,
+                  }
+                }}
               >
                 Settings
               </Button>
               
-              <Button variant="outlined" color="error" onClick={handleLogout}>
+              <Button 
+                variant="outlined" 
+                color="error" 
+                onClick={handleLogout}
+                sx={{
+                  borderRadius: '20px',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
                 Logout
               </Button>
             </Box>
@@ -477,21 +521,50 @@ const Dashboard = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={4}>
               <Card sx={{
-                borderLeft: '4px solid #f44336',
+                borderLeft: `4px solid ${highlightColor}`,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                borderRadius: '8px',
                 '&:hover': {
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)'
+                  boxShadow: '0 8px 24px rgba(2, 48, 71, 0.15)'
                 }
               }}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography 
+                    variant="h6" 
+                    gutterBottom
+                    sx={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primaryColor,
+                      fontWeight: 600
+                    }}
+                  >
                     New Orders
                   </Typography>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h3">{newOrders.length}</Typography>
+                    <Typography 
+                      variant="h3"
+                      sx={{ 
+                        fontFamily: "'Poppins', sans-serif",
+                        color: primaryColor,
+                        fontWeight: 700
+                      }}
+                    >
+                      {newOrders.length}
+                    </Typography>
                     <Button 
-                      variant="contained" 
-                      color="primary"
+                      variant="contained"
                       onClick={handleViewOrders}
+                      sx={{
+                        bgcolor: highlightColor,
+                        color: '#000',
+                        fontWeight: 600,
+                        borderRadius: '20px',
+                        textTransform: 'none',
+                        fontFamily: "'Poppins', sans-serif",
+                        '&:hover': {
+                          bgcolor: '#ffaa00',
+                        }
+                      }}
                     >
                       View Orders
                     </Button>
@@ -503,24 +576,53 @@ const Dashboard = () => {
             {/* Add Total Orders Card */}
             <Grid item xs={12} sm={4}>
               <Card sx={{
-                borderLeft: '4px solid #4caf50',
+                borderLeft: `4px solid ${secondaryColor}`,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                borderRadius: '8px',
                 '&:hover': {
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)'
+                  boxShadow: '0 8px 24px rgba(2, 48, 71, 0.15)'
                 }
               }}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography 
+                    variant="h6" 
+                    gutterBottom
+                    sx={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primaryColor,
+                      fontWeight: 600
+                    }}
+                  >
                     Total Orders
                   </Typography>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h3" id="total-orders-count">
+                    <Typography 
+                      variant="h3" 
+                      id="total-orders-count"
+                      sx={{ 
+                        fontFamily: "'Poppins', sans-serif",
+                        color: primaryColor,
+                        fontWeight: 700
+                      }}
+                    >
                       {ordersFetched ? totalOrders : 
-                        <CircularProgress size={32} sx={{ color: '#4caf50', marginLeft: 1 }} />}
+                        <CircularProgress size={32} sx={{ color: secondaryColor, marginLeft: 1 }} />}
                     </Typography>
                     <Button 
-                      variant="outlined" 
-                      color="primary"
+                      variant="outlined"
                       onClick={() => navigate('/admin/orders?filter=all')}
+                      sx={{
+                        color: secondaryColor,
+                        borderColor: secondaryColor,
+                        borderRadius: '20px',
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        fontFamily: "'Poppins', sans-serif",
+                        '&:hover': {
+                          bgcolor: 'rgba(33, 158, 188, 0.04)',
+                          borderColor: secondaryColor,
+                        }
+                      }}
                     >
                       View All
                     </Button>
@@ -532,29 +634,61 @@ const Dashboard = () => {
             {/* Add Quick Access Card */}
             <Grid item xs={12} sm={4}>
               <Card sx={{
-                borderLeft: '4px solid #2196f3',
+                borderLeft: `4px solid ${primaryColor}`,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                borderRadius: '8px',
                 '&:hover': {
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)'
+                  boxShadow: '0 8px 24px rgba(2, 48, 71, 0.15)'
                 }
               }}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography 
+                    variant="h6" 
+                    gutterBottom
+                    sx={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primaryColor,
+                      fontWeight: 600
+                    }}
+                  >
                     Quick Actions
                   </Typography>
                   <Box display="flex" flexWrap="wrap" gap={1}>
                     <Button 
-                      variant="outlined" 
-                      color="primary" 
+                      variant="outlined"
                       size="small"
                       onClick={openAddItemDialog}
+                      sx={{
+                        color: primaryColor,
+                        borderColor: primaryColor,
+                        borderRadius: '18px',
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        fontFamily: "'Poppins', sans-serif",
+                        '&:hover': {
+                          bgcolor: 'rgba(2, 48, 71, 0.04)',
+                          borderColor: primaryColor,
+                        }
+                      }}
                     >
                       Add Menu Item
                     </Button>
                     <Button 
-                      variant="outlined" 
-                      color="primary"
-                      size="small" 
+                      variant="outlined"
+                      size="small"
                       onClick={() => navigate('/admin/settings')}
+                      sx={{
+                        color: primaryColor,
+                        borderColor: primaryColor,
+                        borderRadius: '18px',
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        fontFamily: "'Poppins', sans-serif",
+                        '&:hover': {
+                          bgcolor: 'rgba(2, 48, 71, 0.04)',
+                          borderColor: primaryColor,
+                        }
+                      }}
                     >
                       Settings
                     </Button>
@@ -567,16 +701,29 @@ const Dashboard = () => {
 
         <Box mb={4}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h5">Menu Management</Typography>
+            <Typography 
+              variant="h5"
+              sx={{ 
+                fontFamily: "'Poppins', sans-serif",
+                color: primaryColor,
+                fontWeight: 600
+              }}
+            >
+              Menu Management
+            </Typography>
             <Button 
-              variant="contained" 
-              color="primary" 
+              variant="contained"
               startIcon={<Add />}
               onClick={openAddItemDialog}
               sx={{
-                bgcolor: primaryColor,
+                bgcolor: highlightColor,
+                color: '#000',
+                fontWeight: 600,
+                borderRadius: '20px',
+                textTransform: 'none',
+                fontFamily: "'Poppins', sans-serif",
                 '&:hover': {
-                  bgcolor: '#3e1e09',
+                  bgcolor: '#ffaa00',
                 }
               }}
             >
@@ -586,32 +733,49 @@ const Dashboard = () => {
 
           {loading ? (
             <Box display="flex" justifyContent="center" my={4}>
-              <CircularProgress />
+              <CircularProgress sx={{ color: highlightColor }} />
             </Box>
           ) : (
-            <TableContainer component={Paper}>
+            <TableContainer 
+              component={Paper}
+              sx={{ 
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                overflow: 'hidden'
+              }}
+            >
               <Table>
-                <TableHead>
+                <TableHead sx={{ bgcolor: primaryColor }}>
                   <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell>Actions</TableCell>
+                    <TableCell sx={{ color: 'white', fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>ID</TableCell>
+                    <TableCell sx={{ color: 'white', fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Name</TableCell>
+                    <TableCell sx={{ color: 'white', fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Description</TableCell>
+                    <TableCell sx={{ color: 'white', fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Price</TableCell>
+                    <TableCell sx={{ color: 'white', fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Category</TableCell>
+                    <TableCell sx={{ color: 'white', fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {menuItems.length > 0 ? (
                     menuItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.description}</TableCell>
-                        <TableCell>₹{item.price}</TableCell>
-                        <TableCell>{item.category}</TableCell>
+                      <TableRow 
+                        key={item.id}
+                        sx={{ 
+                          '&:hover': { bgcolor: 'rgba(2, 48, 71, 0.02)' },
+                          transition: 'background-color 0.2s'
+                        }}
+                      >
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>{item.id}</TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500 }}>{item.name}</TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>{item.description}</TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>₹{item.price}</TableCell>
+                        <TableCell sx={{ fontFamily: "'Poppins', sans-serif" }}>{item.category}</TableCell>
                         <TableCell>
-                          <IconButton color="primary" onClick={() => openEditItemDialog(item)}>
+                          <IconButton 
+                            color="primary" 
+                            onClick={() => openEditItemDialog(item)}
+                            sx={{ color: secondaryColor }}
+                          >
                             <Edit />
                           </IconButton>
                           <IconButton color="error" onClick={() => openDeleteItemDialog(item)}>
@@ -622,7 +786,7 @@ const Dashboard = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} align="center">
+                      <TableCell colSpan={6} align="center" sx={{ fontFamily: "'Poppins', sans-serif" }}>
                         No menu items found
                       </TableCell>
                     </TableRow>
@@ -635,8 +799,19 @@ const Dashboard = () => {
       </Box>
 
       {/* Add Menu Item Dialog */}
-      <Dialog open={openAddDialog} onClose={handleCloseAllDialogs} fullWidth>
-        <DialogTitle>Add New Menu Item</DialogTitle>
+      <Dialog 
+        open={openAddDialog} 
+        onClose={handleCloseAllDialogs} 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontFamily: "'Poppins', sans-serif", color: primaryColor }}>
+          Add New Menu Item
+        </DialogTitle>
         <DialogContent>
           <TextField
             margin="dense"
@@ -645,6 +820,16 @@ const Dashboard = () => {
             value={newItem.name}
             onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
             required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: primaryColor,
+                },
+              },
+              '& .MuiFormLabel-root.Mui-focused': {
+                color: primaryColor,
+              },
+            }}
           />
           <TextField
             margin="dense"
@@ -654,6 +839,16 @@ const Dashboard = () => {
             rows={3}
             value={newItem.description}
             onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: primaryColor,
+                },
+              },
+              '& .MuiFormLabel-root.Mui-focused': {
+                color: primaryColor,
+              },
+            }}
           />
           <TextField
             margin="dense"
@@ -663,6 +858,16 @@ const Dashboard = () => {
             value={newItem.price}
             onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
             required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: primaryColor,
+                },
+              },
+              '& .MuiFormLabel-root.Mui-focused': {
+                color: primaryColor,
+              },
+            }}
           />
           <TextField
             margin="dense"
@@ -671,6 +876,16 @@ const Dashboard = () => {
             value={newItem.category}
             onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
             required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: primaryColor,
+                },
+              },
+              '& .MuiFormLabel-root.Mui-focused': {
+                color: primaryColor,
+              },
+            }}
           />
           <TextField
             margin="dense"
@@ -679,6 +894,16 @@ const Dashboard = () => {
             value={newItem.image_url}
             onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
             helperText="Enter a local path (e.g. /images/food.jpg) or a complete URL (https://...)"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: primaryColor,
+                },
+              },
+              '& .MuiFormLabel-root.Mui-focused': {
+                color: primaryColor,
+              },
+            }}
           />
           <Box mt={2}>
             <Button
@@ -689,9 +914,12 @@ const Dashboard = () => {
                 mb: 2,
                 borderColor: primaryColor,
                 color: primaryColor,
+                borderRadius: '20px',
+                textTransform: 'none',
+                fontFamily: "'Poppins', sans-serif",
                 '&:hover': {
-                  borderColor: secondaryColor,
-                  backgroundColor: 'rgba(106, 78, 56, 0.04)'
+                  bgcolor: 'rgba(2, 48, 71, 0.04)',
+                  borderColor: primaryColor,
                 }
               }}
             >
@@ -774,7 +1002,14 @@ const Dashboard = () => {
 
           {/* Improved Image Preview */}
           <Box mt={2} display="flex" flexDirection="column" alignItems="center">
-            <Typography variant="caption" color="textSecondary" sx={{ mb: 1 }}>
+            <Typography 
+              variant="caption" 
+              color="textSecondary" 
+              sx={{ 
+                mb: 1,
+                fontFamily: "'Poppins', sans-serif" 
+              }}
+            >
               Image Preview {newItem.uploading && '(Uploading...)'}
             </Typography>
             <Box
@@ -814,11 +1049,15 @@ const Dashboard = () => {
                     }}
                   />
                   {newItem.uploading && (
-                    <CircularProgress size={40} sx={{ position: 'absolute', color: primaryColor }} />
+                    <CircularProgress size={40} sx={{ position: 'absolute', color: highlightColor }} />
                   )}
                 </>
               ) : (
-                <Typography variant="body2" color="textSecondary">
+                <Typography 
+                  variant="body2" 
+                  color="textSecondary"
+                  sx={{ fontFamily: "'Poppins', sans-serif" }}
+                >
                   No image selected
                 </Typography>
               )}
@@ -827,7 +1066,11 @@ const Dashboard = () => {
               <Button 
                 size="small"
                 color="error"
-                sx={{ mt: 1 }}
+                sx={{ 
+                  mt: 1,
+                  fontFamily: "'Poppins', sans-serif",
+                  textTransform: 'none',
+                }}
                 onClick={() => setNewItem({...newItem, image_url: ''})}
               >
                 Remove Image
@@ -836,16 +1079,50 @@ const Dashboard = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAllDialogs}>Cancel</Button>
-          <Button onClick={handleAddItem} color="primary" variant="contained">
+          <Button 
+            onClick={handleCloseAllDialogs}
+            sx={{ 
+              color: 'text.secondary',
+              fontFamily: "'Poppins', sans-serif",
+              textTransform: 'none',
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleAddItem} 
+            variant="contained"
+            sx={{
+              bgcolor: highlightColor,
+              color: '#000',
+              fontWeight: 600,
+              borderRadius: '20px',
+              textTransform: 'none',
+              fontFamily: "'Poppins', sans-serif",
+              '&:hover': {
+                bgcolor: '#ffaa00',
+              }
+            }}
+          >
             Add Item
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Edit Menu Item Dialog */}
-      <Dialog open={openEditDialog} onClose={handleCloseAllDialogs} fullWidth>
-        <DialogTitle>Edit Menu Item</DialogTitle>
+      <Dialog 
+        open={openEditDialog} 
+        onClose={handleCloseAllDialogs} 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontFamily: "'Poppins', sans-serif", color: primaryColor }}>
+          Edit Menu Item
+        </DialogTitle>
         <DialogContent>
           {currentItem && (
             <>
@@ -856,6 +1133,16 @@ const Dashboard = () => {
                 value={currentItem.name}
                 onChange={(e) => setCurrentItem({ ...currentItem, name: e.target.value })}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: primaryColor,
+                    },
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': {
+                    color: primaryColor,
+                  },
+                }}
               />
               <TextField
                 margin="dense"
@@ -865,6 +1152,16 @@ const Dashboard = () => {
                 rows={3}
                 value={currentItem.description}
                 onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: primaryColor,
+                    },
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': {
+                    color: primaryColor,
+                  },
+                }}
               />
               <TextField
                 margin="dense"
@@ -874,6 +1171,16 @@ const Dashboard = () => {
                 value={currentItem.price}
                 onChange={(e) => setCurrentItem({ ...currentItem, price: e.target.value })}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: primaryColor,
+                    },
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': {
+                    color: primaryColor,
+                  },
+                }}
               />
               <TextField
                 margin="dense"
@@ -882,6 +1189,16 @@ const Dashboard = () => {
                 value={currentItem.category}
                 onChange={(e) => setCurrentItem({ ...currentItem, category: e.target.value })}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: primaryColor,
+                    },
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': {
+                    color: primaryColor,
+                  },
+                }}
               />
               <TextField
                 margin="dense"
@@ -890,9 +1207,26 @@ const Dashboard = () => {
                 value={currentItem.image_url || ''}
                 onChange={(e) => setCurrentItem({ ...currentItem, image_url: e.target.value })}
                 helperText="Example: /images/dosa.jpg"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: primaryColor,
+                    },
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': {
+                    color: primaryColor,
+                  },
+                }}
               />
               <Box mt={2} display="flex" flexDirection="column" alignItems="center">
-                <Typography variant="caption" color="textSecondary" sx={{ mb: 1 }}>
+                <Typography 
+                  variant="caption" 
+                  color="textSecondary" 
+                  sx={{ 
+                    mb: 1,
+                    fontFamily: "'Poppins', sans-serif" 
+                  }}
+                >
                   Image Preview
                 </Typography>
                 <Box
@@ -922,7 +1256,11 @@ const Dashboard = () => {
                       }}
                     />
                   ) : (
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography 
+                      variant="body2" 
+                      color="textSecondary"
+                      sx={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
                       No image URL provided
                     </Typography>
                   )}
@@ -932,24 +1270,75 @@ const Dashboard = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAllDialogs}>Cancel</Button>
-          <Button onClick={handleEditItem} color="primary" variant="contained">
+          <Button 
+            onClick={handleCloseAllDialogs}
+            sx={{ 
+              color: 'text.secondary',
+              fontFamily: "'Poppins', sans-serif",
+              textTransform: 'none',
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleEditItem} 
+            variant="contained"
+            sx={{
+              bgcolor: highlightColor,
+              color: '#000',
+              fontWeight: 600,
+              borderRadius: '20px',
+              textTransform: 'none',
+              fontFamily: "'Poppins', sans-serif",
+              '&:hover': {
+                bgcolor: '#ffaa00',
+              }
+            }}
+          >
             Save Changes
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={openDeleteDialog} onClose={handleCloseAllDialogs}>
-        <DialogTitle>Delete Menu Item</DialogTitle>
+      <Dialog 
+        open={openDeleteDialog} 
+        onClose={handleCloseAllDialogs}
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontFamily: "'Poppins', sans-serif", color: primaryColor }}>
+          Delete Menu Item
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText sx={{ fontFamily: "'Poppins', sans-serif" }}>
             Are you sure you want to delete "{currentItem?.name}"? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAllDialogs}>Cancel</Button>
-          <Button onClick={handleDeleteItem} color="error" variant="contained">
+          <Button 
+            onClick={handleCloseAllDialogs}
+            sx={{ 
+              color: 'text.secondary',
+              fontFamily: "'Poppins', sans-serif",
+              textTransform: 'none',
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteItem} 
+            color="error" 
+            variant="contained"
+            sx={{
+              borderRadius: '20px',
+              textTransform: 'none',
+              fontFamily: "'Poppins', sans-serif",
+            }}
+          >
             Delete
           </Button>
         </DialogActions>
@@ -964,7 +1353,13 @@ const Dashboard = () => {
         <Alert 
           onClose={() => setSnackbar({ ...snackbar, open: false })} 
           severity={snackbar.severity} 
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            fontFamily: "'Poppins', sans-serif",
+            '& .MuiAlert-icon': {
+              color: snackbar.severity === 'success' ? highlightColor : undefined
+            }
+          }}
         >
           {snackbar.message}
         </Alert>

@@ -22,9 +22,11 @@ import {
 import { AddShoppingCart } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
-const primaryColor = '#6a4e38'; // A slightly lighter, warmer brown
-const secondaryColor = '#a1887f'; // A muted, dusty rose
-const accentColor = '#f5f0e1'; // Off-white, creamy background
+// Update colors to match the site theme
+const primaryColor = '#023047'; // Blue from header
+const secondaryColor = '#219ebc'; // Lighter blue accent
+const accentColor = '#f8f9fa'; // Light background
+const highlightColor = '#ffb703'; // Yellow accent from header
 
 const groupItemsByCategory = (items) => {
     const grouped = items.reduce((acc, item) => {
@@ -95,7 +97,7 @@ const Menu = () => {
         return (
             <Layout>
                 <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
-                    <CircularProgress />
+                    <CircularProgress sx={{ color: highlightColor }} />
                 </Box>
             </Layout>
         );
@@ -105,7 +107,9 @@ const Menu = () => {
         return (
             <Layout>
                 <Container sx={{ mt: 4, mb: 4 }}>
-                    <Typography variant="h6">No menu items available</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: "'Poppins', sans-serif" }}>
+                        No menu items available
+                    </Typography>
                 </Container>
             </Layout>
         );
@@ -134,9 +138,9 @@ const Menu = () => {
                 <Typography
                     variant="h4"
                     sx={{
-                        fontFamily: "'Playfair Display', serif",
+                        fontFamily: "'Poppins', sans-serif",
                         fontWeight: 700,
-                        color: primaryColor, // Use primary color
+                        color: primaryColor, // Updated to blue
                         mb: 3,
                         textAlign: 'center',
                         letterSpacing: 1,
@@ -153,10 +157,13 @@ const Menu = () => {
                         variant="scrollable"
                         scrollButtons="auto"
                         sx={{
+                            '& .MuiTabs-indicator': {
+                                backgroundColor: highlightColor, // Yellow indicator
+                            },
                             '& .MuiTab-root': {
-                                color: secondaryColor,
+                                color: secondaryColor, // Light blue for inactive tabs
                                 '&.Mui-selected': {
-                                    color: primaryColor,
+                                    color: primaryColor, // Dark blue for active tab
                                 },
                             },
                         }}
@@ -169,6 +176,7 @@ const Menu = () => {
                                 sx={{
                                     textTransform: 'capitalize',
                                     fontWeight: 600,
+                                    fontFamily: "'Poppins', sans-serif",
                                 }}
                             />
                         ))}
@@ -186,12 +194,12 @@ const Menu = () => {
                                     flexDirection: 'column',
                                     borderRadius: '14px',
                                     overflow: 'hidden',
-                                    background: accentColor, // Use accent color for background
-                                    boxShadow: '0 4px 16px rgba(85,42,15,0.07)',
+                                    background: accentColor, // Light background
+                                    boxShadow: '0 4px 16px rgba(2,48,71,0.07)', // Updated shadow color
                                     transition: 'transform 0.25s, box-shadow 0.25s',
                                     '&:hover': {
                                         transform: 'scale(1.03)',
-                                        boxShadow: '0 8px 32px rgba(85,42,15,0.18)',
+                                        boxShadow: '0 8px 32px rgba(2,48,71,0.18)', // Updated shadow color
                                     },
                                 }}
                             >
@@ -226,12 +234,13 @@ const Menu = () => {
                                             size="small"
                                             variant="outlined"
                                             sx={{
-                                                borderColor: primaryColor, // Use primary color
-                                                color: primaryColor, // Use primary color
+                                                borderColor: primaryColor, // Updated to blue
+                                                color: primaryColor, // Updated to blue
                                                 fontWeight: 500,
                                                 mb: 1,
                                                 fontSize: 13,
-                                                background: 'rgba(85,42,15,0.04)',
+                                                background: 'rgba(2,48,71,0.04)', // Updated background
+                                                fontFamily: "'Poppins', sans-serif",
                                             }}
                                         />
                                     )}
@@ -239,9 +248,9 @@ const Menu = () => {
                                         variant="h6"
                                         sx={{
                                             fontWeight: 700,
-                                            fontFamily: "'Playfair Display', serif",
+                                            fontFamily: "'Poppins', sans-serif", // Updated font
                                             mb: 0.5,
-                                            color: primaryColor, // Use primary color
+                                            color: primaryColor, // Updated to blue
                                             fontSize: 18,
                                         }}
                                     >
@@ -252,7 +261,7 @@ const Menu = () => {
                                         color="text.secondary"
                                         sx={{
                                             mb: 1.2,
-                                            fontFamily: 'Roboto, sans-serif',
+                                            fontFamily: "'Poppins', sans-serif", // Updated font
                                             fontSize: 14,
                                             lineHeight: 1.5,
                                         }}
@@ -264,9 +273,10 @@ const Menu = () => {
                                     <Typography
                                         variant="subtitle1"
                                         sx={{
-                                            color: primaryColor, // Use primary color
+                                            color: primaryColor, // Updated to blue
                                             fontWeight: 600,
                                             fontSize: 16,
+                                            fontFamily: "'Poppins', sans-serif",
                                         }}
                                     >
                                         ₹{item.price}
@@ -279,15 +289,19 @@ const Menu = () => {
                                         onClick={() => handleAddToCart(item)}
                                         fullWidth
                                         sx={{
-                                            bgcolor: primaryColor, // Use primary color
+                                            bgcolor: highlightColor, // Updated to yellow
+                                            color: '#000', // Black text on yellow background
                                             fontWeight: 600,
                                             textTransform: 'none',
                                             py: 1,
-                                            borderRadius: '22px',
+                                            borderRadius: '20px', // Making consistent with other buttons
                                             fontSize: 15,
                                             letterSpacing: 0.5,
-                                            boxShadow: '0 2px 8px rgba(85,42,15,0.08)',
-                                            '&:hover': { bgcolor: '#3e1e09' },
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                            '&:hover': { 
+                                                bgcolor: '#ffaa00' // Darker yellow on hover
+                                            },
+                                            fontFamily: "'Poppins', sans-serif",
                                         }}
                                     >
                                         Add to Cart
@@ -303,7 +317,16 @@ const Menu = () => {
                     autoHideDuration={3000}
                     onClose={() => setSnackbar({ ...snackbar, open: false })}
                 >
-                    <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                    <Alert 
+                        severity={snackbar.severity} 
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                        sx={{
+                            fontFamily: "'Poppins', sans-serif",
+                            '& .MuiAlert-icon': {
+                                color: snackbar.severity === 'success' ? highlightColor : undefined
+                            }
+                        }}
+                    >
                         {snackbar.message}
                     </Alert>
                 </Snackbar>
